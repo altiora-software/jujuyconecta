@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, MapPin, Users, Briefcase, Shield } from "lucide-react";
+import JujuyConectaAssistantModal from "../assistant/JujuyConectaAssistantModal";
 
 type Counts = {
   lines: number | null;
@@ -24,6 +25,7 @@ export function Hero() {
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -130,9 +132,8 @@ export function Hero() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>
             </Button>
-            <Button asChild size="lg" variant="secondary" className="border-white/20 text-white hover:bg-white/10">
-              <a href="/jobs">Ver empleos disponibles</a>
-            </Button>
+            <Button onClick={() => setOpen(true)}>Abrir asistente</Button>
+            <JujuyConectaAssistantModal open={open} onClose={() => setOpen(false)} />
           </div>
 
           {/* Stats (reales) */}
