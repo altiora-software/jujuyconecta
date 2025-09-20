@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useToast } from "@/hooks/use-toast";
+import { AuthButton } from "@/components/auth/AuthButton";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -113,6 +114,7 @@ export function Navbar() {
                 </Badge>
               )}
             </Button>
+            <AuthButton />
           </div>
 
           {/* Mobile Menu Button */}

@@ -14,7 +14,289 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      jobs: {
+        Row: {
+          active: boolean | null
+          category: string
+          contact_info: string
+          created_at: string
+          description: string
+          expires_at: string | null
+          featured: boolean | null
+          id: string
+          location: string
+          requirements: string | null
+          salary_range: string | null
+          title: string
+          type: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          category: string
+          contact_info: string
+          created_at?: string
+          description: string
+          expires_at?: string | null
+          featured?: boolean | null
+          id?: string
+          location: string
+          requirements?: string | null
+          salary_range?: string | null
+          title: string
+          type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          category?: string
+          contact_info?: string
+          created_at?: string
+          description?: string
+          expires_at?: string | null
+          featured?: boolean | null
+          id?: string
+          location?: string
+          requirements?: string | null
+          salary_range?: string | null
+          title?: string
+          type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          role: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      security_alerts: {
+        Row: {
+          active: boolean | null
+          category: string
+          created_at: string
+          description: string
+          featured: boolean | null
+          id: string
+          severity: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          category: string
+          created_at?: string
+          description: string
+          featured?: boolean | null
+          id?: string
+          severity?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          category?: string
+          created_at?: string
+          description?: string
+          featured?: boolean | null
+          id?: string
+          severity?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      social_resources: {
+        Row: {
+          active: boolean | null
+          address: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          needs: string[] | null
+          schedule: string | null
+          type: string
+          updated_at: string
+          verified: boolean | null
+        }
+        Insert: {
+          active?: boolean | null
+          address: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          needs?: string[] | null
+          schedule?: string | null
+          type: string
+          updated_at?: string
+          verified?: boolean | null
+        }
+        Update: {
+          active?: boolean | null
+          address?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          needs?: string[] | null
+          schedule?: string | null
+          type?: string
+          updated_at?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
+      transport_lines: {
+        Row: {
+          active: boolean | null
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+          number: string
+          route_description: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          number: string
+          route_description?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          number?: string
+          route_description?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      transport_reports: {
+        Row: {
+          created_at: string
+          id: string
+          line_id: string
+          message: string
+          severity: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          line_id: string
+          message: string
+          severity?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          line_id?: string
+          message?: string
+          severity?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transport_reports_line_id_fkey"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "transport_lines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transport_stops: {
+        Row: {
+          created_at: string
+          id: string
+          latitude: number
+          line_id: string
+          longitude: number
+          name: string
+          order_index: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          latitude: number
+          line_id: string
+          longitude: number
+          name: string
+          order_index: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          latitude?: number
+          line_id?: string
+          longitude?: number
+          name?: string
+          order_index?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transport_stops_line_id_fkey"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "transport_lines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

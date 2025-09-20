@@ -8,6 +8,7 @@ import Transport from "./pages/Transport";
 import Resources from "./pages/Resources";
 import Jobs from "./pages/Jobs";
 import Security from "./pages/Security";
+import Admin from "./pages/Admin";
 import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/resources" element={<Resources />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/security" element={<Security />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/notifications" element={<Notifications />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
