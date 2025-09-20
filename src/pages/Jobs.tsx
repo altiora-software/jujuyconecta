@@ -1,12 +1,18 @@
+// app/empleos/page.tsx (o donde tengas tu ruta)
+// Nota: usa shadcn/ui, Supabase client, y Tailwind como en el resto del proyecto.
+
 import { Layout } from "@/components/layout/Layout";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, MapPin, Clock, DollarSign, Filter, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Briefcase, MapPin, Clock, DollarSign, Filter, Search, Clipboard, ClipboardCheck, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Job {
@@ -14,7 +20,7 @@ interface Job {
   title: string;
   description: string;
   category: string;
-  type: 'formal' | 'informal';
+  type: "formal" | "informal";
   salary_range: string | null;
   location: string;
   contact_info: string;
@@ -28,29 +34,48 @@ interface Job {
 export default function Jobs() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('todos');
-  const [selectedType, setSelectedType] = useState('todos');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("todos");
+  const [selectedType, setSelectedType] = useState("todos");
   const [loading, setLoading] = useState(true);
+  const [revealId, setRevealId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // modal publicar
+  const [openPost, setOpenPost] = useState(false);
+  const [posting, setPosting] = useState(false);
+  const [postForm, setPostForm] = useState({
+    title: "",
+    type: "" as "" | "formal" | "informal",
+    category: "",
+    description: "",
+    location: "",
+    contact_info: "",
+    salary_range: "",
+    requirements: "",
+    // opcional: fecha de expiración
+    expires_at: "",
+  });
+
   const { toast } = useToast();
 
   const categories = [
-    { value: 'todos', label: 'Todas las categorías' },
-    { value: 'comercio', label: 'Comercio' },
-    { value: 'construccion', label: 'Construcción' },
-    { value: 'domestico', label: 'Doméstico' },
-    { value: 'administrativo', label: 'Administrativo' },
-    { value: 'gastronomia', label: 'Gastronomía' },
-    { value: 'educacion', label: 'Educación' },
-    { value: 'salud', label: 'Salud' },
-    { value: 'transporte', label: 'Transporte' },
-    { value: 'otros', label: 'Otros' }
+    { value: "todos", label: "Todas las categorías" },
+    { value: "comercio", label: "Comercio" },
+    { value: "construccion", label: "Construcción" },
+    { value: "domestico", label: "Doméstico" },
+    { value: "administrativo", label: "Administrativo" },
+    { value: "gastronomia", label: "Gastronomía" },
+    { value: "educacion", label: "Educación" },
+    { value: "salud", label: "Salud" },
+    { value: "transporte", label: "Transporte" },
+    { value: "otros", label: "Otros" },
   ];
 
   const types = [
-    { value: 'todos', label: 'Todos' },
-    { value: 'formal', label: 'Formal' },
-    { value: 'informal', label: 'Informal' }
+    { value: "todos", label: "Todos" },
+    { value: "formal", label: "Formal" },
+    { value: "informal", label: "Informal" },
   ];
 
   useEffect(() => {
@@ -64,20 +89,20 @@ export default function Jobs() {
   const fetchJobs = async () => {
     try {
       const { data, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('active', true)
-        .order('featured', { ascending: false })
-        .order('created_at', { ascending: false });
+        .from("jobs")
+        .select("*")
+        .eq("active", true)
+        .order("featured", { ascending: false })
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       if (data) setJobs(data as Job[]);
     } catch (error) {
-      console.error('Error fetching jobs:', error);
+      console.error("Error fetching jobs:", error);
       toast({
         title: "Error",
         description: "No se pudieron cargar las ofertas laborales",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -85,43 +110,45 @@ export default function Jobs() {
   };
 
   const applyFilters = () => {
-    let filtered = jobs;
+    let filtered = [...jobs];
 
-    // Filter by search query
+    // Search
     if (searchQuery.trim()) {
-      filtered = filtered.filter(job => 
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.location.toLowerCase().includes(searchQuery.toLowerCase())
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (job) =>
+          job.title.toLowerCase().includes(q) ||
+          job.description.toLowerCase().includes(q) ||
+          job.location.toLowerCase().includes(q)
       );
     }
 
-    // Filter by category
-    if (selectedCategory !== 'todos') {
-      filtered = filtered.filter(job => job.category === selectedCategory);
+    // Category
+    if (selectedCategory !== "todos") {
+      filtered = filtered.filter((job) => job.category === selectedCategory);
     }
 
-    // Filter by type
-    if (selectedType !== 'todos') {
-      filtered = filtered.filter(job => job.type === selectedType);
+    // Type
+    if (selectedType !== "todos") {
+      filtered = filtered.filter((job) => job.type === selectedType);
     }
 
     setFilteredJobs(filtered);
   };
 
   const getCategoryLabel = (category: string) => {
-    return categories.find(c => c.value === category)?.label || category;
+    return categories.find((c) => c.value === category)?.label || category;
   };
 
   const getTypeLabel = (type: string) => {
-    return type === 'formal' ? 'Formal' : 'Informal';
+    return type === "formal" ? "Formal" : "Informal";
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-AR', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+    return new Date(dateString).toLocaleDateString("es-AR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
   };
 
@@ -131,11 +158,92 @@ export default function Jobs() {
     const now = new Date();
     const diffDays = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     return diffDays <= 3 && diffDays > 0;
-  };
+    };
 
   const isExpired = (expiresAt: string | null) => {
     if (!expiresAt) return false;
     return new Date(expiresAt) < new Date();
+  };
+
+  const copyContact = async (id: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 1500);
+      toast({ title: "Contacto copiado", description: "Pegalo en WhatsApp, mail o donde quieras." });
+    } catch {
+      // ignore
+    }
+  };
+
+  const canSubmit = useMemo(() => {
+    const f = postForm;
+    return (
+      f.title.trim().length >= 4 &&
+      (f.type === "formal" || f.type === "informal") &&
+      !!f.category &&
+      f.description.trim().length >= 10 &&
+      f.location.trim().length >= 3 &&
+      f.contact_info.trim().length >= 5
+    );
+  }, [postForm]);
+
+  const submitOffer = async () => {
+    try {
+      if (!canSubmit) {
+        toast({
+          title: "Datos incompletos",
+          description: "Completá título, tipo, categoría, descripción, ubicación y contacto.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setPosting(true);
+
+      const payload = {
+        title: postForm.title.trim(),
+        type: postForm.type,
+        category: postForm.category,
+        description: postForm.description.trim(),
+        location: postForm.location.trim(),
+        contact_info: postForm.contact_info.trim(),
+        salary_range: postForm.salary_range?.trim() || null,
+        requirements: postForm.requirements?.trim() || null,
+        active: true,         // se publica activa automáticamente
+        featured: false,
+        expires_at: postForm.expires_at ? new Date(postForm.expires_at).toISOString() : null,
+      };
+
+      const { error } = await supabase.from("jobs").insert([payload]);
+      if (error) throw error;
+
+      toast({
+        title: "Oferta publicada",
+        description: "Tu oferta quedó visible al instante. ¡Gracias por sumar oportunidades!",
+      });
+      setOpenPost(false);
+      setPostForm({
+        title: "",
+        type: "" as any,
+        category: "",
+        description: "",
+        location: "",
+        contact_info: "",
+        salary_range: "",
+        requirements: "",
+        expires_at: "",
+      });
+      fetchJobs();
+    } catch (e: any) {
+      console.error(e);
+      toast({
+        title: "No se pudo publicar",
+        description: e?.message || "Reintentá en unos minutos.",
+        variant: "destructive",
+      });
+    } finally {
+      setPosting(false);
+    }
   };
 
   if (loading) {
@@ -159,12 +267,179 @@ export default function Jobs() {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
+        {/* Header + explicación */}
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-foreground mb-2">Bolsa de Trabajo</h1>
-          <p className="text-muted-foreground">Oportunidades laborales formales e informales en Jujuy</p>
+          <p className="text-muted-foreground">
+            Oportunidades laborales <strong>formales</strong> e <strong>informales</strong> en Jujuy.
+          </p>
         </div>
 
-        {/* Filters */}
+        <Card className="mb-6">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-2">
+              <Info className="h-5 w-5 mt-0.5 text-primary" />
+              <div className="space-y-1 text-sm">
+                <p>
+                  <strong>Informal</strong>: trabajos o servicios ofrecidos por personas —por ejemplo{" "}
+                  <em>plomero, electricista, gasista, albañil, jardinería, niñera, cuidado de adultos mayores,
+                  limpieza, chofer por día</em>, etc.
+                </p>
+                <p>
+                  <strong>Formal</strong>: búsquedas laborales de empresas, comercios, instituciones o
+                  contrataciones registradas.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* CTA publicar */}
+        <div className="mb-6 flex justify-end">
+          <Dialog open={openPost} onOpenChange={setOpenPost}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                Publicar oferta
+                <Briefcase className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Publicar nueva oferta</DialogTitle>
+                <DialogDescription>
+                  Se valida automáticamente y se publica al instante. Podés editar luego desde administración.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Título *</Label>
+                    <Input
+                      id="title"
+                      value={postForm.title}
+                      onChange={(e) => setPostForm((p) => ({ ...p, title: e.target.value }))}
+                      placeholder="Ej: Electricista matriculado / Cajero para supermercado"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Tipo *</Label>
+                    <Select
+                      value={postForm.type || ""}
+                      onValueChange={(v: "formal" | "informal") => setPostForm((p) => ({ ...p, type: v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Elegir tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="informal">Informal</SelectItem>
+                        <SelectItem value="formal">Formal</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Categoría *</Label>
+                    <Select
+                      value={postForm.category}
+                      onValueChange={(v) => setPostForm((p) => ({ ...p, category: v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Elegir categoría" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories
+                          .filter((c) => c.value !== "todos")
+                          .map((c) => (
+                            <SelectItem key={c.value} value={c.value}>
+                              {c.label}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Ubicación *</Label>
+                    <Input
+                      value={postForm.location}
+                      onChange={(e) => setPostForm((p) => ({ ...p, location: e.target.value }))}
+                      placeholder="San Salvador de Jujuy / Palpalá / Perico..."
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Descripción *</Label>
+                  <Textarea
+                    value={postForm.description}
+                    onChange={(e) => setPostForm((p) => ({ ...p, description: e.target.value }))}
+                    rows={4}
+                    placeholder="Contá qué tareas se realizan, jornada, y cualquier detalle relevante."
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Contacto *</Label>
+                    <Input
+                      value={postForm.contact_info}
+                      onChange={(e) => setPostForm((p) => ({ ...p, contact_info: e.target.value }))}
+                      placeholder="Teléfono, WhatsApp o e-mail"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Rango salarial (opcional)</Label>
+                    <Input
+                      value={postForm.salary_range}
+                      onChange={(e) => setPostForm((p) => ({ ...p, salary_range: e.target.value }))}
+                      placeholder="Ej: $500k - $650k"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Requisitos (opcional)</Label>
+                    <Input
+                      value={postForm.requirements}
+                      onChange={(e) => setPostForm((p) => ({ ...p, requirements: e.target.value }))}
+                      placeholder="Experiencia, cursos, carnet, etc."
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Fecha de expiración (opcional)</Label>
+                    <Input
+                      type="date"
+                      value={postForm.expires_at}
+                      onChange={(e) => setPostForm((p) => ({ ...p, expires_at: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setOpenPost(false)}>
+                    Cancelar
+                  </Button>
+                  <Button onClick={submitOffer} disabled={posting || !canSubmit}>
+                    {posting ? "Publicando..." : "Publicar"}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Filtros */}
         <Card className="mb-6">
           <CardContent className="p-4">
             <div className="space-y-4">
@@ -172,10 +447,10 @@ export default function Jobs() {
                 <Filter className="h-4 w-4" />
                 <span className="font-medium">Filtros</span>
               </div>
-              
+
               <div className="grid gap-4 md:grid-cols-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
                     placeholder="Buscar empleos..."
                     value={searchQuery}
@@ -183,13 +458,13 @@ export default function Jobs() {
                     className="pl-10"
                   />
                 </div>
-                
+
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Categoría" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map(category => (
+                    {categories.map((category) => (
                       <SelectItem key={category.value} value={category.value}>
                         {category.label}
                       </SelectItem>
@@ -199,10 +474,10 @@ export default function Jobs() {
 
                 <Select value={selectedType} onValueChange={setSelectedType}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    {types.map(type => (
+                    {types.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
                       </SelectItem>
@@ -218,85 +493,118 @@ export default function Jobs() {
           </CardContent>
         </Card>
 
-        {/* Jobs List */}
+        {/* Listado */}
         <div className="space-y-4">
           {filteredJobs.length === 0 ? (
             <Card>
-              <CardContent className="p-8 text-center">
-                <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No se encontraron empleos con los filtros aplicados</p>
+              <CardContent className="p-8 text-center space-y-3">
+                <Briefcase className="h-12 w-12 mx-auto text-muted-foreground" />
+                <p className="text-muted-foreground">
+                  No hay ofertas que coincidan ahora. ✨
+                  <br />
+                  Te invitamos a volver pronto: cargamos nuevas oportunidades todas las semanas.
+                </p>
+                <div>
+                  <Button onClick={() => setOpenPost(true)}>Publicar tu oportunidad</Button>
+                </div>
               </CardContent>
             </Card>
           ) : (
-            filteredJobs.map((job) => (
-              <Card key={job.id} className={`hover:shadow-md transition-shadow ${job.featured ? 'border-primary' : ''}`}>
-                <CardContent className="p-6">
-                  <div className="flex flex-col space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          {job.featured && (
-                            <Badge className="bg-gradient-hero text-white">Destacado</Badge>
-                          )}
-                          <Badge variant="outline">
-                            {getCategoryLabel(job.category)}
-                          </Badge>
-                          <Badge variant={job.type === 'formal' ? 'default' : 'secondary'}>
-                            {getTypeLabel(job.type)}
-                          </Badge>
-                          {job.expires_at && isExpiringSoon(job.expires_at) && (
-                            <Badge variant="destructive">Expira pronto</Badge>
-                          )}
-                        </div>
-                        
-                        <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
-                        <p className="text-muted-foreground mb-3 line-clamp-2">{job.description}</p>
-                        
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" />
-                            <span>{job.location}</span>
+            filteredJobs.map((job) => {
+              const revealed = revealId === job.id;
+              const copied = copiedId === job.id;
+              return (
+                <Card
+                  key={job.id}
+                  className={`hover:shadow-md transition-shadow ${job.featured ? "border-primary" : ""}`}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex flex-col space-y-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            {job.featured && <Badge className="bg-gradient-hero text-white">Destacado</Badge>}
+                            <Badge variant="outline">{getCategoryLabel(job.category)}</Badge>
+                            <Badge variant={job.type === "formal" ? "default" : "secondary"}>
+                              {getTypeLabel(job.type)}
+                            </Badge>
+                            {job.expires_at && isExpiringSoon(job.expires_at) && (
+                              <Badge variant="destructive">Expira pronto</Badge>
+                            )}
                           </div>
-                          
-                          {job.salary_range && (
+
+                          <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
+                          <p className="text-muted-foreground mb-3 line-clamp-2">{job.description}</p>
+
+                          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
-                              <DollarSign className="h-4 w-4" />
-                              <span>{job.salary_range}</span>
+                              <MapPin className="h-4 w-4" />
+                              <span>{job.location}</span>
                             </div>
-                          )}
-                          
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            <span>Publicado {formatDate(job.created_at)}</span>
+
+                            {job.salary_range && (
+                              <div className="flex items-center gap-1">
+                                <DollarSign className="h-4 w-4" />
+                                <span>{job.salary_range}</span>
+                              </div>
+                            )}
+
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              <span>Publicado {formatDate(job.created_at)}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {job.requirements && (
-                      <div className="pt-2 border-t">
-                        <p className="text-sm">
-                          <span className="font-medium">Requisitos: </span>
-                          <span className="text-muted-foreground">{job.requirements}</span>
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between pt-2 border-t">
-                      {job.expires_at && (
-                        <p className="text-xs text-muted-foreground">
-                          {isExpired(job.expires_at) ? 'Expirado' : `Expira: ${formatDate(job.expires_at)}`}
-                        </p>
+                      {job.requirements && (
+                        <div className="pt-2 border-t">
+                          <p className="text-sm">
+                            <span className="font-medium">Requisitos: </span>
+                            <span className="text-muted-foreground">{job.requirements}</span>
+                          </p>
+                        </div>
                       )}
-                      
-                      <Button disabled className="ml-auto">
-                        Ver contacto
-                      </Button>
+
+                      <div className="flex items-center justify-between pt-2 border-t">
+                        {job.expires_at && (
+                          <p className="text-xs text-muted-foreground">
+                            {isExpired(job.expires_at) ? "Expirado" : `Expira: ${formatDate(job.expires_at)}`}
+                          </p>
+                        )}
+
+                        {!revealed ? (
+                          <Button className="ml-auto" onClick={() => setRevealId(job.id)}>
+                            Ver contacto
+                          </Button>
+                        ) : (
+                          <div className="ml-auto flex items-center gap-2">
+                            <span className="text-sm">{job.contact_info}</span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => copyContact(job.id, job.contact_info)}
+                            >
+                              {copied ? (
+                                <>
+                                  <ClipboardCheck className="h-4 w-4 mr-1" />
+                                  Copiado
+                                </>
+                              ) : (
+                                <>
+                                  <Clipboard className="h-4 w-4 mr-1" />
+                                  Copiar
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+                  </CardContent>
+                </Card>
+              );
+            })
           )}
         </div>
       </div>

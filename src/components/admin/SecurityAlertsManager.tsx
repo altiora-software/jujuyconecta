@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Shield, AlertTriangle } from "lucide-react";
+import { Plus, Edit, Trash2, Shield, AlertTriangle, Upload, Image as ImageIcon } from "lucide-react";
+import * as XLSX from "xlsx";
 
 interface SecurityAlert {
   id: string;
@@ -18,6 +19,7 @@ interface SecurityAlert {
   description: string;
   category: string;
   severity: string;
+  image_url?: string | null;
   active: boolean;
   featured: boolean;
   created_at: string;
@@ -54,8 +56,14 @@ export const SecurityAlertsManager = ({ onUpdate }: SecurityAlertsManagerProps) 
     title: "",
     description: "",
     category: "",
-    severity: "medium"
+    severity: "medium",
+    image_url: ""
   });
+
+  // Estados para importación masiva
+  const [importOpen, setImportOpen] = useState(false);
+  const [parsedRows, setParsedRows] = useState<any[]>([]);
+  const [fileName, setFileName] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -95,10 +103,7 @@ export const SecurityAlertsManager = ({ onUpdate }: SecurityAlertsManagerProps) 
 
         if (error) throw error;
         
-        toast({
-          title: "Alerta actualizada",
-          description: "La alerta de seguridad se actualizó correctamente",
-        });
+        toast({ title: "Alerta actualizada", description: "Se actualizó correctamente" });
       } else {
         const { error } = await supabase
           .from("security_alerts")
@@ -106,10 +111,7 @@ export const SecurityAlertsManager = ({ onUpdate }: SecurityAlertsManagerProps) 
 
         if (error) throw error;
         
-        toast({
-          title: "Alerta creada",
-          description: "La nueva alerta de seguridad se creó correctamente",
-        });
+        toast({ title: "Alerta creada", description: "Se creó correctamente" });
       }
 
       setIsDialogOpen(false);
@@ -119,11 +121,7 @@ export const SecurityAlertsManager = ({ onUpdate }: SecurityAlertsManagerProps) 
       onUpdate();
     } catch (error) {
       console.error("Error saving alert:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo guardar la alerta de seguridad",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "No se pudo guardar la alerta", variant: "destructive" });
     }
   };
 
@@ -132,7 +130,8 @@ export const SecurityAlertsManager = ({ onUpdate }: SecurityAlertsManagerProps) 
       title: "",
       description: "",
       category: "",
-      severity: "medium"
+      severity: "medium",
+      image_url: ""
     });
   };
 
@@ -142,80 +141,64 @@ export const SecurityAlertsManager = ({ onUpdate }: SecurityAlertsManagerProps) 
       title: alert.title,
       description: alert.description,
       category: alert.category,
-      severity: alert.severity
+      severity: alert.severity,
+      image_url: alert.image_url || ""
     });
     setIsDialogOpen(true);
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("¿Estás seguro de que querés eliminar esta alerta?")) return;
+    if (!confirm("¿Seguro de eliminar esta alerta?")) return;
 
     try {
-      const { error } = await supabase
-        .from("security_alerts")
-        .delete()
-        .eq("id", id);
-
+      const { error } = await supabase.from("security_alerts").delete().eq("id", id);
       if (error) throw error;
-      
-      toast({
-        title: "Alerta eliminada",
-        description: "La alerta de seguridad se eliminó correctamente",
-      });
-      
+      toast({ title: "Alerta eliminada", description: "Se eliminó correctamente" });
       fetchAlerts();
       onUpdate();
     } catch (error) {
       console.error("Error deleting alert:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo eliminar la alerta de seguridad",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "No se pudo eliminar", variant: "destructive" });
     }
   };
 
-  const toggleFeatured = async (id: string, currentFeatured: boolean) => {
+  // --- Importación Masiva ---
+  const handleFile = async (file: File) => {
+    setFileName(file.name);
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows: any[] = XLSX.utils.sheet_to_json(sheet);
+
+    setParsedRows(rows);
+  };
+
+  const handleImport = async () => {
+    if (!parsedRows.length) return;
+
     try {
       const { error } = await supabase
         .from("security_alerts")
-        .update({ featured: !currentFeatured })
-        .eq("id", id);
+        .upsert(parsedRows, { onConflict: "title" });
 
       if (error) throw error;
-      
+
+      toast({ title: "Importación completa", description: `${parsedRows.length} filas procesadas` });
+      setImportOpen(false);
+      setParsedRows([]);
       fetchAlerts();
       onUpdate();
     } catch (error) {
-      console.error("Error updating featured status:", error);
+      console.error("Error importando:", error);
+      toast({ title: "Error", description: "No se pudo importar", variant: "destructive" });
     }
   };
 
-  const toggleActive = async (id: string, currentActive: boolean) => {
-    try {
-      const { error } = await supabase
-        .from("security_alerts")
-        .update({ active: !currentActive })
-        .eq("id", id);
+  const getSeverityColor = (severity: string) =>
+    SEVERITY_LEVELS.find(s => s.value === severity)?.color || "bg-gray-500";
 
-      if (error) throw error;
-      
-      fetchAlerts();
-      onUpdate();
-    } catch (error) {
-      console.error("Error updating active status:", error);
-    }
-  };
-
-  const getSeverityColor = (severity: string) => {
-    const level = SEVERITY_LEVELS.find(s => s.value === severity);
-    return level?.color || "bg-gray-500";
-  };
-
-  const getSeverityLabel = (severity: string) => {
-    const level = SEVERITY_LEVELS.find(s => s.value === severity);
-    return level?.label || severity;
-  };
+  const getSeverityLabel = (severity: string) =>
+    SEVERITY_LEVELS.find(s => s.value === severity)?.label || severity;
 
   return (
     <div className="space-y-6">
@@ -228,108 +211,113 @@ export const SecurityAlertsManager = ({ onUpdate }: SecurityAlertsManagerProps) 
                 Gestión de Alertas de Seguridad
               </CardTitle>
               <CardDescription>
-                Administrá las alertas sobre estafas, fraudes y temas de seguridad digital
+                Administrá alertas sobre estafas, fraudes y seguridad ciudadana
               </CardDescription>
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  onClick={() => {
-                    setEditingAlert(null);
-                    resetForm();
-                  }}
-                  className="gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Nueva Alerta
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingAlert ? "Editar Alerta" : "Nueva Alerta de Seguridad"}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {editingAlert ? "Modificá" : "Agregá"} los datos de la alerta de seguridad
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Título de la Alerta *</Label>
+
+            <div className="flex gap-2">
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button onClick={() => { setEditingAlert(null); resetForm(); }} className="gap-2">
+                    <Plus className="h-4 w-4" /> Nueva Alerta
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>{editingAlert ? "Editar Alerta" : "Nueva Alerta"}</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className="space-y-4">
                     <Input
-                      id="title"
+                      placeholder="Título"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="Nueva modalidad de estafa telefónica"
                       required
                     />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="category">Categoría *</Label>
-                      <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar categoría" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ALERT_CATEGORIES.map((category) => (
-                            <SelectItem key={category.value} value={category.value}>
-                              {category.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="severity">Nivel de Gravedad *</Label>
-                      <Select value={formData.severity} onValueChange={(value) => setFormData({ ...formData, severity: value })}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar gravedad" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {SEVERITY_LEVELS.map((level) => (
-                            <SelectItem key={level.value} value={level.value}>
-                              <div className="flex items-center gap-2">
-                                <div className={`w-3 h-3 rounded-full ${level.color}`} />
-                                {level.label}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Descripción Detallada *</Label>
                     <Textarea
-                      id="description"
+                      placeholder="Descripción completa"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Descripción completa de la alerta, cómo identificarla y qué hacer para prevenirla"
-                      rows={6}
+                      rows={4}
                       required
                     />
-                  </div>
+                    <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                      <SelectTrigger><SelectValue placeholder="Categoría" /></SelectTrigger>
+                      <SelectContent>
+                        {ALERT_CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <Select value={formData.severity} onValueChange={(v) => setFormData({ ...formData, severity: v })}>
+                      <SelectTrigger><SelectValue placeholder="Gravedad" /></SelectTrigger>
+                      <SelectContent>
+                        {SEVERITY_LEVELS.map((s) => (
+                          <SelectItem key={s.value} value={s.value}>
+                            <div className="flex gap-2 items-center">
+                              <span className={`w-3 h-3 rounded-full ${s.color}`} /> {s.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      placeholder="URL de imagen"
+                      value={formData.image_url}
+                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                    />
+                    <Button type="submit">{editingAlert ? "Actualizar" : "Crear"}</Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
 
-                  <div className="flex gap-2">
-                    <Button type="submit" className="flex-1">
-                      {editingAlert ? "Actualizar" : "Crear"} Alerta
-                    </Button>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setIsDialogOpen(false)}
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+              <Dialog open={importOpen} onOpenChange={setImportOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="secondary" className="gap-2"><Upload className="h-4 w-4" /> Importar XLSX</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl">
+                  <DialogHeader>
+                    <DialogTitle>Importación masiva</DialogTitle>
+                    <DialogDescription>
+                      Subí un archivo XLSX con las columnas: <code>title, description, category, severity, image_url</code>.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Input type="file" accept=".xlsx" onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleFile(f);
+                  }} />
+                  {fileName && <p className="text-xs mt-2">Archivo: {fileName}</p>}
+                  {parsedRows.length > 0 && (
+                    <>
+                      <p className="text-sm mt-3">Previsualización de {parsedRows.length} filas</p>
+                      <div className="max-h-64 overflow-auto border rounded">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Título</TableHead>
+                              <TableHead>Categoría</TableHead>
+                              <TableHead>Gravedad</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {parsedRows.slice(0, 10).map((r, i) => (
+                              <TableRow key={i}>
+                                <TableCell>{r.title}</TableCell>
+                                <TableCell>{r.category}</TableCell>
+                                <TableCell>{r.severity}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </>
+                  )}
+                  <Button onClick={handleImport} disabled={!parsedRows.length} className="mt-3">
+                    Importar {parsedRows.length} filas
+                  </Button>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </CardHeader>
+
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8">Cargando alertas...</div>
@@ -340,72 +328,31 @@ export const SecurityAlertsManager = ({ onUpdate }: SecurityAlertsManagerProps) 
                   <TableHead>Título</TableHead>
                   <TableHead>Categoría</TableHead>
                   <TableHead>Gravedad</TableHead>
-                  <TableHead>Destacada</TableHead>
-                  <TableHead>Estado</TableHead>
+                  <TableHead>Imagen</TableHead>
                   <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {alerts.map((alert) => (
-                  <TableRow key={alert.id}>
-                    <TableCell>
-                      <div className="max-w-xs">
-                        <div className="font-medium truncate">{alert.title}</div>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {alert.description.substring(0, 60)}...
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {ALERT_CATEGORIES.find(c => c.value === alert.category)?.label || alert.category}
-                      </Badge>
-                    </TableCell>
+                {alerts.map((a) => (
+                  <TableRow key={a.id}>
+                    <TableCell>{a.title}</TableCell>
+                    <TableCell>{ALERT_CATEGORIES.find(c => c.value === a.category)?.label || a.category}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className={`w-3 h-3 rounded-full ${getSeverityColor(alert.severity)}`} />
-                        <span className="text-sm">{getSeverityLabel(alert.severity)}</span>
+                        <span className={`w-3 h-3 rounded-full ${getSeverityColor(a.severity)}`} />
+                        {getSeverityLabel(a.severity)}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge 
-                        variant={alert.featured ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => toggleFeatured(alert.id, alert.featured)}
-                      >
-                        {alert.featured ? (
-                          <><AlertTriangle className="h-3 w-3 mr-1" />Destacada</>
-                        ) : (
-                          "Normal"
-                        )}
-                      </Badge>
+                      {a.image_url ? (
+                        <img src={a.image_url} alt="alerta" className="h-12 w-12 object-cover rounded" />
+                      ) : (
+                        <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                      )}
                     </TableCell>
                     <TableCell>
-                      <Badge 
-                        variant={alert.active ? "default" : "secondary"}
-                        className="cursor-pointer"
-                        onClick={() => toggleActive(alert.id, alert.active)}
-                      >
-                        {alert.active ? "Activa" : "Inactiva"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(alert)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(alert.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Button size="sm" variant="outline" onClick={() => handleEdit(a)}><Edit className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDelete(a.id)}><Trash2 className="h-4 w-4" /></Button>
                     </TableCell>
                   </TableRow>
                 ))}

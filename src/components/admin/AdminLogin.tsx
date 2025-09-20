@@ -7,11 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Lock } from "lucide-react";
 
 interface AdminLoginProps {
-  onLogin: (username: string, password: string) => boolean;
+  onLogin: (email: string, password: string) => Promise<boolean>;
 }
 
 export const AdminLogin = ({ onLogin }: AdminLoginProps) => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");        // ✅ usar email
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -19,23 +19,20 @@ export const AdminLogin = ({ onLogin }: AdminLoginProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    const success = onLogin(username, password);
-    
-    if (success) {
-      toast({
-        title: "Acceso autorizado",
-        description: "Bienvenido al panel de administración",
-      });
-    } else {
-      toast({
-        title: "Acceso denegado",
-        description: "Usuario o contraseña incorrectos",
-        variant: "destructive",
-      });
+    try {
+      const success = await onLogin(email, password); // ✅ ahora existe email
+      if (success) {
+        toast({ title: "Acceso autorizado", description: "Bienvenido al panel de administración" });
+      } else {
+        toast({
+          title: "Acceso denegado",
+          description: "Usuario o contraseña incorrectos o sin permisos",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
@@ -46,20 +43,18 @@ export const AdminLogin = ({ onLogin }: AdminLoginProps) => {
             <Lock className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-2xl">Panel de Administración</CardTitle>
-          <CardDescription>
-            Ingresá tus credenciales para acceder al sistema
-          </CardDescription>
+          <CardDescription>Ingresá tus credenciales para acceder al sistema</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Usuario</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="admin"
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@tu-dominio.com"
                 required
               />
             </div>
@@ -74,16 +69,9 @@ export const AdminLogin = ({ onLogin }: AdminLoginProps) => {
                 required
               />
             </div>
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Verificando..." : "Iniciar Sesión"}
             </Button>
-            <div className="text-xs text-muted-foreground text-center mt-4 p-2 bg-muted/50 rounded">
-              <strong>Demo:</strong> admin / admin123
-            </div>
           </form>
         </CardContent>
       </Card>
