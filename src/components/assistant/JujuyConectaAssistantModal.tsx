@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+
+// ⬇️ Solo enviamos el MENSAJE al agente (sin contexto adicional)
+// y validamos máximo 12 palabras por mensaje.
 
 type Msg = { sender: "user" | "bot"; text: string; booking_url?: string };
 
@@ -23,9 +25,14 @@ export default function JujuyConectaAssistantModal({
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [errorBar, setErrorBar] = useState("");
-  const sessionIdRef = useRef<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const sessionIdRef = useRef<string | null>(null);
+
+  // === Helpers ===
+  const normalize = (s: string) => s.replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
+  const wordCount = (s: string) => (normalize(s) ? normalize(s).split(" ").length : 0);
+  const MAX_WORDS = 12;
 
   // ID de sesión (persistente)
   useEffect(() => {
@@ -50,7 +57,7 @@ export default function JujuyConectaAssistantModal({
     };
   }, [open, onClose]);
 
-  // Bienvenida
+  // Bienvenida (opcional)
   useEffect(() => {
     if (!open || !showWelcome) return;
     setMessages((m) =>
@@ -60,7 +67,7 @@ export default function JujuyConectaAssistantModal({
             {
               sender: "bot",
               text:
-                "¡Hola! Soy el asistente de **Jujuy Conecta** 🤖. Te ayudo a encontrar información sobre colectivos, recursos sociales, empleos y seguridad digital en Jujuy.",
+                "¡Hola! Soy el asistente de **Jujuy Conecta** 🤖. Mandá tu consulta en hasta 12 palabras.",
             },
           ]
     );
@@ -82,109 +89,33 @@ export default function JujuyConectaAssistantModal({
 
   if (!open) return null;
 
-  // === RAG local simple con Supabase (muestra corta) ===
-  async function buildLocalContext(query: string): Promise<string> {
-    const q = query.toLowerCase();
-    let parts: string[] = [];
+  // === Llamada: solo mensaje ===
+  async function sendToAssistant(message: string): Promise<{ reply?: string; booking_url?: string }> {
+    if (!ASSISTANT_ENDPOINT) throw new Error("ASSISTANT_ENDPOINT no configurado");
 
-    try {
-      // Transporte
-      if (/colectivo|línea|linea|transporte|bondi/.test(q)) {
-        const { data } = await supabase
-          .from("transport_lines")
-          .select("number,name,active")
-          .order("number", { ascending: true })
-          .limit(6);
-        if (data?.length) {
-          parts.push(
-            `Líneas (muestra): ${data
-              .map((l: any) => `L${l.number} ${l.name} (${l.active ? "activa" : "inactiva"})`)
-              .join(" | ")}`
-          );
-        }
-      }
+    const res = await fetch(ASSISTANT_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }), // ⬅️ Solo enviamos el texto del usuario
+    });
 
-      // Recursos sociales
-      if (/merendero|comedor|recurso|ayuda|social/.test(q)) {
-        const { data } = await supabase
-          .from("social_resources")
-          .select("name,type,address,verified")
-          .eq("active", true)
-          .order("verified", { ascending: false })
-          .limit(6);
-        if (data?.length) {
-          parts.push(
-            `Recursos (muestra): ${data
-              .map((r: any) => `${r.name} [${r.type}] - ${r.address}${r.verified ? " ✓" : ""}`)
-              .join(" | ")}`
-          );
-        }
-      }
-
-      // Empleos
-      if (/empleo|trabajo|laburo|oferta/.test(q)) {
-        const { data } = await supabase
-          .from("jobs")
-          .select("title,location,type")
-          .eq("active", true)
-          .order("featured", { ascending: false })
-          .limit(6);
-        if (data?.length) {
-          parts.push(
-            `Empleos (muestra): ${data
-              .map((j: any) => `${j.title} — ${j.location} (${j.type})`)
-              .join(" | ")}`
-          );
-        }
-      }
-
-      // Seguridad
-      if (/estafa|phishing|grooming|fraude|seguridad/.test(q)) {
-        const { data } = await supabase
-          .from("security_alerts")
-          .select("title,category,severity")
-          .eq("active", true)
-          .order("featured", { ascending: false })
-          .limit(6);
-        if (data?.length) {
-          parts.push(
-            `Alertas (muestra): ${data
-              .map((a: any) => `${a.category}/${a.severity}: ${a.title}`)
-              .join(" | ")}`
-          );
-        }
-      }
-    } catch (e) {
-      console.warn("Error generando contexto local:", e);
-    }
-
-    return parts.join("\n");
-  }
-
-  async function sendToAssistant(payload: {
-    message: string;
-  }): Promise<{ reply?: string; booking_url?: string }> {
-    
-    const ENDPOINT = import.meta.env.VITE_ASSISTANT_ENDPOINT
-    
-    const res = await fetch(ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
-    })
-
-    const data = await res.json();
-    
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const t = await res.text().catch(() => "");
-      throw new Error(t || `HTTP ${res.status}`);
+      const errTxt = typeof data === "object" && data && "error" in data ? (data as any).error : "";
+      throw new Error(errTxt || `HTTP ${res.status}`);
     }
-    return res.json();
+    return data;
   }
 
   async function handleSend() {
-    const text = input.trim();
+    const text = normalize(input);
     if (!text) return;
+
+    const wc = wordCount(text);
+    if (wc > MAX_WORDS) {
+      setErrorBar(`Máximo ${MAX_WORDS} palabras por mensaje. Tenés ${wc}.`);
+      return;
+    }
 
     setMessages((m) => [...m, { sender: "user", text }]);
     setInput("");
@@ -192,19 +123,12 @@ export default function JujuyConectaAssistantModal({
     setErrorBar("");
 
     try {
-      const localCtx = await buildLocalContext(text);
-      const lastUserMsg = messages[messages.length - 1]?.text || "";
-      const context = [lastUserMsg, localCtx].filter(Boolean).join("\n---\n");
-
-      const data = await sendToAssistant({ message: text });
-
-      const reply =
-        data?.reply ||
-        "No pude procesarlo ahora mismo. Si querés, dejá tu contacto y te respondemos a la brevedad.";
+      const data = await sendToAssistant(text);
+      const reply = data?.reply ||
+        "No pude procesarlo ahora mismo. Probá de nuevo en un rato.";
       setMessages((m) => [...m, { sender: "bot", text: reply, booking_url: data?.booking_url }]);
-    } catch (e: any) {
+    } catch (e) {
       console.error(e);
-    //   setErrorBar("No pude conectar con el asistente. Revisá el endpoint o el proxy.");
       setMessages((m) => [
         ...m,
         { sender: "bot", text: "Tuvimos un inconveniente procesando tu consulta. Probá nuevamente." },
@@ -221,6 +145,23 @@ export default function JujuyConectaAssistantModal({
     }
   }
 
+  function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    const raw = e.target.value;
+    const norm = normalize(raw);
+    const words = norm ? norm.split(" ") : [];
+
+    if (words.length > MAX_WORDS) {
+      // Recortamos a 12 palabras y avisamos
+      const trimmed = words.slice(0, MAX_WORDS).join(" ");
+      setInput(trimmed);
+      setErrorBar(`Máximo ${MAX_WORDS} palabras por mensaje.`);
+      return;
+    }
+
+    setErrorBar("");
+    setInput(raw); // mantenemos el valor con espacios mientras no exceda
+  }
+
   return (
     <div
       className="fixed inset-0 z-[100000] flex items-center justify-center dark"
@@ -235,7 +176,7 @@ export default function JujuyConectaAssistantModal({
       <div className="relative w-[94vw] max-w-3xl h-[86dvh] sm:h-[78vh] rounded-2xl overflow-hidden
                       shadow-[0_30px_100px_rgba(0,0,0,0.55)] border border-white/10
                       bg-neutral-950/90 text-neutral-100 flex flex-col">
-        {/* Header brand Jujuy Conecta (usa tus colores Tailwind) */}
+        {/* Header brand Jujuy Conecta */}
         <div className="flex items-center justify-between px-5 py-3 text-white bg-gradient-to-r from-primary to-secondary">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-white/20 grid place-items-center">🧭</div>
@@ -283,10 +224,10 @@ export default function JujuyConectaAssistantModal({
                 <textarea
                   ref={textareaRef}
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={handleChange}
                   onKeyDown={handleKeyDown}
                   rows={1}
-                  placeholder="Preguntá por colectivos, recursos, empleos o alertas…"
+                  placeholder={`Escribí tu consulta (máx. ${MAX_WORDS} palabras)…`}
                   className="flex-1 min-h-[40px] max-h-32 resize-none bg-transparent outline-none px-2 py-2 text-sm leading-5
                              text-neutral-100 placeholder:text-neutral-400 caret-white"
                 />
@@ -302,8 +243,9 @@ export default function JujuyConectaAssistantModal({
                   </svg>
                 </button>
               </div>
-              <div className="px-2 pt-1">
+              <div className="px-2 pt-1 flex items-center justify-between">
                 <span className="text-[11px] text-neutral-400">Enter envía • Shift+Enter hace salto de línea</span>
+                <span className="text-[11px] text-neutral-500">{wordCount(input)}/{MAX_WORDS} palabras</span>
               </div>
             </div>
           </div>
