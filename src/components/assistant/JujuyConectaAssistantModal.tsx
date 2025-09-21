@@ -12,8 +12,7 @@ type Props = {
   title?: string;
 };
 
-const ASSISTANT_ENDPOINT =
-  import.meta.env.VITE_ASSISTANT_PROXY || import.meta.env.VITE_ASSISTANT_ENDPOINT;
+const ASSISTANT_ENDPOINT = import.meta.env.VITE_ASSISTANT_ENDPOINT;
 
 export default function JujuyConectaAssistantModal({
   open,
@@ -96,7 +95,7 @@ export default function JujuyConectaAssistantModal({
     const res = await fetch(ASSISTANT_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }), // ⬅️ Solo enviamos el texto del usuario
+      body: JSON.stringify({ message }),
     });
 
     const data = await res.json().catch(() => ({}));
