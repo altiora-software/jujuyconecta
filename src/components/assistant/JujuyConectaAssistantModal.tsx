@@ -91,7 +91,7 @@ export default function JujuyConectaAssistantModal({
 
   // === Llamada: solo mensaje ===
   async function sendToAssistant(message: string): Promise<{ reply?: string; booking_url?: string }> {
-    if (!ASSISTANT_ENDPOINT) throw new Error("ASSISTANT_ENDPOINT no configurado");
+    // if (!ASSISTANT_ENDPOINT) throw new Error("ASSISTANT_ENDPOINT no configurado");
 
     const res = await fetch(ASSISTANT_ENDPOINT, {
       method: "POST",
