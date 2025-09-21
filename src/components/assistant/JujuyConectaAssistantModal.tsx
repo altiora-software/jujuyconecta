@@ -163,7 +163,6 @@ export default function JujuyConectaAssistantModal({
 
   async function sendToAssistant(payload: {
     message: string;
-    context: string;
   }): Promise<{ reply?: string; booking_url?: string }> {
     
     const ENDPOINT = import.meta.env.VITE_ASSISTANT_ENDPOINT
@@ -197,7 +196,7 @@ export default function JujuyConectaAssistantModal({
       const lastUserMsg = messages[messages.length - 1]?.text || "";
       const context = [lastUserMsg, localCtx].filter(Boolean).join("\n---\n");
 
-      const data = await sendToAssistant({ message: text, context });
+      const data = await sendToAssistant({ message: text });
 
       const reply =
         data?.reply ||
@@ -205,7 +204,7 @@ export default function JujuyConectaAssistantModal({
       setMessages((m) => [...m, { sender: "bot", text: reply, booking_url: data?.booking_url }]);
     } catch (e: any) {
       console.error(e);
-      setErrorBar("No pude conectar con el asistente. Revisá el endpoint o el proxy.");
+    //   setErrorBar("No pude conectar con el asistente. Revisá el endpoint o el proxy.");
       setMessages((m) => [
         ...m,
         { sender: "bot", text: "Tuvimos un inconveniente procesando tu consulta. Probá nuevamente." },
