@@ -13,7 +13,7 @@ type Props = {
 };
 
 const ASSISTANT_ENDPOINT =
-  import.meta.env.VITE_ASSISTANT_PROXY || import.meta.env.VITE_N8N_WEBHOOK_URL;
+  import.meta.env.VITE_ASSISTANT_PROXY || import.meta.env.VITE_ASSISTANT_ENDPOINT;
 
 export default function JujuyConectaAssistantModal({
   open,
