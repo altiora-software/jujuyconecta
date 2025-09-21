@@ -95,7 +95,7 @@ export default function JujuyConectaAssistantModal({
     const res = await fetch(ASSISTANT_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify(message),
     });
 
     const data = await res.json().catch(() => ({}));
