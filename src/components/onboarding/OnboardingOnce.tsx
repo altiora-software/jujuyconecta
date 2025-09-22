@@ -79,7 +79,7 @@ export function OnboardingOnce({ onOpenAssistant, storageKey = STORAGE_KEY_DEFAU
 
         {/* CTA grandes (dos acciones clave) */}
         <div className="flex flex-col sm:flex-row gap-2">
-          <Button
+          {/* <Button
             className="w-full bg-primary text-white hover:opacity-90"
             onClick={() => {
               onOpenAssistant?.();
@@ -88,9 +88,9 @@ export function OnboardingOnce({ onOpenAssistant, storageKey = STORAGE_KEY_DEFAU
           >
             <MessageCircle className="h-4 w-4 mr-2" />
             Probar el asistente (IA)
-          </Button>
+          </Button> */}
 
-          <div className="grid grid-cols-2 gap-2 w-full">
+          <div className="grid grid-cols-2 gap-2 w-full text-white">
             <Button asChild variant="outline" className="w-full">
               <Link to="/transport"><Bus className="h-4 w-4 mr-2" /> Transporte</Link>
             </Button>
@@ -106,7 +106,6 @@ export function OnboardingOnce({ onOpenAssistant, storageKey = STORAGE_KEY_DEFAU
           </div>
         </div>
 
-        {/* “Entendido” (cierra y listo) */}
         <div className="mt-3 flex justify-end">
           <Button variant="ghost" onClick={() => setShow(false)}>
             Entendido
@@ -121,7 +120,7 @@ function Tip({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
     <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-neutral-900/60 px-3 py-2 text-sm">
       <span className="text-primary">{icon}</span>
-      <span className="text-neutral-200">{text}</span>
+      <span className="text-green-200">{text}</span>
     </div>
   );
 }
