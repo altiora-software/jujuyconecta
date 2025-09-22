@@ -1,4 +1,6 @@
+import { getCorrelator } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
+import { useCorrelator } from "@/hooks/useCorrelator";
 
 // ⬇️ Solo enviamos el MENSAJE al agente (sin contexto adicional)
 // y validamos máximo 12 palabras por mensaje.
@@ -27,6 +29,7 @@ export default function JujuyConectaAssistantModal({
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const sessionIdRef = useRef<string | null>(null);
+  const { correlator, rotateCorrelator } = useCorrelator();
 
   // === Helpers ===
   const normalize = (s: string) => s.replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
@@ -56,6 +59,10 @@ export default function JujuyConectaAssistantModal({
     };
   }, [open, onClose]);
 
+  const startNewSession = () => {
+    const newCorr = rotateCorrelator();
+    console.log("Nueva sesión. Correlator:", newCorr);
+    };
   // Bienvenida (opcional)
   useEffect(() => {
     if (!open || !showWelcome) return;
@@ -70,6 +77,7 @@ export default function JujuyConectaAssistantModal({
             },
           ]
     );
+    startNewSession();
   }, [open, showWelcome]);
 
   // Autoscroll
@@ -88,13 +96,20 @@ export default function JujuyConectaAssistantModal({
 
   if (!open) return null;
 
+
   // === Llamada: solo mensaje ===
   async function sendToAssistant(message: string): Promise<{ reply?: string; booking_url?: string }> {
     // if (!ASSISTANT_ENDPOINT) throw new Error("ASSISTANT_ENDPOINT no configurado");
+    const objetoAEnviar = {
+        message,
 
+    }
     const res = await fetch(ASSISTANT_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "X-Correlation-Id": getCorrelator()
+    },
       body: JSON.stringify(message),
     });
 

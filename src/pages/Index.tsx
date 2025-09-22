@@ -3,8 +3,9 @@ import { Hero } from "@/components/home/Hero";
 import { ModuleGrid } from "@/components/home/ModuleGrid";
 
 const Index = () => {
+  
   return (
-    <Layout>
+    <Layout>    
       <Hero />
       <ModuleGrid />
     </Layout>

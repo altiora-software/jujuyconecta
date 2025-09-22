@@ -7,11 +7,11 @@
 @layer base {
   :root {
     /* Core Brand Colors - Jujuy Conecta */
-    --primary: 220 91% 54%; /* #2563EB - Electric Blue */
+    --primary: 152 72% 35%; /* #2563EB - Electric Blue */
     --primary-foreground: 0 0% 100%;
     --primary-glow: 220 91% 65%;
     
-    --secondary: 165 75% 45%; /* #00B894 - Emerald Green */
+    --secondary: 165 75% 25%; /* #00B894 - Emerald Green */
     --secondary-foreground: 0 0% 100%;
     --secondary-glow: 165 75% 55%;
     

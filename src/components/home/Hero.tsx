@@ -1,13 +1,12 @@
 // components/home/Hero.tsx
-"use client";
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, MapPin, Users, Briefcase, Shield } from "lucide-react";
-import JujuyConectaAssistantModal from "../assistant/JujuyConectaAssistantModal";
+import JujuyConectaAssistantModal from "@/components/assistant/JujuyConectaAssistantModal";
+import { OnboardingOnce } from "@/components/onboarding/OnboardingOnce";
 
 type Counts = {
   lines: number | null;
@@ -25,38 +24,20 @@ export function Hero() {
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
 
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        // 1) Líneas activas
-        const { count: linesCount, error: linesErr } = await supabase
-          .from("transport_lines")
-          .select("*", { count: "exact", head: true })
-          .eq("active", true);
-        if (linesErr) throw linesErr;
+        const [{ count: linesCount, error: linesErr }, { count: resourcesCount, error: resErr }, { count: jobsCount, error: jobsErr }, { count: alertsCount, error: alertsErr }] =
+          await Promise.all([
+            supabase.from("transport_lines").select("*", { count: "exact", head: true }).eq("active", true),
+            supabase.from("social_resources").select("*", { count: "exact", head: true }).eq("active", true),
+            supabase.from("jobs").select("*", { count: "exact", head: true }).eq("active", true),
+            supabase.from("security_alerts").select("*", { count: "exact", head: true }).eq("active", true),
+          ]);
 
-        // 2) Recursos sociales activos
-        const { count: resourcesCount, error: resErr } = await supabase
-          .from("social_resources")
-          .select("*", { count: "exact", head: true })
-          .eq("active", true);
-        if (resErr) throw resErr;
-
-        // 3) Empleos activos (si no tenés columna active, quitá el .eq)
-        const { count: jobsCount, error: jobsErr } = await supabase
-          .from("jobs")
-          .select("*", { count: "exact", head: true })
-          .eq("active", true);
-        if (jobsErr) throw jobsErr;
-
-        // 4) Alertas activas
-        const { count: alertsCount, error: alertsErr } = await supabase
-          .from("security_alerts")
-          .select("*", { count: "exact", head: true })
-          .eq("active", true);
-        if (alertsErr) throw alertsErr;
+        if (linesErr || resErr || jobsErr || alertsErr) throw linesErr || resErr || jobsErr || alertsErr;
 
         setCounts({
           lines: linesCount ?? 0,
@@ -71,7 +52,6 @@ export function Hero() {
           description: "Mostramos números aproximados mientras se reintenta.",
           variant: "destructive",
         });
-        // fallback para no mostrar vacío
         setCounts((prev) => ({
           lines: prev.lines ?? 0,
           resources: prev.resources ?? 0,
@@ -106,7 +86,7 @@ export function Hero() {
 
   return (
     <section className="relative bg-gradient-hero text-white py-20 overflow-hidden">
-      {/* Background Pattern */}
+      {/* Backdrop decorativo */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-32 -translate-y-32" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-48 translate-y-48" />
@@ -124,16 +104,25 @@ export function Hero() {
             recursos comunitarios y oportunidades laborales.
           </p>
 
-          {/* CTAs con navegación */}
+          {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button asChild size="lg" variant="secondary" className="shadow-glow-secondary">
-              <a href="/resources">
+            {/* <Button asChild size="lg" variant="secondary" className="shadow-glow-secondary">
+              <Link to="/resources">
                 Explorar recursos
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </a>
+              </Link>
             </Button>
-            <Button onClick={() => setOpen(true)}>Abrir asistente</Button>
-            <JujuyConectaAssistantModal open={open} onClose={() => setOpen(false)} />
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+              asChild
+            >
+              <Link to="/jobs">Ver empleos disponibles</Link>
+            </Button> */}
+            <Button size="lg" onClick={() => setAssistantOpen(true)}>
+              Hablar con el asistente
+            </Button>
           </div>
 
           {/* Stats (reales) */}
@@ -145,6 +134,17 @@ export function Hero() {
           </div>
         </div>
       </div>
+
+      {/* Onboarding (una sola vez) */}
+      <OnboardingOnce onOpenAssistant={() => setAssistantOpen(true)} />
+
+      {/* Modal Asistente */}
+      {assistantOpen && (
+        <JujuyConectaAssistantModal
+          open={assistantOpen}
+          onClose={() => setAssistantOpen(false)}
+        />
+      )}
     </section>
   );
 }
