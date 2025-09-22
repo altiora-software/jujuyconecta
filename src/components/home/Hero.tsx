@@ -94,14 +94,15 @@ export function Hero() {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Movilidad, ayuda social y oportunidades{" "}
-            <span className="block text-secondary-glow">en un solo lugar</span>
-          </h1>
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          La primer plataforma{" "}
+          <span className="block text-secondary-glow">impulsada por IA local</span>
+        </h1>
 
           <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-2xl mx-auto">
-            La plataforma que conecta a los jujeños con información de transporte en tiempo real,
-            recursos comunitarios y oportunidades laborales.
+            Explorá la historia, el turismo,
+            accedé a recursos comunitarios, colectivos y encontrá oportunidades laborales.  
+            Todo en un solo lugar, pensado para los jujeños..
           </p>
 
           {/* CTAs */}
