@@ -72,7 +72,7 @@ export function Navbar() {
 
           {/* Desktop Search */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <form onSubmit={handleSearch} className="relative w-full">
+            {/* <form onSubmit={handleSearch} className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Buscar transporte, empleos, recursos..."
@@ -80,7 +80,7 @@ export function Navbar() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-muted/50 border-0 focus:bg-background transition-smooth"
               />
-            </form>
+            </form> */}
           </div>
 
           {/* Desktop Navigation */}
