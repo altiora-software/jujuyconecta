@@ -73,7 +73,7 @@ export default function JujuyConectaAssistantModal({
             {
               sender: "bot",
               text:
-                "¡Hola! Soy el asistente de **Jujuy Conecta** 🤖. Mandá tu consulta en hasta 12 palabras.",
+                "Aqui comienza la charla con el asistente de **Jujuy Conecta** 🤖. Mandá tu consulta en hasta 12 palabras.",
             },
           ]
     );
