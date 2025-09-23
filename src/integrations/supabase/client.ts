@@ -5,6 +5,9 @@ import type { Database } from './types';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+console.log('SUPABASE_PUBLISHABLE_KEY', SUPABASE_PUBLISHABLE_KEY);
+console.log('SUPABASE_URL', SUPABASE_URL);
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
