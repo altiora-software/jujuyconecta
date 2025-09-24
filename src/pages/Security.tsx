@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Shield, AlertTriangle, Clock, Eye, Share2, Link as LinkIcon, AlertOctagon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SecurityAlert {
   id: string;
@@ -240,7 +241,22 @@ export default function Security() {
         </div>
 
         <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7">
+          <div className="md:hidden">
+            <label className="text-sm text-muted-foreground mb-2 block">Categoría</label>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Elegí una categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <TabsList className="hidden md:grid w-full grid-cols-3 lg:grid-cols-7">
             {categories.map((category) => (
               <TabsTrigger key={category.value} value={category.value} className="text-sm">
                 {category.label}

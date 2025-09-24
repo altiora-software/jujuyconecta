@@ -91,16 +91,16 @@ export function OnboardingOnce({ onOpenAssistant, storageKey = STORAGE_KEY_DEFAU
           </Button> */}
 
           <div className="grid grid-cols-2 gap-2 w-full text-white">
-            <Button asChild variant="destructive" className="w-full">
+            <Button asChild variant="ghost" className="w-full">
               <Link to="/transport"><Bus className="h-4 w-4 mr-2" /> Transporte</Link>
             </Button>
-            <Button asChild variant="destructive" className="w-full">
+            <Button asChild variant="ghost" className="w-full">
               <Link to="/resources"><Users className="h-4 w-4 mr-2" /> Recursos</Link>
             </Button>
-            <Button asChild variant="destructive" className="w-full">
+            <Button asChild variant="ghost" className="w-full">
               <Link to="/jobs"><Briefcase className="h-4 w-4 mr-2" /> Empleos</Link>
             </Button>
-            <Button asChild variant="destructive" className="w-full">
+            <Button asChild variant="ghost" className="w-full">
               <Link to="/security"><Shield className="h-4 w-4 mr-2" /> Seguridad</Link>
             </Button>
           </div>
