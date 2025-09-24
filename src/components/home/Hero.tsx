@@ -1,4 +1,3 @@
-// components/home/Hero.tsx
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -6,8 +5,9 @@ import { useToast } from "@/hooks/use-toast";
 import { MapPin, Users, Briefcase, Shield } from "lucide-react";
 import JujuyConectaAssistantModal from "@/components/assistant/JujuyConectaAssistantModal";
 import { OnboardingOnce } from "@/components/onboarding/OnboardingOnce";
-import { useAuth } from "@/hooks/useAuth";   // ⬅️ usamos tu hook
-import imagenHero from "@/assets/jujuy-hero.jpg"
+import { useAuth } from "@/hooks/useAuth";
+import imagenHero from "@/assets/jujuy-hero.jpg";
+import LoginRequiredDialog from "@/components/auth/LoginRequiredDialog";
 
 type Counts = {
   lines: number | null;
@@ -22,7 +22,10 @@ export function Hero() {
   const { toast } = useToast();
   const [assistantOpen, setAssistantOpen] = useState(false);
 
-  const { user, loading: authLoading, signInWithGoogle } = useAuth(); // ⬅️
+  const { user, loading: authLoading, signInWithGoogle } = useAuth();
+
+  // NEW: estado para el modal de login
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -54,20 +57,20 @@ export function Hero() {
     })();
   }, [toast]);
 
-  // ⬅️ Handler que exige login
   const handleOpenAssistant = useCallback(async () => {
-    if (authLoading) return; // todavía cargando el estado de auth
+    if (authLoading) return;
     if (!user) {
-      toast({
-        title: "Ingresá para usar el asistente",
-        description: "Necesitás iniciar sesión para chatear con el asistente.",
-      });
-      // dispara el flujo de Google (o podés redirigir a /auth)
-      await signInWithGoogle();
+      setLoginDialogOpen(true);
       return;
     }
     setAssistantOpen(true);
-  }, [authLoading, user, signInWithGoogle, toast]);
+  }, [authLoading, user]);
+
+  // Callback que se ejecuta cuando el usuario aceptó términos y clickea "Continuar con Google"
+  const handleContinueWithGoogle = useCallback(async () => {
+    await signInWithGoogle();
+    // si el login fue exitoso, el hook debería actualizar "user" y se cerrará el modal con onClose
+  }, [signInWithGoogle]);
 
   const Stat = ({ icon, value, label }: { icon: React.ReactNode; value: number | null; label: string }) => (
     <div className="text-center">
@@ -83,7 +86,7 @@ export function Hero() {
     <section className="relative bg-gradient-hero text-white py-20 overflow-hidden">
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-32 -translate-y-32" />
-          <img src={imagenHero} alt="no hay dara que mostrar"/>
+        <img src={imagenHero} alt="Paisaje de Jujuy" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-48 translate-y-48" />
       </div>
 
@@ -116,7 +119,15 @@ export function Hero() {
 
       <OnboardingOnce onOpenAssistant={handleOpenAssistant} />
 
-      {/* Solo abrimos el modal si hay usuario */}
+      {/* Modal de login cuando no hay usuario */}
+      <LoginRequiredDialog
+        open={loginDialogOpen && !user}
+        onClose={() => setLoginDialogOpen(false)}
+        onContinueWithGoogle={handleContinueWithGoogle}
+        // supportEmail={import.meta.env.VITE_SUPPORT_EMAIL} // opcional
+      />
+
+      {/* Asistente solo si hay usuario */}
       {assistantOpen && user && (
         <JujuyConectaAssistantModal open={assistantOpen} onClose={() => setAssistantOpen(false)} />
       )}

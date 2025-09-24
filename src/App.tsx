@@ -10,6 +10,8 @@ import Security from "./pages/Security";
 import Admin from "./pages/Admin";
 import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +24,8 @@ const App = () => (
         <Route path="/" element={<Index />} />
         <Route path="/transport" element={<Transport />} />
         <Route path="/resources" element={<Resources />} />
+        <Route path="/terminos" element={<TermsAndConditions />} />
+        <Route path="/privacidad" element={<PrivacyPolicy />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/security" element={<Security />} />
         <Route path="/admin" element={<Admin />} />
