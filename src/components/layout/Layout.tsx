@@ -69,7 +69,7 @@ export function Layout({ children }: LayoutProps) {
               Conectando a los jujeños con recursos, transporte y oportunidades.
             </p>
             <p className="text-muted-foreground text-xs">
-              © 2024 Jujuy Conecta. Desarrollado por{" "}
+              © 2025 Jujuy Conecta. Desarrollado por{" "}
               <a href="https://altiorasoftware.com.ar" target="_blank" rel="noreferrer" className="underline">
                 Altiora Software
               </a>{" "}
