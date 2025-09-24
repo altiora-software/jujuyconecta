@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      job_submissions: {
+        Row: {
+          id: string;
+          title: string;
+          type: "formal" | "informal";
+          category: string;
+          description: string;
+          location: string;
+          contact_info: string;
+          salary_range: string | null;
+          requirements: string | null;
+          expires_at: string | null;
+          submitted_by: string | null;
+          submitted_email: string | null;
+          status: "pending" | "approved" | "rejected";
+          created_at: string;
+        }
+        Insert: {
+          id?: string;
+          title: string;
+          type: "formal" | "informal";
+          category: string;
+          description: string;
+          location: string;
+          contact_info: string;
+          salary_range?: string | null;
+          requirements?: string | null;
+          expires_at?: string | null;
+          submitted_by?: string | null;
+          submitted_email?: string | null;
+          status?: "pending" | "approved" | "rejected";
+          created_at?: string;
+        }
+        Update: {
+          id?: string;
+          title?: string;
+          type?: "formal" | "informal";
+          category?: string;
+          description?: string;
+          location?: string;
+          contact_info?: string;
+          salary_range?: string | null;
+          requirements?: string | null;
+          expires_at?: string | null;
+          submitted_by?: string | null;
+          submitted_email?: string | null;
+          status?: "pending" | "approved" | "rejected";
+          created_at?: string;
+        }
+        Relationships: []
+      }
       jobs: {
         Row: {
           active: boolean | null
@@ -297,6 +348,7 @@ export type Database = {
           },
         ]
       }
+      
       contact_messages: {
         Row: {
           id: string
@@ -323,7 +375,7 @@ export type Database = {
           created_at?: string
         }
         Relationships: []
-      }
+      }     
       
     }
     Views: {

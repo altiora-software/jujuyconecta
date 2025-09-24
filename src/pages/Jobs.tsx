@@ -1,19 +1,15 @@
-// app/empleos/page.tsx (o donde tengas tu ruta)
-// Nota: usa shadcn/ui, Supabase client, y Tailwind como en el resto del proyecto.
-
+// app/empleos/page.tsx
 import { Layout } from "@/components/layout/Layout";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Briefcase, MapPin, Clock, DollarSign, Filter, Search, Clipboard, ClipboardCheck, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import JobSubmissionDialog from "@/components/jobs/JobSubmissionDialog"; // ⬅️ NUEVO
 
 interface Job {
   id: string;
@@ -40,22 +36,6 @@ export default function Jobs() {
   const [loading, setLoading] = useState(true);
   const [revealId, setRevealId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  // modal publicar
-  const [openPost, setOpenPost] = useState(false);
-  const [posting, setPosting] = useState(false);
-  const [postForm, setPostForm] = useState({
-    title: "",
-    type: "" as "" | "formal" | "informal",
-    category: "",
-    description: "",
-    location: "",
-    contact_info: "",
-    salary_range: "",
-    requirements: "",
-    // opcional: fecha de expiración
-    expires_at: "",
-  });
 
   const { toast } = useToast();
 
@@ -158,7 +138,7 @@ export default function Jobs() {
     const now = new Date();
     const diffDays = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     return diffDays <= 3 && diffDays > 0;
-    };
+  };
 
   const isExpired = (expiresAt: string | null) => {
     if (!expiresAt) return false;
@@ -173,76 +153,6 @@ export default function Jobs() {
       toast({ title: "Contacto copiado", description: "Pegalo en WhatsApp, mail o donde quieras." });
     } catch {
       // ignore
-    }
-  };
-
-  const canSubmit = useMemo(() => {
-    const f = postForm;
-    return (
-      f.title.trim().length >= 4 &&
-      (f.type === "formal" || f.type === "informal") &&
-      !!f.category &&
-      f.description.trim().length >= 10 &&
-      f.location.trim().length >= 3 &&
-      f.contact_info.trim().length >= 5
-    );
-  }, [postForm]);
-
-  const submitOffer = async () => {
-    try {
-      if (!canSubmit) {
-        toast({
-          title: "Datos incompletos",
-          description: "Completá título, tipo, categoría, descripción, ubicación y contacto.",
-          variant: "destructive",
-        });
-        return;
-      }
-      setPosting(true);
-
-      const payload = {
-        title: postForm.title.trim(),
-        type: postForm.type,
-        category: postForm.category,
-        description: postForm.description.trim(),
-        location: postForm.location.trim(),
-        contact_info: postForm.contact_info.trim(),
-        salary_range: postForm.salary_range?.trim() || null,
-        requirements: postForm.requirements?.trim() || null,
-        active: true,         // se publica activa automáticamente
-        featured: false,
-        expires_at: postForm.expires_at ? new Date(postForm.expires_at).toISOString() : null,
-      };
-
-      const { error } = await supabase.from("jobs").insert([payload]);
-      if (error) throw error;
-
-      toast({
-        title: "Oferta publicada",
-        description: "Tu oferta quedó visible al instante. ¡Gracias por sumar oportunidades!",
-      });
-      setOpenPost(false);
-      setPostForm({
-        title: "",
-        type: "" as any,
-        category: "",
-        description: "",
-        location: "",
-        contact_info: "",
-        salary_range: "",
-        requirements: "",
-        expires_at: "",
-      });
-      fetchJobs();
-    } catch (e: any) {
-      console.error(e);
-      toast({
-        title: "No se pudo publicar",
-        description: e?.message || "Reintentá en unos minutos.",
-        variant: "destructive",
-      });
-    } finally {
-      setPosting(false);
     }
   };
 
@@ -269,10 +179,22 @@ export default function Jobs() {
       <div className="container mx-auto px-4 py-8">
         {/* Header + explicación */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Bolsa de Trabajo</h1>
-          <p className="text-muted-foreground">
-            Oportunidades laborales <strong>formales</strong> e <strong>informales</strong> en Jujuy.
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Bolsa de Trabajo</h1>
+              <p className="text-muted-foreground">
+                Oportunidades laborales <strong>formales</strong> e <strong>informales</strong> en Jujuy.
+              </p>
+            </div>
+            {/* Botón para enviar oferta (revisión) */}
+            <JobSubmissionDialog
+              triggerLabel="Publicar oferta (revisión)"
+              onSubmitted={() => {
+                // Si querés refrescar algo acá, lo podés hacer.
+                // No refresca el listado porque va a 'job_submissions' (pendientes).
+              }}
+            />
+          </div>
         </div>
 
         <Card className="mb-6">
@@ -293,151 +215,6 @@ export default function Jobs() {
             </div>
           </CardContent>
         </Card>
-
-        {/* CTA publicar */}
-        <div className="mb-6 flex justify-end">
-          <Dialog open={openPost} onOpenChange={setOpenPost}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                Publicar oferta
-                <Briefcase className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Publicar nueva oferta</DialogTitle>
-                <DialogDescription>
-                  Se valida automáticamente y se publica al instante. Podés editar luego desde administración.
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="grid gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Título *</Label>
-                    <Input
-                      id="title"
-                      value={postForm.title}
-                      onChange={(e) => setPostForm((p) => ({ ...p, title: e.target.value }))}
-                      placeholder="Ej: Electricista matriculado / Cajero para supermercado"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Tipo *</Label>
-                    <Select
-                      value={postForm.type || ""}
-                      onValueChange={(v: "formal" | "informal") => setPostForm((p) => ({ ...p, type: v }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Elegir tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="informal">Informal</SelectItem>
-                        <SelectItem value="formal">Formal</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Categoría *</Label>
-                    <Select
-                      value={postForm.category}
-                      onValueChange={(v) => setPostForm((p) => ({ ...p, category: v }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Elegir categoría" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories
-                          .filter((c) => c.value !== "todos")
-                          .map((c) => (
-                            <SelectItem key={c.value} value={c.value}>
-                              {c.label}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Ubicación *</Label>
-                    <Input
-                      value={postForm.location}
-                      onChange={(e) => setPostForm((p) => ({ ...p, location: e.target.value }))}
-                      placeholder="San Salvador de Jujuy / Palpalá / Perico..."
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Descripción *</Label>
-                  <Textarea
-                    value={postForm.description}
-                    onChange={(e) => setPostForm((p) => ({ ...p, description: e.target.value }))}
-                    rows={4}
-                    placeholder="Contá qué tareas se realizan, jornada, y cualquier detalle relevante."
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Contacto *</Label>
-                    <Input
-                      value={postForm.contact_info}
-                      onChange={(e) => setPostForm((p) => ({ ...p, contact_info: e.target.value }))}
-                      placeholder="Teléfono, WhatsApp o e-mail"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Rango salarial (opcional)</Label>
-                    <Input
-                      value={postForm.salary_range}
-                      onChange={(e) => setPostForm((p) => ({ ...p, salary_range: e.target.value }))}
-                      placeholder="Ej: $500k - $650k"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Requisitos (opcional)</Label>
-                    <Input
-                      value={postForm.requirements}
-                      onChange={(e) => setPostForm((p) => ({ ...p, requirements: e.target.value }))}
-                      placeholder="Experiencia, cursos, carnet, etc."
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Fecha de expiración (opcional)</Label>
-                    <Input
-                      type="date"
-                      value={postForm.expires_at}
-                      onChange={(e) => setPostForm((p) => ({ ...p, expires_at: e.target.value }))}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setOpenPost(false)}>
-                    Cancelar
-                  </Button>
-                  <Button onClick={submitOffer} disabled={posting || !canSubmit}>
-                    {posting ? "Publicando..." : "Publicar"}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
 
         {/* Filtros */}
         <Card className="mb-6">
@@ -505,7 +282,8 @@ export default function Jobs() {
                   Te invitamos a volver pronto: cargamos nuevas oportunidades todas las semanas.
                 </p>
                 <div>
-                  <Button onClick={() => setOpenPost(true)}>Publicar tu oportunidad</Button>
+                  {/* Botón también en el empty state */}
+                  <JobSubmissionDialog triggerLabel="Publicar tu oportunidad" />
                 </div>
               </CardContent>
             </Card>
