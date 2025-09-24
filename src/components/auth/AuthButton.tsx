@@ -1,12 +1,27 @@
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { LogIn, LogOut, Settings, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
+import LoginRequiredDialog from "@/components/auth/LoginRequiredDialog"; // ⬅️ nuevo
 
 export function AuthButton() {
   const { user, profile, loading, signInWithGoogle, signOut, isAdmin } = useAuth();
+
+  // estado para el modal de login
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+
+  // callback para continuar con google
+  const handleContinueWithGoogle = useCallback(async () => {
+    await signInWithGoogle();
+  }, [signInWithGoogle]);
 
   if (loading) {
     return <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />;
@@ -14,15 +29,25 @@ export function AuthButton() {
 
   if (!user) {
     return (
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={signInWithGoogle}
-        className="gap-2"
-      >
-        <LogIn className="h-4 w-4" />
-        Ingresar
-      </Button>
+      <>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setLoginDialogOpen(true)}
+          className="gap-2"
+        >
+          <LogIn className="h-4 w-4" />
+          Ingresar
+        </Button>
+
+        {/* Modal con checkbox de T&C */}
+        <LoginRequiredDialog
+          open={loginDialogOpen}
+          onClose={() => setLoginDialogOpen(false)}
+          onContinueWithGoogle={handleContinueWithGoogle}
+          // supportEmail={import.meta.env.VITE_SUPPORT_EMAIL} // opcional
+        />
+      </>
     );
   }
 
@@ -44,9 +69,7 @@ export function AuthButton() {
             {profile?.full_name && (
               <p className="font-medium">{profile.full_name}</p>
             )}
-            <p className="text-xs text-muted-foreground">
-              {user.email}
-            </p>
+            <p className="text-xs text-muted-foreground">{user.email}</p>
           </div>
         </div>
         <DropdownMenuItem asChild>
