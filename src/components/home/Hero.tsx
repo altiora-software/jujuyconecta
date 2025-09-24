@@ -1,13 +1,13 @@
 // components/home/Hero.tsx
 import { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, MapPin, Users, Briefcase, Shield } from "lucide-react";
+import { MapPin, Users, Briefcase, Shield } from "lucide-react";
 import JujuyConectaAssistantModal from "@/components/assistant/JujuyConectaAssistantModal";
 import { OnboardingOnce } from "@/components/onboarding/OnboardingOnce";
 import { useAuth } from "@/hooks/useAuth";   // ⬅️ usamos tu hook
+import imagenHero from "@/assets/jujuy-hero.jpg"
 
 type Counts = {
   lines: number | null;
@@ -83,6 +83,7 @@ export function Hero() {
     <section className="relative bg-gradient-hero text-white py-20 overflow-hidden">
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-32 -translate-y-32" />
+          <img src={imagenHero} alt="no hay dara que mostrar"/>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-48 translate-y-48" />
       </div>
 
