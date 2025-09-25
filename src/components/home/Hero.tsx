@@ -93,7 +93,6 @@ export function Hero() {
           src={imagenHero}
           alt="Paisaje de Jujuy"
           className="w-full h-full object-cover object-center scale-[1.15] sm:scale-[1.2] lg:scale-[1.25] transition-transform duration-700"
-          fetchPriority="high"
         />
         {/* Verde más translúcido para que se vea la imagen */}
         <div className="absolute inset-0 bg-gradient-hero/45 sm:bg-gradient-hero/40 lg:bg-gradient-hero/35" />

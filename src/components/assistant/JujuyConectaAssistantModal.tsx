@@ -191,7 +191,7 @@ export default function JujuyConectaAssistantModal({
                       shadow-[0_30px_100px_rgba(0,0,0,0.55)] border border-white/10
                       bg-neutral-950/90 text-neutral-100 flex flex-col">
         {/* Header brand Jujuy Conecta */}
-        <div className="flex items-center justify-between px-5 py-3 text-white bg-gradient-to-r from-primary to-secondary">
+        <div className="flex items-center justify-between px-5 py-3 text-white bg-gradient-to-r from-red-900 to-teal-900">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-white/20 grid place-items-center">🧭</div>
             <div>
@@ -234,6 +234,16 @@ export default function JujuyConectaAssistantModal({
           <div className="h-4 bg-gradient-to-t from-neutral-950/95 to-transparent" />
           <div className="px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
             <div className="rounded-2xl border border-white/10 bg-neutral-900/90 backdrop-blur p-2 shadow">
+              {/* Instrucciones + contador */}
+              <div className="px-2 pt-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="text-[11px] text-neutral-400">
+                  Enter envía • Shift+Enter hace salto de línea
+                </span>
+                <span className="text-[11px] text-neutral-500">
+                  {wordCount(input)}/{MAX_WORDS} palabras
+                </span>
+              </div>
+
               <div className="flex items-end gap-2">
                 <textarea
                   ref={textareaRef}
@@ -241,14 +251,14 @@ export default function JujuyConectaAssistantModal({
                   onChange={handleChange}
                   onKeyDown={handleKeyDown}
                   rows={1}
-                  placeholder={`Escribí tu consulta (máx. ${MAX_WORDS} palabras)…`}
+                  placeholder={`Escribí tu consulta…`}
                   className="flex-1 min-h-[40px] max-h-32 resize-none bg-transparent outline-none px-2 py-2 text-sm leading-5
-                             text-neutral-100 placeholder:text-neutral-400 caret-white"
+                            text-neutral-100 placeholder:text-neutral-400 caret-white"
                 />
                 <button
                   onClick={handleSend}
                   className="shrink-0 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl
-                             bg-primary text-white hover:opacity-90 transition shadow"
+                            bg-primary text-white hover:opacity-90 transition shadow"
                   aria-label="Enviar"
                 >
                   Enviar
@@ -257,13 +267,17 @@ export default function JujuyConectaAssistantModal({
                   </svg>
                 </button>
               </div>
-              <div className="px-2 pt-1 flex items-center justify-between">
-                <span className="text-[11px] text-neutral-400">Enter envía • Shift+Enter hace salto de línea</span>
-                <span className="text-[11px] text-neutral-500">{wordCount(input)}/{MAX_WORDS} palabras</span>
+              
+              {/* Disclaimer del asistente */}
+              <div className="px-2 pt-1">
+                <p className="text-[10px] text-neutral-500">
+                  El asistente es solo informativo, puede dar respuestas incompletas o inexactas. Siempre consultá fuentes oficiales.
+                </p>
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
