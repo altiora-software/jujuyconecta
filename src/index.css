@@ -25,7 +25,7 @@
     --warning-foreground: 222 84% 5%;
 
     /* Neutral Palette */
-    --background: 220 20% 98%; /* #F5F6FA - Light Background */
+    --background: 220 22% 96%;; /* #F5F6FA - Light Background */
     --foreground: 220 25% 15%;
     
     --card: 0 0% 100%;
@@ -51,7 +51,13 @@
     --radius: 1rem; /* 16px rounded corners */
     
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-app: radial-gradient(1200px 800px at 10% -10%, hsl(var(--yungas-2) / 0.25), transparent 60%),
+            radial-gradient(900px 600px at 110% 10%, hsl(var(--quebrada-2) / 0.22), transparent 60%),
+            radial-gradient(800px 600px at -10% 110%, hsl(var(--puna-1) / 0.20), transparent 60%),
+            radial-gradient(700px 600px at 120% 120%, hsl(var(--valles-1) / 0.18), transparent 60%),
+            linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+
+    --gradient-app: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-glow)));
     --gradient-hero: linear-gradient(20deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 50%);
     --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));

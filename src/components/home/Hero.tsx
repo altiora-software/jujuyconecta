@@ -83,54 +83,82 @@ export function Hero() {
   );
 
   return (
-    <section className="relative bg-gradient-hero text-white py-20 overflow-hidden">
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-32 -translate-y-32" />
-        <img src={imagenHero} alt="Paisaje de Jujuy" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-48 translate-y-48" />
+    <section
+      className="relative overflow-hidden text-black"
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
+    >
+      {/* Capa base: imagen full + overlay verde translúcido */}
+      <div className="absolute inset-0">
+        <img
+          src={imagenHero}
+          alt="Paisaje de Jujuy"
+          className="w-full h-full object-cover object-center scale-[1.15] sm:scale-[1.2] lg:scale-[1.25] transition-transform duration-700"
+          fetchPriority="high"
+        />
+        {/* Verde más translúcido para que se vea la imagen */}
+        <div className="absolute inset-0 bg-gradient-hero/45 sm:bg-gradient-hero/40 lg:bg-gradient-hero/35" />
+        {/* Blobs suaves (ocultos en xs para no tapar) */}
+        <div className="hidden sm:block absolute -top-24 -left-24 w-64 h-64 bg-white/25 rounded-full blur-3xl" />
+        <div className="hidden sm:block absolute -bottom-28 -right-28 w-[28rem] h-[28rem] bg-white/20 rounded-full blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            La herramienta que te {" "}
-            <span className="block text-secondary-glow">conecta con Jujuy</span>
-          </h1>
+      {/* Contenido */}
+      <div className="relative z-10">
+        <div className="container mx-auto px-4">
+          <div className="min-h-[70svh] sm:min-h-[68svh] lg:min-h-[60svh] flex flex-col items-center justify-center text-center gap-6 py-12 sm:py-14 lg:py-20">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight">
+              La forma más simple de{" "}
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-800 to-teal-500">
+                conectarte con Jujuy
+              </span>
+            </h1>
 
-          <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Explorá la historia y el turismo de Jujuy, accedé a recursos comunitarios, transporte, y recibí alertas para cuidarte en internet. 
-            Una herramienta pensada para que cualquier jujeño o turista esté más informado.
-          </p>
+            <p className="max-w-[34rem] text-base sm:text-lg lg:text-2xl/8 opacity-95">
+              Explorá historia y turismo, accedé a recursos comunitarios y transporte, y recibí alertas para cuidarte en internet.
+              Pensada para jujeños y turistas.
+            </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" onClick={handleOpenAssistant}>
-              Hablar con el asistente
-            </Button>
-          </div>
+            {/* CTA */}
+            <div className="w-full max-w-md flex flex-col xs:flex-row gap-3 justify-center">
+              <Button
+                size="lg"
+                className="w-full xs:w-auto hover:animate-glow"
+                onClick={handleOpenAssistant}
+              >
+                Hablar con el asistente
+              </Button>
+            </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
-            <Stat icon={<MapPin />} value={counts.lines} label="Líneas de colectivo activas" />
-            <Stat icon={<Users />} value={counts.resources} label="Recursos sociales activos" />
-            <Stat icon={<Briefcase />} value={counts.jobs} label="Empleos activos" />
-            <Stat icon={<Shield />} value={counts.alerts} label="Alertas de seguridad activas" />
+            {/* Stats: 2 columnas en móvil, 4 en md+ */}
+            <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-2">
+              <Stat icon={<MapPin />} value={counts.lines} label="Líneas activas" />
+              <Stat icon={<Users />} value={counts.resources} label="Recursos activos" />
+              <Stat icon={<Briefcase />} value={counts.jobs} label="Empleos activos" />
+              <Stat icon={<Shield />} value={counts.alerts} label="Alertas activas" />
+            </div>
+
+            {/* Disclaimer corto (legible en mobile) */}
+            <p className="text-xs sm:text-[13px] text-white/80 max-w-[34rem]">
+              Datos de fuentes públicas; podrían cambiar. Verificá con fuentes oficiales.
+            </p>
           </div>
         </div>
       </div>
 
+      {/* Onboarding + Modales */}
       <OnboardingOnce onOpenAssistant={handleOpenAssistant} />
 
-      {/* Modal de login cuando no hay usuario */}
       <LoginRequiredDialog
         open={loginDialogOpen && !user}
         onClose={() => setLoginDialogOpen(false)}
         onContinueWithGoogle={handleContinueWithGoogle}
-        // supportEmail={import.meta.env.VITE_SUPPORT_EMAIL} // opcional
       />
 
-      {/* Asistente solo si hay usuario */}
       {assistantOpen && user && (
         <JujuyConectaAssistantModal open={assistantOpen} onClose={() => setAssistantOpen(false)} />
       )}
     </section>
+
+
   );
 }

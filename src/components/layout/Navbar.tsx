@@ -133,7 +133,7 @@ export function Navbar() {
           <div className="md:hidden border-t bg-card/95 backdrop-blur">
             <div className="px-4 py-4 space-y-3">
               {/* Mobile Search */}
-              <form onSubmit={handleSearch} className="relative">
+              {/* <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   placeholder="Buscar en Jujuy Conecta..."
@@ -141,7 +141,7 @@ export function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
-              </form>
+              </form> */}
               
               {/* Mobile Navigation */}
               <div className="space-y-1">
