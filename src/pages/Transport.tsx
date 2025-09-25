@@ -156,7 +156,7 @@ export default function Transport() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Transporte Público</h1>
           <p className="text-muted-foreground">
-            Detalles de líneas, paradas y reportes. El mapa es opcional en este primer MVP.
+            Detalles de líneas, paradas y reportes.
           </p>
         </div>
 

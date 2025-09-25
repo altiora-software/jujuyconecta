@@ -93,13 +93,13 @@ export function Hero() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            La primer plataforma{" "}
-            <span className="block text-secondary-glow">impulsada por IA local</span>
+            La herramienta que te {" "}
+            <span className="block text-secondary-glow">conecta con Jujuy</span>
           </h1>
 
           <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Explorá la historia y el turismo, accedé a recursos comunitarios, colectivos y oportunidades laborales.
-            Todo en un solo lugar, pensado para los jujeños.
+            Explorá la historia y el turismo de Jujuy, accedé a recursos comunitarios, transporte, y recibí alertas para cuidarte en internet. 
+            Una herramienta pensada para que cualquier jujeño o turista esté más informado.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">

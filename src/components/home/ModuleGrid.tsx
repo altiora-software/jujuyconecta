@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bus, Users, Briefcase, Shield, Bell, ArrowRight } from "lucide-react";
+import AboutJujuyConecta from "../about/AboutJujuyConecta";
 
 type TransportLine = {
   id: string;
@@ -332,9 +333,9 @@ export function ModuleGrid() {
             );
           })}
         </div>
-
+        <AboutJujuyConecta />
         {/* Notification CTA */}
-        <div className="mt-16 text-center">
+        {/* <div className="mt-16 text-center">
           <Card className="max-w-md mx-auto border-primary/20 bg-gradient-primary/5">
             <CardHeader>
               <div className="flex justify-center mb-2">
@@ -352,7 +353,7 @@ export function ModuleGrid() {
               </Link>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
       </div>
     </section>
   );
