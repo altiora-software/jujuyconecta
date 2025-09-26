@@ -191,25 +191,39 @@ export default function JujuyConectaAssistantModal({
                       shadow-[0_30px_100px_rgba(0,0,0,0.55)] border border-white/10
                       bg-neutral-950/90 text-neutral-100 flex flex-col">
         {/* Header brand Jujuy Conecta */}
-        <div className="flex items-center justify-between px-5 py-3 text-white bg-gradient-to-r from-red-900 to-teal-900">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-white/20 grid place-items-center">🧭</div>
-            <div>
-              <div className="font-semibold leading-none">{title}</div>
-              <div className="text-xs opacity-90">Asistencia ciudadana — Jujuy Conecta</div>
+        <header className="relative overflow-hidden border-b border-white/10">
+          {/* franja sutil en gradiente */}
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-emerald-500/25 via-teal-500/20 to-sky-500/20" />
+          <div className="relative flex items-center justify-between px-5 py-3">
+            <div className="flex items-center gap-3 min-w-0">
+              {/* LOGO circular con aro de luz */}
+              <div className="relative">
+                <div className="h-9 w-9 rounded-full bg-gradient-to-br from-emerald-400 to-teal-300 shadow-glow" />
+                <div className="absolute inset-0 grid place-items-center">
+                  <div className="h-7 w-7 rounded-full bg-neutral-950/85 border border-white/20 grid place-items-center">
+                    <span className="text-[10px] font-bold tracking-wider text-white">JC</span>
+                  </div>
+                </div>
+              </div>
+              {/* Títulos */}
+              <div className="min-w-0">
+                <h2 className="font-semibold leading-none text-white truncate">{title}</h2>
+                <p className="text-[11px] text-white/80">Asistencia ciudadana • Jujuy Conecta</p>
+              </div>
             </div>
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-full grid place-items-center bg-white/5 hover:bg-white/10 border border-white/15 transition"
+              aria-label="Cerrar"
+            >
+              ✕
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="w-9 h-9 rounded-full hover:bg-white/15 transition"
-            aria-label="Cerrar"
-          >
-            ✕
-          </button>
-        </div>
+        </header>
+
 
         {errorBar && (
-          <div className="px-4 py-2 text-xs bg-red-900/30 text-red-200 border-b border-red-800/40">
+          <div className="px-4 py-2 text-[12px] bg-red-900/35 text-red-200 border-b border-red-800/40">
             {errorBar}
           </div>
         )}
@@ -244,39 +258,55 @@ export default function JujuyConectaAssistantModal({
                 </span>
               </div>
 
-              <div className="flex items-end gap-2">
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={handleChange}
-                  onKeyDown={handleKeyDown}
-                  rows={1}
-                  placeholder={`Escribí tu consulta…`}
-                  className="flex-1 min-h-[40px] max-h-32 resize-none bg-transparent outline-none px-2 py-2 text-sm leading-5
-                            text-neutral-100 placeholder:text-neutral-400 caret-white"
-                />
+              {/* Barra de entrada */}
+              <div className="mt-1 flex items-end gap-2">
+                <div className="flex-1 relative">
+                  {/* icono de guía */}
+                  <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
+                    💬
+                  </div>
+                  <textarea
+                    ref={textareaRef}
+                    value={input}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    rows={1}
+                    placeholder="Escribí tu consulta…"
+                    className="w-full min-h-[44px] max-h-32 resize-none
+                              bg-neutral-800/60 border border-white/10 rounded-xl
+                              pl-9 pr-3 py-2 text-sm leading-5 text-neutral-100
+                              placeholder:text-neutral-400 caret-white
+                              focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-white/20 transition"
+                  />
+                </div>
+
+                {/* CTA enviar: pill con gradiente y glow */}
                 <button
                   onClick={handleSend}
-                  className="shrink-0 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl
-                            bg-primary text-white hover:opacity-90 transition shadow"
+                  className="shrink-0 inline-flex items-center justify-center gap-2
+                            px-4 h-11 rounded-xl
+                            bg-gradient-to-br from-emerald-500 to-teal-500
+                            text-white hover:opacity-95 transition shadow-glow"
                   aria-label="Enviar"
                 >
                   Enviar
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4"
+                      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
                 </button>
               </div>
-              
-              {/* Disclaimer del asistente */}
-              <div className="px-2 pt-1">
+
+              {/* Disclaimer breve (4 palabras) + aclaración */}
+              <div className="px-2 pt-2">
                 <p className="text-[10px] text-neutral-500">
-                  El asistente es solo informativo, puede dar respuestas incompletas o inexactas. Siempre consultá fuentes oficiales.
+                  El asistente es informativo y puede no ser exacto. Consultá siempre fuentes oficiales.
                 </p>
               </div>
             </div>
           </div>
         </div>
+
 
       </div>
     </div>
@@ -326,7 +356,10 @@ function Bubble({
     <div className={`flex ${isRight ? "justify-end" : "justify-start"}`}>
       <div
         className={`max-w-[78%] rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm space-y-2
-        ${isRight ? "bg-primary text-white" : "bg-neutral-800 border border-neutral-700/60 text-neutral-100"}`}
+        ${isRight
+          ? "bg-gradient-to-br from-emerald-500/90 to-teal-500/90 text-white"
+          : "bg-neutral-800/80 border border-neutral-700/60 text-neutral-100 backdrop-blur"}`
+        }
       >
         <div className="whitespace-pre-wrap break-words">{content}</div>
         {hasLink && (
@@ -334,7 +367,8 @@ function Bubble({
             href={booking_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-secondary text-white hover:opacity-90 transition"
+            className="inline-flex items-center justify-center px-3 py-2 rounded-lg
+                      bg-white/10 hover:bg-white/15 text-white transition"
             role="button"
           >
             Abrir agenda

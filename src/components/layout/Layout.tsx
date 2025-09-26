@@ -5,7 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom"; // ⬅️ nuevo
+import { Link } from "react-router-dom";
+import SocialLinks, { Icons } from "../common/SocialLinks";
 
 interface LayoutProps { children: ReactNode; }
 
@@ -52,7 +53,17 @@ export function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-1">{children}</main>
-
+      <SocialLinks
+        items={[
+          { href: "https://instagram.com/jujuy_conecta", label: "Instagram", icon: Icons.Instagram },
+          { href: "https://facebook.com/jujuy_conecta", label: "Facebook", icon: Icons.Facebook },
+          { href: "https://x.com/jujuy_conecta", label: "Twitter/X", icon: Icons.Twitter },
+          { href: "https://youtube.com/@jujuyconecta", label: "YouTube", icon: Icons.Youtube },
+          { href: "mailto:jujuyconecta@gmail.com.ar", label: "Email", icon: Icons.Mail },
+        ]}
+        className="justify-center md:justify-start"
+        rounded="2xl"
+      />
       <footer className="border-t bg-card/50 py-12 mt-16">
         {/* Primera fila: 1→2→4 columnas responsivas */}
         <div className="container mx-auto px-4 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
