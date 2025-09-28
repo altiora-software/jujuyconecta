@@ -67,27 +67,6 @@ export function Layout({ children }: LayoutProps) {
       <footer className="border-t bg-card/50 py-12 mt-16">
         {/* Primera fila: 1→2→4 columnas responsivas */}
         <div className="container mx-auto px-4 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          
-          {/* Marca */}
-          <div className="text-center sm:text-left space-y-3">
-            <div className="flex items-center justify-center sm:justify-start space-x-2">
-              <div className="h-6 w-6 rounded bg-gradient-hero flex items-center justify-center">
-                <span className="text-white font-bold text-xs">JC</span>
-              </div>
-              <span className="text-lg font-semibold text-primary">Jujuy Conecta</span>
-            </div>
-            <p className="text-muted-foreground text-sm">
-              Conectando a los jujeños con recursos, transporte y oportunidades.
-            </p>
-            <p className="text-muted-foreground text-xs">
-              © 2025 Jujuy Conecta. Desarrollado por{" "}
-              <a href="https://altiorasoftware.com.ar" target="_blank" rel="noreferrer" className="underline">
-                Altiora Software
-              </a>{" "}
-              ❤️ para la comunidad jujeña.
-            </p>
-          </div>
-
           {/* Transparencia de datos */}
           <div className="text-center sm:text-left space-y-3">
             <h3 className="text-base font-semibold">🔎 Transparencia de datos</h3>
@@ -157,6 +136,25 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </div>
         </div>
+         {/* Marca */}
+         <div className="text-center sm:text-left space-y-3">
+            <div className="flex items-center justify-center sm:justify-start space-x-2">
+              <div className="h-6 w-6 rounded bg-gradient-hero flex items-center justify-center">
+                <span className="text-white font-bold text-xs">JC</span>
+              </div>
+              <span className="text-lg font-semibold text-primary">Jujuy Conecta</span>
+            </div>
+            <p className="text-muted-foreground text-sm">
+              Conectando a los jujeños con recursos, transporte y oportunidades.
+            </p>
+            <p className="text-muted-foreground text-xs">
+              © 2025 Jujuy Conecta. Desarrollado por{" "}
+              <a href="https://altiorasoftware.com.ar" target="_blank" rel="noreferrer" className="underline">
+                Altiora Software
+              </a>{" "}
+              ❤️ para la comunidad jujeña.
+            </p>
+          </div>
       </footer>
     </div>
   );
