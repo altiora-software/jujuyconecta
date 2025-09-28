@@ -85,7 +85,7 @@ export default function TermsAndConditions() {
               </li>
               <li>
                 El usuario puede solicitar la eliminación de su cuenta y datos escribiendo a{" "}
-                <a href="mailto:correo@jujuyconecta.com">correo@jujuyconecta.com</a>.
+                <a href="mailto:jujuyconecta@gmail.com">jujuyconecta@gmail.com</a>.
               </li>
             </ul>
           </section>

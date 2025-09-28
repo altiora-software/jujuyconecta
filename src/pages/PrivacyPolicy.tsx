@@ -116,7 +116,7 @@ export default function PrivacyPolicy() {
             </ul>
             <p>
               Para ejercer estos derechos, podés escribir a{" "}
-              <a href="mailto:correo@jujuyconecta.com">correo@jujuyconecta.com</a>.
+              <a href="mailto:jujuyconecta@gmail.com">jujuyconecta@gmail.com</a>.
             </p>
           </section>
 
@@ -154,7 +154,7 @@ export default function PrivacyPolicy() {
             <h2>11. Contacto</h2>
             <p>
               Para consultas sobre privacidad o protección de datos, escribinos a:{" "}
-              <a href="mailto:correo@jujuyconecta.com">jujuyconecta@gmail.com</a>
+              <a href="mailto:jujuyconecta@gmail.com">jujuyconecta@gmail.com</a>
             </p>
           </section>
         </article>
