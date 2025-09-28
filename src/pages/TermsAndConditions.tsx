@@ -2,137 +2,182 @@ import { Layout } from "@/components/layout/Layout";
 import { Link } from "react-router-dom";
 
 const sections = [
-  { id: "aceptacion", title: "1. Aceptación" },
-  { id: "acceso-registro", title: "2. Acceso y registro" },
-  { id: "uso-permitido", title: "3. Uso permitido" },
-  { id: "informacion-provista", title: "4. Información provista" },
-  { id: "privacidad-datos", title: "5. Privacidad y datos personales" },
-  { id: "contenido-terceros", title: "6. Contenido de terceros" },
-  { id: "limitacion-resp", title: "7. Limitación de responsabilidad" },
-  { id: "modificaciones", title: "8. Modificaciones" },
-  { id: "jurisdiccion", title: "9. Jurisdicción" },
-  { id: "nota", title: "Nota importante (beta)" },
+  { id: "acceptance", title: "1. Acceptance" },
+  { id: "access-registration", title: "2. Access and Registration" },
+  { id: "permitted-use", title: "3. Permitted Use" },
+  { id: "provided-information", title: "4. Provided Information" },
+  { id: "privacy-data", title: "5. Privacy and Personal Data" },
+  { id: "thirdparty-content", title: "6. Third-Party Content" },
+  { id: "liability-limitation", title: "7. Limitation of Liability" },
+  { id: "modifications", title: "8. Modifications" },
+  { id: "jurisdiction", title: "9. Jurisdiction" },
+  { id: "note", title: "Important Note (beta)" },
 ];
 
 export default function TermsAndConditions() {
-  const lastUpdated = "24/09/2025"; // TODO: actualizar cuando corresponda
+  const lastUpdated = "09/24/2025"; // TODO: update when appropriate
 
   return (
     <Layout>
       <div className="container mx-auto px-4 py-10">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">📜 Términos y Condiciones – Jujuy Conecta</h1>
+          <h1 className="text-3xl font-bold text-foreground">
+            📜 Terms and Conditions – Jujuy Conecta
+          </h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Última actualización: <time dateTime="2025-09-24">{lastUpdated}</time>
+            Last updated: <time dateTime="2025-09-24">{lastUpdated}</time>
           </p>
         </header>
 
-        {/* Índice */}
-        <nav aria-label="Índice" className="mb-8 border rounded-lg p-4">
-          <p className="font-medium mb-2">Contenido</p>
+        {/* Index */}
+        <nav aria-label="Index" className="mb-8 border rounded-lg p-4">
+          <p className="font-medium mb-2">Contents</p>
           <ul className="list-disc list-inside space-y-1 text-sm">
             {sections.map((s) => (
               <li key={s.id}>
-                <a className="hover:underline" href={`#${s.id}`}>{s.title}</a>
+                <a className="hover:underline" href={`#${s.id}`}>
+                  {s.title}
+                </a>
               </li>
             ))}
           </ul>
         </nav>
 
         <article className="prose prose-neutral dark:prose-invert max-w-none">
-          <section id="aceptacion">
-            <h2>1. Aceptación</h2>
+          <section id="acceptance">
+            <h2>1. Acceptance</h2>
             <p>
-              Al registrarse y utilizar Jujuy Conecta, el usuario acepta estos Términos y Condiciones.
-              Si no está de acuerdo, debe abstenerse de usar la aplicación.
+              By registering and using Jujuy Conecta, the user accepts these
+              Terms and Conditions. If you do not agree, you must refrain from
+              using the application.
             </p>
           </section>
 
-          <section id="acceso-registro">
-            <h2>2. Acceso y registro</h2>
+          <section id="access-registration">
+            <h2>2. Access and Registration</h2>
             <p>
-              Para acceder a ciertas funciones, el usuario debe iniciar sesión con su cuenta de Google.
-              La autenticación se realiza únicamente para verificar identidad y permitir el uso del asistente digital.
-              Jujuy Conecta no accede a correos electrónicos, contactos ni archivos personales de la cuenta de Google.
+              To access certain features, the user must log in with their Google
+              account. Authentication is only performed to verify identity and
+              allow the use of the digital assistant. Jujuy Conecta does not
+              access emails, contacts, or personal files from the Google
+              account.
             </p>
           </section>
 
-          <section id="uso-permitido">
-            <h2>3. Uso permitido</h2>
+          <section id="permitted-use">
+            <h2>3. Permitted Use</h2>
             <ul>
-              <li>Utilizar la aplicación solo con fines informativos, educativos o de consulta.</li>
-              <li>No emplear la plataforma para actividades ilícitas, difamatorias o que vulneren derechos de terceros.</li>
-              <li>Respetar las normas de convivencia y uso responsable de la información.</li>
-            </ul>
-          </section>
-
-          <section id="informacion-provista">
-            <h2>4. Información provista</h2>
-            <ul>
-              <li>La información proviene de fuentes públicas y puede no estar siempre actualizada.</li>
-              <li>Jujuy Conecta no garantiza exactitud absoluta ni disponibilidad permanente de los servicios.</li>
-              <li>La aplicación no reemplaza consultas oficiales, médicas, legales o profesionales.</li>
-            </ul>
-          </section>
-
-          <section id="privacidad-datos">
-            <h2>5. Privacidad y datos personales</h2>
-            <ul>
-              <li>El único dato requerido es la dirección de correo electrónico vinculada a la cuenta Google.</li>
-              <li>Este dato se utiliza exclusivamente para crear el perfil de usuario y registrar su actividad en la app.</li>
               <li>
-                No se compartirán datos personales con terceros sin consentimiento previo, salvo obligación legal.
+                Use the application only for informational, educational, or
+                consultation purposes.
               </li>
               <li>
-                El usuario puede solicitar la eliminación de su cuenta y datos escribiendo a{" "}
-                <a href="mailto:jujuyconecta@gmail.com">jujuyconecta@gmail.com</a>.
+                Do not use the platform for illegal, defamatory activities, or
+                those that infringe upon the rights of third parties.
+              </li>
+              <li>
+                Respect community rules and use the information responsibly.
               </li>
             </ul>
           </section>
 
-          <section id="contenido-terceros">
-            <h2>6. Contenido de terceros</h2>
+          <section id="provided-information">
+            <h2>4. Provided Information</h2>
+            <ul>
+              <li>
+                Information comes from public sources and may not always be up
+                to date.
+              </li>
+              <li>
+                Jujuy Conecta does not guarantee absolute accuracy or permanent
+                availability of services.
+              </li>
+              <li>
+                The application does not replace official, medical, legal, or
+                professional consultations.
+              </li>
+            </ul>
+          </section>
+
+          <section id="privacy-data">
+            <h2>5. Privacy and Personal Data</h2>
+            <ul>
+              <li>
+                The only required data is the email address linked to the Google
+                account.
+              </li>
+              <li>
+                This data is used exclusively to create the user profile and log
+                their activity within the app.
+              </li>
+              <li>
+                Personal data will not be shared with third parties without
+                prior consent, except when legally required.
+              </li>
+              <li>
+                The user may request deletion of their account and data by
+                writing to{" "}
+                <a href="mailto:jujuyconecta@gmail.com">
+                  jujuyconecta@gmail.com
+                </a>
+                .
+              </li>
+            </ul>
+          </section>
+
+          <section id="thirdparty-content">
+            <h2>6. Third-Party Content</h2>
             <p>
-              Jujuy Conecta puede mostrar información sobre comercios, instituciones, transporte y servicios.
-              Dicho contenido es informativo y de carácter público, y no implica asociación ni aval formal.
+              Jujuy Conecta may display information about businesses,
+              institutions, transportation, and services. This content is
+              informational and public in nature and does not imply any formal
+              association or endorsement.
             </p>
           </section>
 
-          <section id="limitacion-resp">
-            <h2>7. Limitación de responsabilidad</h2>
+          <section id="liability-limitation">
+            <h2>7. Limitation of Liability</h2>
             <p>
-              El uso de la aplicación es bajo exclusiva responsabilidad del usuario.
-              Jujuy Conecta no se responsabiliza por daños, pérdidas o inconvenientes derivados del uso de la información publicada.
+              Use of the application is under the sole responsibility of the
+              user. Jujuy Conecta is not responsible for damages, losses, or
+              inconveniences resulting from the use of published information.
             </p>
           </section>
 
-          <section id="modificaciones">
-            <h2>8. Modificaciones</h2>
+          <section id="modifications">
+            <h2>8. Modifications</h2>
             <p>
-              Jujuy Conecta podrá actualizar estos Términos y Condiciones en cualquier momento.
-              Los cambios serán notificados en la aplicación o en el sitio web oficial.
+              Jujuy Conecta may update these Terms and Conditions at any time.
+              Changes will be notified in the application or on the official
+              website.
             </p>
           </section>
 
-          <section id="jurisdiccion">
-            <h2>9. Jurisdicción</h2>
+          <section id="jurisdiction">
+            <h2>9. Jurisdiction</h2>
             <p>
-              Estos Términos se rigen por las leyes de la República Argentina. Cualquier controversia será resuelta en los
-              tribunales de la Provincia de Jujuy.
+              These Terms are governed by the laws of the Argentine Republic.
+              Any dispute will be resolved in the courts of the Province of
+              Jujuy.
             </p>
           </section>
 
-          <section id="nota">
-            <h2>📌 Nota importante</h2>
+          <section id="note">
+            <h2>📌 Important Note</h2>
             <p>
-              La aplicación se encuentra en versión beta gratuita y puede presentar fallas o limitaciones.
+              The application is in free beta version and may present bugs or
+              limitations.
             </p>
           </section>
         </article>
 
         <footer className="mt-10 text-sm text-muted-foreground">
           <p>
-            ¿Buscás nuestra <Link className="underline" to="/privacidad">Política de Privacidad</Link>?
+            Looking for our{" "}
+            <Link className="underline" to="/privacidad">
+              Privacy Policy
+            </Link>
+            ?
           </p>
         </footer>
       </div>

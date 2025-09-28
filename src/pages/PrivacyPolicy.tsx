@@ -2,158 +2,186 @@ import { Layout } from "@/components/layout/Layout";
 import { Link } from "react-router-dom";
 
 const sections = [
-  { id: "introduccion", title: "1. Introducción" },
-  { id: "datos", title: "2. Datos recopilados" },
-  { id: "uso", title: "3. Uso de los datos" },
-  { id: "comparticion", title: "4. Compartición de datos" },
-  { id: "seguridad", title: "5. Almacenamiento y seguridad" },
-  { id: "retencion", title: "6. Retención de datos" },
-  { id: "derechos", title: "7. Derechos del usuario" },
-  { id: "terceros", title: "8. Servicios de terceros" },
-  { id: "menores", title: "9. Menores de edad" },
-  { id: "cambios", title: "10. Cambios en la política" },
-  { id: "contacto", title: "11. Contacto" },
+  { id: "introduction", title: "1. Introduction" },
+  { id: "data", title: "2. Data Collected" },
+  { id: "usage", title: "3. Use of Data" },
+  { id: "sharing", title: "4. Data Sharing" },
+  { id: "security", title: "5. Storage and Security" },
+  { id: "retention", title: "6. Data Retention" },
+  { id: "rights", title: "7. User Rights" },
+  { id: "thirdparties", title: "8. Third-Party Services" },
+  { id: "minors", title: "9. Minors" },
+  { id: "changes", title: "10. Policy Changes" },
+  { id: "contact", title: "11. Contact" },
 ];
 
 export default function PrivacyPolicy() {
-  const lastUpdated = "24/09/2025"; // actualizar cuando corresponda
+  const lastUpdated = "09/24/2025"; // update when appropriate
 
   return (
     <Layout>
       <div className="container mx-auto px-4 py-10">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">🔒 Política de Privacidad – Jujuy Conecta</h1>
+          <h1 className="text-3xl font-bold text-foreground">
+            🔒 Privacy Policy – Jujuy Conecta
+          </h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Última actualización: <time dateTime="2025-09-24">{lastUpdated}</time>
+            Last updated: <time dateTime="2025-09-24">{lastUpdated}</time>
           </p>
         </header>
 
-        {/* Índice */}
-        <nav aria-label="Índice" className="mb-8 border rounded-lg p-4">
-          <p className="font-medium mb-2">Contenido</p>
+        {/* Index */}
+        <nav aria-label="Index" className="mb-8 border rounded-lg p-4">
+          <p className="font-medium mb-2">Contents</p>
           <ul className="list-disc list-inside space-y-1 text-sm">
             {sections.map((s) => (
               <li key={s.id}>
-                <a className="hover:underline" href={`#${s.id}`}>{s.title}</a>
+                <a className="hover:underline" href={`#${s.id}`}>
+                  {s.title}
+                </a>
               </li>
             ))}
           </ul>
         </nav>
 
         <article className="prose prose-neutral dark:prose-invert max-w-none">
-          <section id="introduccion">
-            <h2>1. Introducción</h2>
+          <section id="introduction">
+            <h2>1. Introduction</h2>
             <p>
-              En Jujuy Conecta respetamos tu privacidad. Esta Política explica qué datos recopilamos, cómo los usamos y cuáles
-              son tus derechos al utilizar la aplicación.
+              At Jujuy Conecta we respect your privacy. This Policy explains
+              what data we collect, how we use it, and what your rights are when
+              using the application.
             </p>
           </section>
 
-          <section id="datos">
-            <h2>2. Datos recopilados</h2>
-            <p>Para el funcionamiento de la app solicitamos únicamente:</p>
+          <section id="data">
+            <h2>2. Data Collected</h2>
+            <p>For the app to function we only request:</p>
             <ul>
               <li>
-                <strong>Correo electrónico asociado a tu cuenta de Google:</strong> se utiliza para autenticar tu identidad y crear tu
-                perfil en la aplicación.
+                <strong>Email address linked to your Google account:</strong>{" "}
+                used to authenticate your identity and create your profile in
+                the application.
               </li>
               <li>
-                <strong>Información técnica mínima:</strong> datos de uso básicos (fecha de acceso, consultas realizadas de manera
-                anónima, estadísticas) con fines de mejora del servicio.
+                <strong>Minimal technical information:</strong> basic usage data
+                (access date, queries performed anonymously, statistics) for the
+                purpose of improving the service.
               </li>
             </ul>
             <p className="mt-3">
-              <strong>👉 No accedemos</strong> a tus correos electrónicos, contactos, archivos ni a información privada de tu cuenta de Google.
+              <strong>👉 We do not access</strong> your emails, contacts, files,
+              or any private information from your Google account.
             </p>
           </section>
 
-          <section id="uso">
-            <h2>3. Uso de los datos</h2>
-            <p>Los datos recopilados se utilizan para:</p>
+          <section id="usage">
+            <h2>3. Use of Data</h2>
+            <p>The collected data is used to:</p>
             <ul>
-              <li>Permitir el inicio de sesión seguro.</li>
-              <li>Personalizar tu experiencia en la app.</li>
-              <li>Mejorar el servicio a partir de métricas de uso generales.</li>
-              <li>Contactarte únicamente si es necesario por soporte o incidencias.</li>
+              <li>Allow secure login.</li>
+              <li>Personalize your experience in the app.</li>
+              <li>Improve the service based on general usage metrics.</li>
+              <li>Contact you only if necessary for support or issues.</li>
             </ul>
           </section>
 
-          <section id="comparticion">
-            <h2>4. Compartición de datos</h2>
+          <section id="sharing">
+            <h2>4. Data Sharing</h2>
             <ul>
-              <li>No vendemos, alquilamos ni compartimos tus datos personales con terceros.</li>
-              <li>Solo podrán compartirse en caso de obligación legal (ejemplo: requerimiento judicial).</li>
-            </ul>
-          </section>
-
-          <section id="seguridad">
-            <h2>5. Almacenamiento y seguridad</h2>
-            <ul>
-              <li>Los datos se almacenan en servidores seguros de proveedores de confianza.</li>
-              <li>Implementamos medidas técnicas y organizativas para proteger la información frente a accesos no autorizados.</li>
               <li>
-                En caso de incidente de seguridad, notificaremos al usuario y a las autoridades competentes según lo exija la ley.
+                We do not sell, rent, or share your personal data with third
+                parties.
+              </li>
+              <li>
+                Data may only be shared if legally required (e.g., court order).
               </li>
             </ul>
           </section>
 
-          <section id="retencion">
-            <h2>6. Retención de datos</h2>
+          <section id="security">
+            <h2>5. Storage and Security</h2>
             <ul>
-              <li>Conservamos tus datos mientras tengas una cuenta activa en Jujuy Conecta.</li>
-              <li>Si solicitás la eliminación, tu información será borrada de manera definitiva en un plazo máximo de 30 días.</li>
+              <li>
+                Data is stored on secure servers from trusted providers.
+              </li>
+              <li>
+                We implement technical and organizational measures to protect
+                information against unauthorized access.
+              </li>
+              <li>
+                In the event of a security incident, we will notify the user and
+                relevant authorities as required by law.
+              </li>
             </ul>
           </section>
 
-          <section id="derechos">
-            <h2>7. Derechos del usuario</h2>
-            <p>Tenés derecho a:</p>
+          <section id="retention">
+            <h2>6. Data Retention</h2>
             <ul>
-              <li>Acceder a tus datos personales.</li>
-              <li>Rectificarlos si son incorrectos.</li>
-              <li>Solicitar la eliminación de tu cuenta y datos.</li>
-              <li>Limitar u oponerte al tratamiento de tus datos.</li>
+              <li>
+                We keep your data as long as you have an active account in Jujuy
+                Conecta.
+              </li>
+              <li>
+                If you request deletion, your information will be permanently
+                erased within a maximum of 30 days.
+              </li>
+            </ul>
+          </section>
+
+          <section id="rights">
+            <h2>7. User Rights</h2>
+            <p>You have the right to:</p>
+            <ul>
+              <li>Access your personal data.</li>
+              <li>Correct it if it is inaccurate.</li>
+              <li>Request deletion of your account and data.</li>
+              <li>Restrict or object to the processing of your data.</li>
             </ul>
             <p>
-              Para ejercer estos derechos, podés escribir a{" "}
+              To exercise these rights, you can write to{" "}
               <a href="mailto:jujuyconecta@gmail.com">jujuyconecta@gmail.com</a>.
             </p>
           </section>
 
-          <section id="terceros">
-            <h2>8. Servicios de terceros</h2>
+          <section id="thirdparties">
+            <h2>8. Third-Party Services</h2>
             <p>
-              El inicio de sesión se realiza mediante Google Identity Services (OAuth 2.0). La política de privacidad de Google se puede
-              consultar en{" "}
+              Login is carried out through Google Identity Services (OAuth
+              2.0). Google’s Privacy Policy can be reviewed at{" "}
               <a
                 href="https://policies.google.com/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 https://policies.google.com/privacy
-              </a>.
+              </a>
+              .
             </p>
           </section>
 
-          <section id="menores">
-            <h2>9. Menores de edad</h2>
+          <section id="minors">
+            <h2>9. Minors</h2>
             <p>
-              El servicio está destinado a usuarios mayores de 13 años. Si un menor accede sin autorización, el tutor o responsable
-              puede solicitar la eliminación inmediata de los datos asociados.
+              The service is intended for users over 13 years old. If a minor
+              accesses without authorization, the guardian or responsible adult
+              may request the immediate deletion of associated data.
             </p>
           </section>
 
-          <section id="cambios">
-            <h2>10. Cambios en la política</h2>
+          <section id="changes">
+            <h2>10. Policy Changes</h2>
             <p>
-              Podremos actualizar esta Política de Privacidad. Notificaremos cambios relevantes en la aplicación o sitio web.
+              We may update this Privacy Policy. We will notify of relevant
+              changes in the application or on the website.
             </p>
           </section>
 
-          <section id="contacto">
-            <h2>11. Contacto</h2>
+          <section id="contact">
+            <h2>11. Contact</h2>
             <p>
-              Para consultas sobre privacidad o protección de datos, escribinos a:{" "}
+              For privacy or data protection inquiries, write to:{" "}
               <a href="mailto:jujuyconecta@gmail.com">jujuyconecta@gmail.com</a>
             </p>
           </section>
@@ -161,7 +189,11 @@ export default function PrivacyPolicy() {
 
         <footer className="mt-10 text-sm text-muted-foreground">
           <p>
-            ¿Buscás los <Link className="underline" to="/terminos">Términos y Condiciones</Link>?
+            Looking for the{" "}
+            <Link className="underline" to="/terminos">
+              Terms and Conditions
+            </Link>
+            ?
           </p>
         </footer>
       </div>
