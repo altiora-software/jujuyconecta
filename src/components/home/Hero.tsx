@@ -74,11 +74,11 @@ export function Hero() {
 
   const Stat = ({ icon, value, label }: { icon: React.ReactNode; value: number | null; label: string }) => (
     <div className="text-center">
-      <div className="h-8 w-8 mx-auto mb-2 text-secondary">{icon}</div>
-      <div className="text-2xl font-bold tabular-nums">
+      <div className="h-8 w-8 mx-auto mb-2 text-yellow-400">{icon}</div>
+      <div className="text-2xl font-bold tabular-nums text-black">
         {loading ? <span className="inline-block h-6 w-16 bg-white/30 rounded animate-pulse" /> : value ?? 0}
       </div>
-      <div className="text-sm opacity-80">{label}</div>
+      <div className="text-sm text-black/90 font-medium">{label}</div>
     </div>
   );
 
@@ -129,7 +129,7 @@ export function Hero() {
             </div>
 
             {/* Stats: 2 columnas en móvil, 4 en md+ */}
-            <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-2">
+            <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-2 ">
               <Stat icon={<MapPin />} value={counts.lines} label="Líneas activas" />
               <Stat icon={<Users />} value={counts.resources} label="Recursos activos" />
               <Stat icon={<Briefcase />} value={counts.jobs} label="Empleos activos" />
@@ -137,7 +137,7 @@ export function Hero() {
             </div>
 
             {/* Disclaimer corto (legible en mobile) */}
-            <p className="text-xs sm:text-[13px] text-white/80 max-w-[34rem]">
+            <p className="text-xs sm:text-[13px] text-blue/80 max-w-[34rem]">
               Datos de fuentes públicas; podrían cambiar. Verificá con fuentes oficiales.
             </p>
           </div>
