@@ -145,7 +145,7 @@ export default function JujuyConectaAssistantModal({
       console.error(e);
       setMessages((m) => [
         ...m,
-        { sender: "bot", text: "Tuvimos un inconveniente procesando tu consulta. Probá nuevamente." },
+        { sender: "bot", text: "Hola! por el momento no puedo ayudarte, estoy en entrenamiento para poder estar mas actualizado, pronto podremos charlar!" },
       ]);
     } finally {
       setIsTyping(false);

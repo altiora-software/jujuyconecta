@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Users, Briefcase, Shield } from "lucide-react";
+import { MapPin, Users, Briefcase, Shield, Newspaper, Mic, Gift } from "lucide-react";
 import JujuyConectaAssistantModal from "@/components/assistant/JujuyConectaAssistantModal";
 import { OnboardingOnce } from "@/components/onboarding/OnboardingOnce";
 import { useAuth } from "@/hooks/useAuth";
@@ -91,8 +91,9 @@ export function Hero() {
       <div className="absolute inset-0">
         <img
           src={imagenHero}
-          alt="Paisaje de Jujuy"
+          alt="Paisaje representativo de Jujuy — Jujuy Conecta"
           className="w-full h-full object-cover object-center scale-[1.15] sm:scale-[1.2] lg:scale-[1.25] transition-transform duration-700"
+          loading="lazy"
         />
         {/* Verde más translúcido para que se vea la imagen */}
         <div className="absolute inset-0 bg-gradient-hero/45 sm:bg-gradient-hero/40 lg:bg-gradient-hero/35" />
@@ -106,30 +107,70 @@ export function Hero() {
         <div className="container mx-auto px-4">
           <div className="min-h-[70svh] sm:min-h-[68svh] lg:min-h-[60svh] flex flex-col items-center justify-center text-center gap-6 py-12 sm:py-14 lg:py-20">
             <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight">
-              La forma más simple de{" "}
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-800 to-teal-500">
-                conectarte con Jujuy
-              </span>
+              Jujuy Conecta <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-800 to-blue-500">la plataforma que une información, cultura y servicios.</span>
             </h1>
 
-            <p className="max-w-[34rem] text-base sm:text-lg lg:text-2xl/8 opacity-95">
-              Explorá historia y turismo, accedé a recursos comunitarios y transporte, y recibí alertas para cuidarte en internet.
-              Pensada para jujeños y turistas.
+            <p className="max-w-[56rem] text-base sm:text-lg lg:text-xl/7 opacity-95">
+              Somos el medio digital que conecta a la gente con <strong>información local</strong>, <strong>servicios útiles</strong> y <strong>comunidad</strong>.
+              Publicamos noticias y reportajes en nuestro diario digital, producimos un videopodcast con historias y entrevistas, y mantenemos herramientas y recursos para facilitar la vida en Jujuy.
             </p>
 
-            {/* CTA */}
-            <div className="w-full max-w-md flex flex-col xs:flex-row gap-3 justify-center">
-              <Button
-                size="lg"
-                className="w-full xs:w-auto hover:animate-glow"
-                onClick={handleOpenAssistant}
-              >
-                Hablar con el asistente
+            {/* CTA principal */}
+            <div className="w-full max-w-2xl flex flex-col xs:flex-row gap-3 justify-center items-center">
+              <div className="flex gap-3 w-full xs:w-auto flex-wrap justify-center">
+                <Button 
+                  size="lg"
+                  className="w-full xs:w-auto"
+                  onClick={handleOpenAssistant}
+                >
+                  <Briefcase className="mr-2" /> Habla con el asistente!
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full xs:w-auto hover:animate-glow"
+                  onClick={() => (window.location.href = "/diario")}
+                >
+                  <Newspaper className="mr-2" /> Lee nuestro diario digital
+                </Button>
+
+                <Button
+                  size="lg"
+                  className="w-full xs:w-auto"
+                  onClick={() => (window.location.href = "/podcast")}
+                >
+                  <Mic className="mr-2" /> Escucha el videopodcast!
+                </Button>
+
+              </div>
+            </div>
+
+            {/* Segunda fila CTA: Asistente + Apoyar */}
+            <div className="flex gap-3 mt-2 items-center">
+              
+              <Button size="sm" variant="ghost" onClick={() => (window.location.href = "/apoyar")}>
+                <Gift className="mr-2" /> Apoyar / Donar
               </Button>
             </div>
 
+            {/* Tarjeta corta explicativa (visually separated) */}
+            {/* <div className="mt-4 bg-white/90 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-md max-w-3xl w-full text-left">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <div className="text-sm font-semibold text-slate-700">Qué hacemos</div>
+                  <div className="mt-1 text-sm text-slate-800">
+                    Publicamos noticias locales, promovemos emprendimientos, organizamos eventos (catas, encuentros) y ofrecemos recursos — todo en un solo lugar.
+                  </div>
+                </div>
+                <div className="flex gap-4 items-center">
+                  <div className="text-xs text-slate-600">¿Querés publicar o colaborar?</div>
+                  <Button size="sm" onClick={() => (window.location.href = "/contacto")}>Contactanos</Button>
+                </div>
+              </div>
+            </div> */}
+
             {/* Stats: 2 columnas en móvil, 4 en md+ */}
-            <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-2 ">
+            <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-4 ">
               <Stat icon={<MapPin />} value={counts.lines} label="Líneas activas" />
               <Stat icon={<Users />} value={counts.resources} label="Recursos activos" />
               <Stat icon={<Briefcase />} value={counts.jobs} label="Empleos activos" />
@@ -137,8 +178,8 @@ export function Hero() {
             </div>
 
             {/* Disclaimer corto (legible en mobile) */}
-            <p className="text-xs sm:text-[13px] text-blue/80 max-w-[34rem]">
-              Datos de fuentes públicas; podrían cambiar. Verificá con fuentes oficiales.
+            <p className="text-xs sm:text-[13px] text-blue/80 max-w-[34rem] mt-2">
+              Datos de fuentes públicas; podrían cambiar. Verificá con fuentes oficiales. Para temas editoriales escribinos a contacto@jujuyconecta.com
             </p>
           </div>
         </div>
@@ -157,7 +198,5 @@ export function Hero() {
         <JujuyConectaAssistantModal open={assistantOpen} onClose={() => setAssistantOpen(false)} />
       )}
     </section>
-
-
   );
 }

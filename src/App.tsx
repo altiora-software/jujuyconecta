@@ -12,6 +12,12 @@ import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Podcast from "./pages/Podcast";
+import DiarioPresentacion from "./pages/Diario";
+import ApoyarPage from "./pages/Apoyar";
+import Agenda from "./pages/servicios/Agenda";
+import AllServicesPage from "./pages/AllServicesPage";
+import Mantenimiento from "./pages/servicios/Directorio";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +30,14 @@ const App = () => (
         <Route path="/" element={<Index />} />
         <Route path="/transport" element={<Transport />} />
         <Route path="/resources" element={<Resources />} />
+        <Route path="/podcast" element={<Podcast />} />
+        <Route path="/diario" element={<DiarioPresentacion />} />
+        <Route path="/apoyar" element={<ApoyarPage />} />
+        <Route path="/servicios/agenda" element={<Agenda />} />
+        <Route path="/servicios/directorio" element={<Mantenimiento />} />
+        <Route path="/servicios/asesoria-startup" element={<Mantenimiento />} />
+        <Route path="/servicios/marketplace" element={<Mantenimiento />} />
+        <Route path="/servicios/todos" element={<AllServicesPage />} />
         <Route path="/terminos" element={<TermsAndConditions />} />
         <Route path="/privacidad" element={<PrivacyPolicy />} />
         <Route path="/jobs" element={<Jobs />} />

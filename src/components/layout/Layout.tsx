@@ -53,7 +53,7 @@ export function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-1">{children}</main>
-      <SocialLinks
+      {/* <SocialLinks
         items={[
           { href: "https://instagram.com/jujuy_conecta", label: "Instagram", icon: Icons.Instagram },
           { href: "https://facebook.com/jujuy_conecta", label: "Facebook", icon: Icons.Facebook },
@@ -63,7 +63,7 @@ export function Layout({ children }: LayoutProps) {
         ]}
         className="justify-center md:justify-start"
         rounded="2xl"
-      />
+      /> */}
       <footer className="border-t bg-card/50 py-12 mt-16">
         {/* Primera fila: 1→2→4 columnas responsivas */}
         <div className="container mx-auto px-4 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -137,24 +137,47 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
          {/* Marca */}
-         <div className="text-center sm:text-left space-y-3">
-            <div className="flex items-center justify-center sm:justify-start space-x-2">
-              <div className="h-6 w-6 rounded bg-gradient-hero flex items-center justify-center">
-                <span className="text-white font-bold text-xs">JC</span>
+         {/* Footer / Brand block - siempre centrado y responsive */}
+        <div className="w-full flex justify-center">
+          <div
+            role="contentinfo"
+            aria-label="Identidad y créditos de Jujuy Conecta"
+            className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl px-4 py-6 text-center space-y-3"
+          >
+            <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-center">
+              {/* Logo circular */}
+              <div
+                className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-tr from-green-600 to-green-400 text-white font-bold text-sm shrink-0"
+                aria-hidden="true"
+              >
+                JC
               </div>
-              <span className="text-lg font-semibold text-primary">Jujuy Conecta</span>
+
+              {/* Título y subtítulo (si querés que el título quede siempre centrado, lo dejamos así) */}
+              <div>
+                <div className="text-lg md:text-xl font-semibold text-green-800">Jujuy Conecta</div>
+                <p className="mt-1 text-sm text-slate-600">
+                  Conectando a los jujeños con recursos, transporte y oportunidades.
+                </p>
+              </div>
             </div>
-            <p className="text-muted-foreground text-sm">
-              Conectando a los jujeños con recursos, transporte y oportunidades.
-            </p>
-            <p className="text-muted-foreground text-xs">
+
+            {/* Créditos / copy */}
+            <p className="text-xs text-slate-500">
               © 2025 Jujuy Conecta. Desarrollado por{" "}
-              <a href="https://altiorasoftware.com.ar" target="_blank" rel="noreferrer" className="underline">
-                Altiora Software
+              <a
+                href="https://altiorasoftware.com.ar"
+                target="_blank"
+                rel="noreferrer"
+                className="underline text-green-700 hover:text-green-900"
+              >
+                Ether Code
               </a>{" "}
               ❤️ para la comunidad jujeña.
             </p>
           </div>
+        </div>
+
       </footer>
     </div>
   );
