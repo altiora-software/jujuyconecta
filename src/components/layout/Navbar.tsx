@@ -35,13 +35,13 @@ export function Navbar() {
       // { label: "Portal de Noticias", href: "/servicios/portal-noticias" },
       { label: "Agenda Comunitaria", href: "/servicios/agenda" },
       { label: "Directorio Local", href: "/servicios/directorio" },
-      { label: "Alertas de Seguridad", href: "/security" },
     ],
     "Emprendimientos": [
       { label: "Marketplace Local", href: "/servicios/marketplace" },
       { label: "Asesoría de Negocios", href: "/servicios/asesoria-startup" },
     ],
     "Formación": [
+      { label: "Alertas de Seguridad", href: "/security" },
       { label: "Cursos y Talleres", href: "/servicios/cursos" },
       { label: "Mentorías", href: "/servicios/mentorias" },
     ],
