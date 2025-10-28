@@ -7,7 +7,11 @@ import JujuyConectaAssistantModal from "@/components/assistant/JujuyConectaAssis
 import { OnboardingOnce } from "@/components/onboarding/OnboardingOnce";
 import { useAuth } from "@/hooks/useAuth";
 import imagenHero from "@/assets/jujuy-hero.jpg";
-import LoginRequiredDialog from "@/components/auth/LoginRequiredDialog";
+// import LoginRequiredDialog from "@/components/auth/LoginRequiredDialog";
+import AiTrainingModal from "@/components/aiTrainingModal/AiTrainingModal";
+
+
+
 
 type Counts = {
   lines: number | null;
@@ -17,6 +21,7 @@ type Counts = {
 };
 
 export function Hero() {
+  const [open, setOpen] = useState(false);
   const [counts, setCounts] = useState<Counts>({ lines: null, resources: null, jobs: null, alerts: null });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -60,10 +65,12 @@ export function Hero() {
   const handleOpenAssistant = useCallback(async () => {
     if (authLoading) return;
     if (!user) {
-      setLoginDialogOpen(true);
+      // setLoginDialogOpen(true);
+      setOpen(true);
       return;
     }
-    setAssistantOpen(true);
+    setOpen(true);
+    // setAssistantOpen(true);
   }, [authLoading, user]);
 
   // Callback que se ejecuta cuando el usuario aceptó términos y clickea "Continuar con Google"
@@ -187,12 +194,17 @@ export function Hero() {
 
       {/* Onboarding + Modales */}
       <OnboardingOnce onOpenAssistant={handleOpenAssistant} />
+      <AiTrainingModal
+        open={open}
+        onClose={() => setOpen(false)}
+        supportEmail="soporte@jujuyconecta.ar"
+      />
 
-      <LoginRequiredDialog
+      {/* <LoginRequiredDialog
         open={loginDialogOpen && !user}
         onClose={() => setLoginDialogOpen(false)}
         onContinueWithGoogle={handleContinueWithGoogle}
-      />
+      /> */}
 
       {assistantOpen && user && (
         <JujuyConectaAssistantModal open={assistantOpen} onClose={() => setAssistantOpen(false)} />

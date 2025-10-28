@@ -348,6 +348,33 @@ export type Database = {
           },
         ]
       }
+      ai_access_requests: {
+        Row: {
+          id: string
+          email: string
+          agreed: boolean
+          source: string | null
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          agreed: boolean
+          source?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          agreed?: boolean
+          source?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       
       contact_messages: {
         Row: {
