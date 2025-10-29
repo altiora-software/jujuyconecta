@@ -2,29 +2,96 @@
 <html lang="es">
   <head>
     <!-- Google Tag Manager -->
-      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-PZTWNM8K');</script>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PZTWNM8K');</script>
     <!-- End Google Tag Manager -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jujuy Conecta - Movilidad, Recursos y Oportunidades</title>
-    <meta name="description" content="Plataforma que conecta a los jujeños con información de transporte, turismo, historia, recursos comunitarios y oportunidades laborales" />
+  
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  
+    <title>Jujuy Conecta — Movilidad, turismo, recursos y oportunidades</title>
+    <meta name="description" content="Jujuy Conecta: noticias, transporte, turismo, recursos comunitarios y oportunidades para la provincia de Jujuy. Información local, confiable y actualizada." />
     <meta name="author" content="Jujuy Conecta" />
-
-    <meta property="og:title" content="Jujuy Conecta - Movilidad, Recursos y Oportunidades" />
-    <meta property="og:description" content="Plataforma que conecta a los jujeños con información de turismo, historia, transporte, recursos comunitarios y oportunidades laborales" />
-    <meta property="og:type" content="website" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    
-    <!-- PWA Manifest -->
+    <meta name="theme-color" content="#0b61ff" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://jujuyconecta.example.com/" />
+  
+    <!-- Preconnect & DNS-prefetch -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://images.example-cdn.com" />
+  
+    <!-- Favicons & App -->
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563EB" />
-    <link rel="apple-touch-icon" href="/favicon.ico" />
+  
+    <!-- Open Graph -->
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Jujuy Conecta" />
+    <meta property="og:title" content="Jujuy Conecta — Movilidad, turismo, recursos y oportunidades" />
+    <meta property="og:description" content="Información local para Jujuy: transporte, turismo, servicios y oportunidades laborales." />
+    <meta property="og:url" content="https://jujuyconecta.example.com/" />
+    <meta property="og:image" content="https://jujuyconecta.example.com/og/jujuy-conecta-home.png" />
+    <meta property="og:image:alt" content="Jujuy Conecta — portada" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+  
+    <!-- Twitter card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@jujuyconecta" />
+    <meta name="twitter:title" content="Jujuy Conecta — Movilidad, turismo, recursos y oportunidades" />
+    <meta name="twitter:description" content="Información local para Jujuy: transporte, turismo, servicios y oportunidades laborales." />
+    <meta name="twitter:image" content="https://jujuyconecta.example.com/og/jujuy-conecta-home.png" />
+  
+    <!-- Hreflang (si vas a soportar otros idiomas) -->
+    <!-- <link rel="alternate" href="https://jujuyconecta.example.com/" hreflang="es-ar" /> -->
+  
+    <!-- Fonts (use font-display:swap in CSS) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+    <!-- Critical CSS inline (optional) -->
+    <!-- <style>/* Critical above-the-fold CSS small chunk */</style> -->
+  
+    <!-- Structured Data (homepage minimal) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://jujuyconecta.example.com/#org",
+          "name": "Jujuy Conecta",
+          "url": "https://jujuyconecta.example.com/",
+          "logo": "https://jujuyconecta.example.com/logo.png",
+          "sameAs": [
+            "https://www.facebook.com/jujuyconecta",
+            "https://www.instagram.com/jujuyconecta",
+            "https://twitter.com/jujuyconecta"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://jujuyconecta.example.com/#website",
+          "url": "https://jujuyconecta.example.com/",
+          "name": "Jujuy Conecta",
+          "publisher": { "@id": "https://jujuyconecta.example.com/#org" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://jujuyconecta.example.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
   </head>
+  
 
   <body>
     <!-- Google Tag Manager (noscript) -->

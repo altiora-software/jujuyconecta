@@ -1,14 +1,8 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Sitemap: https://jujuyconecta.example.com/sitemap.xml
+Host: https://jujuyconecta.example.com
+
+# Block staging or admin paths if you want:
+Disallow: /admin
+Disallow: /login
