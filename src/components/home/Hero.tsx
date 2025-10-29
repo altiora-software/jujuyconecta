@@ -146,7 +146,7 @@ export function Hero() {
                   className="w-full xs:w-auto"
                   onClick={() => (window.location.href = "/podcast")}
                 >
-                  <Mic className="mr-2" /> Escucha el videopodcast!
+                  <Mic className="mr-2" /> Escucha nuestro videopodcast
                 </Button>
 
               </div>
