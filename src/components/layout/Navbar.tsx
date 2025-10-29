@@ -182,7 +182,7 @@ export function Navbar() {
 
                   {/* Pequeña acción/CTA */}
                   <div className="mt-3 flex justify-end">
-                    <Link to="/servicios/todos" onClick={() => setIsServicesOpen(false)}>
+                    <Link to="/servicios" onClick={() => setIsServicesOpen(false)}>
                       <Button size="sm" variant="outline">Ver todos los servicios</Button>
                     </Link>
                   </div>
