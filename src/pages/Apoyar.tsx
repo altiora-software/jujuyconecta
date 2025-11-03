@@ -191,14 +191,14 @@ export default function ApoyarPage(): JSX.Element {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Reemplazá los datos a continuación por los reales de tu cuenta antes de publicar.
+                Datos de la cuenta.
               </p>
 
               <div className="mt-3 text-sm">
-                <p><strong>Banco:</strong> REEMPLAZAR NOMBRE BANCO</p>
+                <p><strong>Banco:</strong> BANCO</p>
                 <p><strong>CBU / CVU:</strong> 0000000000000000000000</p>
-                <p><strong>Alias:</strong> juju.ycon.ecta.don</p>
-                <p><strong>Titular:</strong> Fundación / Nombre</p>
+                <p><strong>Alias:</strong> jujuyconecta</p>
+                <p><strong>Titular:</strong> Fundación </p>
               </div>
 
               <div className="mt-4">
