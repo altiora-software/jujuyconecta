@@ -1,5 +1,1 @@
-# Archivo ads.txt para Jujuy Conecta y Diario Digital
-# Declaración de vendedores autorizados de inventario publicitario
-# Más info: https://iabtechlab.com/ads-txt/
-
 google.com, pub-2751071957273972, DIRECT, f08c47fec0942fa0
