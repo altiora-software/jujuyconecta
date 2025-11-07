@@ -166,7 +166,7 @@ export function Layout({ children }: LayoutProps) {
             <p className="text-xs text-slate-500">
               © 2025 Jujuy Conecta. Desarrollado por{" "}
               <a
-                href="https://altiorasoftware.com.ar"
+                href="https://ethercode.com.ar"
                 target="_blank"
                 rel="noreferrer"
                 className="underline text-green-700 hover:text-green-900"
