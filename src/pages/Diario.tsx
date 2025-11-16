@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Newspaper, Heart, Megaphone, Users, Mail } from "lucide-react";
 
-const DIARIO_URL = "/diario"; // Cambiá por dominio real del diario
+const DIARIO_URL = "https://jujuyconecta.online"; // Cambiá por dominio real del diario
 
 export default function DiarioPresentacion(): JSX.Element {
   const [email, setEmail] = useState("");
