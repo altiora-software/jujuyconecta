@@ -64,7 +64,44 @@
     <meta name="twitter:title" content="Jujuy Conecta — Movilidad, turismo, recursos y oportunidades" />
     <meta name="twitter:description" content="Información local para Jujuy: transporte, turismo, servicios y oportunidades laborales." />
     <meta name="twitter:image" content="https://jujuyconecta.com/og/jujuy-conecta-home.png" />
-  
+    <!-- SEO Avanzado Jujuy Conecta -->
+    <meta name="description" content="Jujuy Conecta es la plataforma más completa de Jujuy con noticias, transporte, turismo, mapas interactivos, recursos públicos, eventos, trámites, obras del gobierno, clima, seguridad, comercios, restaurantes y oportunidades laborales en toda la provincia. Información actualizada y confiable para San Salvador de Jujuy y cada municipio." />
+
+    <meta name="keywords" content="Jujuy, San Salvador de Jujuy, transporte Jujuy, turismo Jujuy, noticias Jujuy, obras Jujuy, colectivos Jujuy, eventos Jujuy, recursos Jujuy, mapa Jujuy, líneas de colectivo Jujuy, hospital Jujuy, rutas Jujuy, comercios Jujuy, trámites Jujuy, clima Jujuy, seguridad Jujuy" />
+
+    <link rel="canonical" href="https://jujuyconecta.com/" />
+
+    <meta name="coverage" content="Jujuy, Argentina" />
+    <meta name="geo.region" content="AR-Y" />
+    <meta name="geo.placename" content="San Salvador de Jujuy" />
+    <meta name="geo.position" content="-24.1857;-65.2995" />
+    <meta name="ICBM" content="-24.1857, -65.2995" />
+
+    <!-- OpenGraph extendido -->
+    <meta property="og:title" content="Jujuy Conecta — Noticias, transporte, turismo y recursos de Jujuy" />
+    <meta property="og:description" content="La plataforma más completa de información en Jujuy. Rutas, líneas de colectivo, turismo, clima, noticias, mapas de obras y servicios en toda la provincia." />
+    <meta property="og:image" content="https://jujuyconecta.com/og/jujuy-home-cover.png" />
+
+    <!-- Twitter extendido -->
+    <meta name="twitter:title" content="Jujuy Conecta — Todo Jujuy en un solo lugar" />
+    <meta name="twitter:description" content="Transporte, turismo, noticias, servicios, mapas de obras y guías locales de Jujuy." />
+
+    <!-- News -->
+    <meta name="news_keywords" content="Noticias Jujuy, Último momento Jujuy, San Salvador de Jujuy noticias" />
+
+    <!-- Indexación fuerte -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+
+    <!-- Topic Clusters -->
+    <meta property="article:tag" content="Jujuy" />
+    <meta property="article:tag" content="San Salvador de Jujuy" />
+    <meta property="article:tag" content="Transporte Jujuy" />
+    <meta property="article:tag" content="Turismo Jujuy" />
+    <meta property="article:tag" content="Noticias Jujuy" />
+    <meta property="article:tag" content="Colectivos Jujuy" />
+    <meta property="article:tag" content="Obras Jujuy" />
+
     <!-- Hreflang (si vas a soportar otros idiomas) -->
     <!-- <link rel="alternate" href="https://jujuyconecta.com/" hreflang="es-ar" /> -->
   
@@ -106,6 +143,95 @@
       ]
     }
     </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+      
+          {
+            "@type": "Organization",
+            "@id": "https://jujuyconecta.com/#org",
+            "name": "Jujuy Conecta",
+            "url": "https://jujuyconecta.com/",
+            "logo": "https://jujuyconecta.com/logo.png",
+            "description": "Plataforma integral de noticias, transporte, turismo, recursos y servicios de Jujuy.",
+            "sameAs": [
+              "https://www.instagram.com/jujuyconecta",
+              "https://www.facebook.com/jujuyconecta",
+              "https://twitter.com/jujuyconecta"
+            ]
+          },
+      
+          {
+            "@type": "WebSite",
+            "@id": "https://jujuyconecta.com/#website",
+            "url": "https://jujuyconecta.com/",
+            "name": "Jujuy Conecta",
+            "publisher": { "@id": "https://jujuyconecta.com/#org" },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://jujuyconecta.com/search?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          },
+      
+          {
+            "@type": "WebPage",
+            "@id": "https://jujuyconecta.com/#webpage",
+            "url": "https://jujuyconecta.com/",
+            "name": "Jujuy Conecta - Portal de Jujuy",
+            "description": "Noticias, transporte, turismo, obras, recursos y servicios de Jujuy.",
+            "inLanguage": "es-AR",
+            "isPartOf": { "@id": "https://jujuyconecta.com/#website" }
+          },
+      
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Inicio",
+                "item": "https://jujuyconecta.com/"
+              }
+            ]
+          },
+      
+          {
+            "@type": "Place",
+            "@id": "https://jujuyconecta.com/#jujuy",
+            "name": "Jujuy",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "San Salvador de Jujuy",
+              "addressRegion": "Jujuy",
+              "addressCountry": "AR"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": -24.1857,
+              "longitude": -65.2995
+            }
+          },
+      
+          {
+            "@type": "TouristDestination",
+            "@id": "https://jujuyconecta.com/#destino",
+            "name": "Turismo en Jujuy",
+            "description": "Guía completa de turismo en Jujuy: actividades, lugares, rutas, hoteles, gastronomía.",
+            "url": "https://jujuyconecta.com/turismo"
+          },
+      
+          {
+            "@type": "GovernmentService",
+            "@id": "https://jujuyconecta.com/#servicios",
+            "name": "Servicios y recursos en Jujuy",
+            "provider": { "@id": "https://jujuyconecta.com/#org" },
+            "serviceType": "Transporte, salud, educación, trámites, obras públicas"
+          }
+        ]
+      }
+      </script>
   </head>  
 
   <body>
