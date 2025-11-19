@@ -1,0 +1,27 @@
+[
+    {
+      "type": "transporte_linea",
+      "cluster": "transporte",
+      "municipio": "San Salvador de Jujuy",
+      "titulo_base": "Línea 5: 370 Viviendas – Hospital Materno Infantil",
+      "descripcion_base": "Colectivo urbano que conecta el Hospital Materno Infantil con el barrio 370 Viviendas atravesando el centro.",
+      "datos_clave": "Paradas principales: Hospital Materno Infantil, Av. Córdoba, Av. 19 de Abril, Plaza Italia, Av. Almirante Brown, 370 Viviendas. Frecuencia estimada: 10 a 15 minutos en hora pico."
+    },
+    {
+      "type": "turismo_atractivo",
+      "cluster": "turismo",
+      "municipio": "Tilcara",
+      "titulo_base": "Garganta del Diablo en Tilcara",
+      "descripcion_base": "Atractivo natural de la Quebrada de Humahuaca, con sendero y miradores.",
+      "datos_clave": "Altura aproximada, dificultad del sendero, tiempo de caminata, clima típico, recomendaciones de seguridad, servicios cercanos en Tilcara."
+    },
+    {
+      "type": "recurso",
+      "cluster": "recursos",
+      "municipio": "San Salvador de Jujuy",
+      "titulo_base": "Hospital Pablo Soria",
+      "descripcion_base": "Uno de los hospitales más importantes de la capital jujeña, con servicios de guardia y especialidades.",
+      "datos_clave": "Dirección, teléfonos, servicios de guardia, especialidades, líneas de colectivo que llegan, horarios de atención, recomendaciones en caso de emergencia."
+    }
+  ]
+  

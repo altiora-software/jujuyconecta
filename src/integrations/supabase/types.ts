@@ -269,6 +269,301 @@ export type Database = {
         }
         Relationships: []
       }
+      content_pages: {
+        Row: {
+          id: string
+          slug: string
+          title: string
+          subtitle: string | null
+          type: "noticia" | "transporte_linea" | "transporte_parada" | "turismo_atractivo" | "turismo_localidad" | "turismo_ruta" | "recurso" | "obra" | "guia"
+          cluster: "transporte" | "turismo" | "recursos" | "obras" | "noticias" | "general"
+          municipio: string | null
+          category: string | null
+          tags: string[] | null
+          summary: string | null
+          body_md: string | null
+          body_html: string | null
+          schema_json: any | null
+          related_slugs: string[] | null
+          status: "draft" | "published"
+          image_url: string | null
+          source: string | null
+          published_at: string | null
+          created_at: string
+          updated_at: string
+        }
+      
+        Insert: {
+          id?: string
+          slug: string
+          title: string
+          subtitle?: string | null
+          type: "noticia" | "transporte_linea" | "transporte_parada" | "turismo_atractivo" | "turismo_localidad" | "turismo_ruta" | "recurso" | "obra" | "guia"
+          cluster: "transporte" | "turismo" | "recursos" | "obras" | "noticias" | "general"
+          municipio?: string | null
+          category?: string | null
+          tags?: string[] | null
+          summary?: string | null
+          body_md?: string | null
+          body_html?: string | null
+          schema_json?: any | null
+          related_slugs?: string[] | null
+          status?: "draft" | "published"
+          image_url?: string | null
+          source?: string | null
+          published_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      
+        Update: {
+          id?: string
+          slug?: string
+          title?: string
+          subtitle?: string | null
+          type?: "noticia" | "transporte_linea" | "transporte_parada" | "turismo_atractivo" | "turismo_localidad" | "turismo_ruta" | "recurso" | "obra" | "guia"
+          cluster?: "transporte" | "turismo" | "recursos" | "obras" | "noticias" | "general"
+          municipio?: string | null
+          category?: string | null
+          tags?: string[] | null
+          summary?: string | null
+          body_md?: string | null
+          body_html?: string | null
+          schema_json?: any | null
+          related_slugs?: string[] | null
+          status?: "draft" | "published"
+          image_url?: string | null
+          source?: string | null
+          published_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      
+        Relationships: []
+      }
+      internal_links: {
+        Row: {
+          id: string
+          keyword: string
+          target_slug: string
+          priority: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          keyword: string
+          target_slug: string
+          priority?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          keyword?: string
+          target_slug?: string
+          priority?: number | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      
+      tourism_places: {
+        Row: {
+          id: string;
+          name: string;
+          municipality: string | null;
+          category:
+            | "naturaleza"
+            | "cultura"
+            | "gastronomia"
+            | "aventura"
+            | "urbano"
+            | "otros";
+          short_description: string | null;
+          long_description: string | null;
+          image_url: string | null;
+          latitude: number | null;
+          longitude: number | null;
+          rating: number | null;
+          tags: string[] | null;
+          is_featured: boolean;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+          created_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          municipality?: string | null;
+          category?:
+            | "naturaleza"
+            | "cultura"
+            | "gastronomia"
+            | "aventura"
+            | "urbano"
+            | "otros";
+          short_description?: string | null;
+          long_description?: string | null;
+          image_url?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          rating?: number | null;
+          tags?: string[] | null;
+          is_featured?: boolean;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          municipality?: string | null;
+          category?:
+            | "naturaleza"
+            | "cultura"
+            | "gastronomia"
+            | "aventura"
+            | "urbano"
+            | "otros";
+          short_description?: string | null;
+          long_description?: string | null;
+          image_url?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          rating?: number | null;
+          tags?: string[] | null;
+          is_featured?: boolean;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+        };
+        Relationships: [];
+      };
+
+      tourism_routes: {
+        Row: {
+          id: string;
+          name: string;
+          difficulty: "facil" | "media" | "dificil" | null;
+          duration_hours: number | null;
+          distance_km: number | null;
+          short_description: string | null;
+          long_description: string | null;
+          start_municipality: string | null;
+          end_municipality: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+          created_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          difficulty?: "facil" | "media" | "dificil" | null;
+          duration_hours?: number | null;
+          distance_km?: number | null;
+          short_description?: string | null;
+          long_description?: string | null;
+          start_municipality?: string | null;
+          end_municipality?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          difficulty?: "facil" | "media" | "dificil" | null;
+          duration_hours?: number | null;
+          distance_km?: number | null;
+          short_description?: string | null;
+          long_description?: string | null;
+          start_municipality?: string | null;
+          end_municipality?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+        };
+        Relationships: [];
+      };
+
+      tourism_events: {
+        Row: {
+          id: string;
+          title: string;
+          municipality: string | null;
+          date: string;
+          category:
+            | "fiesta_popular"
+            | "festival"
+            | "peña"
+            | "feria"
+            | "evento_cultural"
+            | "evento_deportivo"
+            | "otro"
+            | null;
+          location_detail: string | null;
+          price_range: string | null;
+          short_description: string | null;
+          external_link: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+          created_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          municipality?: string | null;
+          date: string;
+          category?:
+            | "fiesta_popular"
+            | "festival"
+            | "peña"
+            | "feria"
+            | "evento_cultural"
+            | "evento_deportivo"
+            | "otro"
+            | null;
+          location_detail?: string | null;
+          price_range?: string | null;
+          short_description?: string | null;
+          external_link?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          municipality?: string | null;
+          date?: string;
+          category?:
+            | "fiesta_popular"
+            | "festival"
+            | "peña"
+            | "feria"
+            | "evento_cultural"
+            | "evento_deportivo"
+            | "otro"
+            | null;
+          location_detail?: string | null;
+          price_range?: string | null;
+          short_description?: string | null;
+          external_link?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+        };
+        Relationships: [];
+      };
+
       transport_reports: {
         Row: {
           created_at: string
@@ -348,6 +643,106 @@ export type Database = {
           },
         ]
       }
+      transport_raw_stops: {
+        Row: {
+          id: string
+          line_id: string | null
+          line_code: string
+          direction: string
+          order_index: number
+      
+          stop_name: string
+          direccion: string | null
+      
+          address_raw: string | null
+          city: string | null
+          province: string | null
+          country: string | null
+      
+          latitude: number | null
+          longitude: number | null
+          precision_note: string | null
+      
+          source: string | null
+          processed: boolean | null
+      
+          stop_id: string | null
+      
+          created_at: string
+        }
+      
+        Insert: {
+          id?: string
+          line_id?: string | null
+          line_code: string
+          direction: string
+          order_index: number
+      
+          stop_name: string
+          direccion?: string | null
+      
+          address_raw?: string | null
+          city?: string | null
+          province?: string | null
+          country?: string | null
+      
+          latitude?: number | null
+          longitude?: number | null
+          precision_note?: string | null
+      
+          source?: string | null
+          processed?: boolean | null
+      
+          stop_id?: string | null
+      
+          created_at?: string
+        }
+      
+        Update: {
+          id?: string
+          line_id?: string | null
+          line_code?: string
+          direction?: string
+          order_index?: number
+      
+          stop_name?: string
+          direccion?: string | null
+      
+          address_raw?: string | null
+          city?: string | null
+          province?: string | null
+          country?: string | null
+      
+          latitude?: number | null
+          longitude?: number | null
+          precision_note?: string | null
+      
+          source?: string | null
+          processed?: boolean | null
+      
+          stop_id?: string | null
+      
+          created_at?: string
+        }
+      
+        Relationships: [
+          {
+            foreignKeyName: "transport_raw_stops_line_id_fkey"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "transport_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transport_raw_stops_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: false
+            referencedRelation: "transport_stops"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      
       ai_access_requests: {
         Row: {
           id: string

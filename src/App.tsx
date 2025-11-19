@@ -19,6 +19,7 @@ import Agenda from "./pages/servicios/Agenda";
 import AllServicesPage from "./pages/AllServicesPage";
 import Mantenimiento from "./pages/servicios/Directorio";
 import { ScrollToTop } from "./components/common/ScrollUp";
+import Tourism from "./pages/Tourism";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
         <Route path="/security" element={<Security />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/turismo" element={<Tourism />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

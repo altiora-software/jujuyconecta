@@ -26,6 +26,7 @@ export function Navbar() {
     { label: "Inicio", href: "/" },
     { label: "Diario Digital", href: "/diario" },
     { label: "Podcast", href: "/podcast" },
+    { label: "Turismo", href: "/turismo" },
   ];
 
   // Ejemplo de servicios organizados en solapas
