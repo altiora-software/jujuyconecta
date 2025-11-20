@@ -229,17 +229,18 @@ export default function ApoyarPage(): JSX.Element {
               </p>
 
               <div className="mt-3">
-                <Button
-                  variant="outline"
+              <a
                   onClick={() =>
                     toast({
-                      title: "Muchas gracias",
-                      description: "Escribinos y coordinamos la colaboración.",
-                    })
-                  }
-                >
-                  Contactar para donar en especie
-                </Button>
+                    title: "Muchas gracias",
+                    description: "Escribinos y coordinamos la colaboración.",
+                  })
+                }
+                href="#patrocinio"
+                className="inline-flex items-center gap-2 px-4 py-3 rounded border"
+              >
+                 🎁 Conactar para donar en especie
+              </a>
               </div>
             </CardContent>
           </Card>
