@@ -146,7 +146,7 @@ export function Hero() {
                     className="w-full xs:w-auto"
                     onClick={handleOpenAssistant}
                   >
-                    <Briefcase className="mr-2" /> Habla con el asistente!
+                    <Briefcase className="mr-2" /> Proximamente conocé al asistente!
                   </Button>
                 {/* <Button
                   size="lg"
@@ -204,7 +204,7 @@ export function Hero() {
       <AiTrainingModal
         open={open}
         onClose={() => setOpen(false)}
-        supportEmail="soporte@jujuyconecta.ar"
+        supportEmail="jujuyconecta@gmail.com"
       />
 
       {/* <LoginRequiredDialog

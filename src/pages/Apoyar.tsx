@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const ENLACE_MERCADOPAGO = "https://www.mercadopago.com.ar/checkout_stub_link_REEMPLAZAR";
 const ENLACE_PAYPAL = "https://www.paypal.com/donate?hosted_button_id=REEMPLAZAR";
-const DIAGRAM_CONTACT_EMAIL = "hola@jujuyconecta.ar";
+const DIAGRAM_CONTACT_EMAIL = "jujuyconecta@gmail.com";
 
 export default function ApoyarPage(): JSX.Element {
   const [amount, setAmount] = useState<string>("");

@@ -195,8 +195,8 @@ export default function AiTrainingModal({ open, onClose, onRequestAccess, suppor
 
               <div className="text-xs text-slate-500">
                 Usamos tu email solo para notificarte. Si preferís, escribinos a{" "}
-                <a href={`mailto:${supportEmail ?? "hola@jujuyconecta.ar"}`} className="underline">
-                  {supportEmail ?? "hola@jujuyconecta.ar"}
+                <a href={`mailto:${supportEmail ?? "jujuyconecta@gmail.com"}`} className="underline">
+                  {supportEmail ?? "jujuyconecta@gmail.com"}
                 </a>
                 .
               </div>

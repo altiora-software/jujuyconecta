@@ -430,7 +430,7 @@ export default function Podcast() {
                   <div>
                     <h4 className="font-semibold">Cómo participar</h4>
                     <p className="text-sm text-muted-foreground mt-2">
-                      Enviá preguntas, sugerencias de invitados o historias al mail <strong>hola@jujuyconecta.ar</strong> o por
+                      Enviá preguntas, sugerencias de invitados o historias al mail <strong>jujuyconecta@gmail.com</strong> o por
                       Instagram <strong>@jujuyconecta</strong>.
                     </p>
                   </div>
