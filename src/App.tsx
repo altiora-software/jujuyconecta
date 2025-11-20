@@ -20,11 +20,13 @@ import AllServicesPage from "./pages/AllServicesPage";
 import Mantenimiento from "./pages/servicios/Directorio";
 import { ScrollToTop } from "./components/common/ScrollUp";
 import Tourism from "./pages/Tourism";
+import { InstallAppButton } from "./components/pwa/InstallAppButton";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <InstallAppButton />
     <Toaster />
     <Sonner />
     <BrowserRouter>
