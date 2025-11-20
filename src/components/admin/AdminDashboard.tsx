@@ -18,6 +18,7 @@ import { SocialResourcesManager } from "./SocialResourcesManager";
 import { JobsManager } from "./JobsManager";
 import { SecurityAlertsManager } from "./SecurityAlertsManager";
 import { TransportReportsManager } from "./TransportReportsManager";
+import { TourismPlacesManager } from "./TourismPlacesManager";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -168,11 +169,12 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
         {/* Management Tabs */}
         <Tabs defaultValue="transport" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="transport">Transporte</TabsTrigger>
             <TabsTrigger value="resources">Recursos</TabsTrigger>
             <TabsTrigger value="jobs">Empleos</TabsTrigger>
             <TabsTrigger value="security">Seguridad</TabsTrigger>
+            <TabsTrigger value="tourism">Turismo</TabsTrigger>
             <TabsTrigger value="reports">Reportes</TabsTrigger>
           </TabsList>
 
@@ -192,10 +194,15 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             <SecurityAlertsManager onUpdate={refreshStats} />
           </TabsContent>
 
+          <TabsContent value="tourism" className="mt-6">
+            <TourismPlacesManager onUpdate={refreshStats} />
+          </TabsContent>
+
           <TabsContent value="reports" className="mt-6">
             <TransportReportsManager onUpdate={refreshStats} />
           </TabsContent>
         </Tabs>
+
       </div>
     </div>
   );

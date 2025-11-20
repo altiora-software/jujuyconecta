@@ -370,76 +370,45 @@ export type Database = {
         Row: {
           id: string;
           name: string;
-          municipality: string | null;
-          category:
-            | "naturaleza"
-            | "cultura"
-            | "gastronomia"
-            | "aventura"
-            | "urbano"
-            | "otros";
-          short_description: string | null;
-          long_description: string | null;
+          region: string;
+          category: string;
+          description: string | null;
+          latitude: number;
+          longitude: number;
+          altitude_meters: number | null;
+          best_time_to_visit: string | null;
           image_url: string | null;
-          latitude: number | null;
-          longitude: number | null;
-          rating: number | null;
-          tags: string[] | null;
-          is_featured: boolean;
-          is_active: boolean;
-          created_at: string;
-          updated_at: string;
-          created_by: string | null;
+          created_at: string | null;
+          updated_at: string | null;
         };
         Insert: {
           id?: string;
           name: string;
-          municipality?: string | null;
-          category?:
-            | "naturaleza"
-            | "cultura"
-            | "gastronomia"
-            | "aventura"
-            | "urbano"
-            | "otros";
-          short_description?: string | null;
-          long_description?: string | null;
+          region: string;
+          category: string;
+          description?: string | null;
+          latitude: number;
+          longitude: number;
+          altitude_meters?: number | null;
+          best_time_to_visit?: string | null;
           image_url?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
-          rating?: number | null;
-          tags?: string[] | null;
-          is_featured?: boolean;
-          is_active?: boolean;
-          created_at?: string;
-          updated_at?: string;
-          created_by?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
           name?: string;
-          municipality?: string | null;
-          category?:
-            | "naturaleza"
-            | "cultura"
-            | "gastronomia"
-            | "aventura"
-            | "urbano"
-            | "otros";
-          short_description?: string | null;
-          long_description?: string | null;
+          region?: string;
+          category?: string;
+          description?: string | null;
+          latitude?: number;
+          longitude?: number;
+          altitude_meters?: number | null;
+          best_time_to_visit?: string | null;
           image_url?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
-          rating?: number | null;
-          tags?: string[] | null;
-          is_featured?: boolean;
-          is_active?: boolean;
-          created_at?: string;
-          updated_at?: string;
-          created_by?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
         };
-        Relationships: [];
       };
 
       tourism_routes: {

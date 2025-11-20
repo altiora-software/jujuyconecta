@@ -1,30 +1,52 @@
 import { Layout } from "@/components/layout/Layout";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Mountain, Route as RouteIcon, Calendar, Sparkles, Star, Clock } from "lucide-react";
+import {
+  MapPin,
+  Mountain,
+  Route as RouteIcon,
+  Calendar,
+} from "lucide-react";
 import { TourismMap } from "@/components/tourism/TourismMap";
 
 interface TourismPlace {
   id: string;
   name: string;
-  municipality: string | null;
-  category: string; // ej: "naturaleza", "cultura", "gastronomia", "aventura"
-  short_description: string | null;
-  long_description: string | null;
-  image_url: string | null;
+  region: string; // Quebrada, Valles, Puna, Yungas, etc
+  category: string; // naturaleza, cultura, gastronomia, aventura, urbano
+  description: string | null;
   latitude: number | null;
   longitude: number | null;
-  rating: number | null; // 0 a 5
-  tags: string[] | null;
-  is_featured: boolean;
+  altitude_meters: number | null;
+  best_time_to_visit: string | null;
+  image_url: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface TourismRoute {
@@ -44,9 +66,9 @@ interface TourismEvent {
   title: string;
   municipality: string | null;
   date: string; // ISO
-  category: string | null; // fiesta, festival, peña, etc
+  category: string | null;
   location_detail: string | null;
-  price_range: string | null; // "Gratis", "$$", etc
+  price_range: string | null;
   short_description: string | null;
   external_link: string | null;
 }
@@ -63,7 +85,7 @@ export default function Tourism() {
 
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [municipalityFilter, setMunicipalityFilter] = useState<string>("all");
+  const [regionFilter, setRegionFilter] = useState<string>("all");
 
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
 
@@ -74,6 +96,7 @@ export default function Tourism() {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = async () => {
@@ -82,11 +105,28 @@ export default function Tourism() {
       const [placesRes, routesRes, eventsRes] = await Promise.all([
         supabase
           .from("tourism_places")
-          .select("*")
-          .eq("is_active", true)
-          .order("is_featured", { ascending: false })
+          .select(
+            `
+              id,
+              name,
+              region,
+              category,
+              description,
+              latitude,
+              longitude,
+              altitude_meters,
+              best_time_to_visit,
+              image_url,
+              created_at,
+              updated_at
+            `
+          )
+          .order("region", { ascending: true })
           .order("name", { ascending: true }),
-        supabase.from("tourism_routes").select("*").order("name", { ascending: true }),
+        supabase
+          .from("tourism_routes")
+          .select("*")
+          .order("name", { ascending: true }),
         supabase
           .from("tourism_events")
           .select("*")
@@ -106,7 +146,9 @@ export default function Tourism() {
       console.error("Error fetching tourism data:", error);
       toast({
         title: "Error",
-        description: error?.message || "No se pudo cargar la información de turismo.",
+        description:
+          error?.message ||
+          "No se pudo cargar la información de turismo.",
         variant: "destructive",
       });
     } finally {
@@ -114,16 +156,13 @@ export default function Tourism() {
     }
   };
 
-  const municipalities = useMemo(() => {
+  const regions = useMemo(() => {
     const set = new Set<string>();
     places.forEach((p) => {
-      if (p.municipality) set.add(p.municipality);
-    });
-    events.forEach((e) => {
-      if (e.municipality) set.add(e.municipality);
+      if (p.region) set.add(p.region);
     });
     return Array.from(set).sort();
-  }, [places, events]);
+  }, [places]);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -135,28 +174,19 @@ export default function Tourism() {
 
   const filteredPlaces = useMemo(() => {
     return places.filter((p) => {
-      if (categoryFilter !== "all" && p.category !== categoryFilter) return false;
-      if (municipalityFilter !== "all" && p.municipality !== municipalityFilter) return false;
+      if (categoryFilter !== "all" && p.category !== categoryFilter)
+        return false;
+      if (regionFilter !== "all" && p.region !== regionFilter)
+        return false;
       if (!search.trim()) return true;
       const q = search.toLowerCase();
       return (
         p.name.toLowerCase().includes(q) ||
-        (p.short_description || "").toLowerCase().includes(q) ||
-        (p.municipality || "").toLowerCase().includes(q) ||
-        (p.tags || []).some((tag) => tag.toLowerCase().includes(q))
+        (p.description || "").toLowerCase().includes(q) ||
+        (p.region || "").toLowerCase().includes(q)
       );
     });
-  }, [places, categoryFilter, municipalityFilter, search]);
-
-  const featuredPlaces = useMemo(
-    () => filteredPlaces.filter((p) => p.is_featured),
-    [filteredPlaces]
-  );
-
-  const nonFeaturedPlaces = useMemo(
-    () => filteredPlaces.filter((p) => !p.is_featured),
-    [filteredPlaces]
-  );
+  }, [places, categoryFilter, regionFilter, search]);
 
   const handleOpenDetails = (place: TourismPlace) => {
     setDetailsPlace(place);
@@ -189,8 +219,9 @@ export default function Tourism() {
             Turismo en Jujuy
           </h1>
           <p className="text-muted-foreground max-w-2xl">
-            Descubrí lugares, rutas y eventos para conocer Jujuy como local. Todo curado
-            para que puedas planificar mejor tu visita o tu fin de semana.
+            Descubrí lugares, rutas y eventos para conocer Jujuy como local.
+            Todo curado para que puedas planificar mejor tu visita o tu fin
+            de semana.
           </p>
         </div>
 
@@ -216,7 +247,7 @@ export default function Tourism() {
                       Buscar
                     </label>
                     <Input
-                      placeholder="Cerro, pueblo, museo, gastronomía…"
+                      placeholder="Cerro, pueblo, región, actividad…"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                     />
@@ -227,7 +258,9 @@ export default function Tourism() {
                     </label>
                     <select
                       value={categoryFilter}
-                      onChange={(e) => setCategoryFilter(e.target.value)}
+                      onChange={(e) =>
+                        setCategoryFilter(e.target.value)
+                      }
                       className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     >
                       <option value="all">Todas</option>
@@ -240,62 +273,38 @@ export default function Tourism() {
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-1 block">
-                      Municipio
+                      Región
                     </label>
                     <select
-                      value={municipalityFilter}
-                      onChange={(e) => setMunicipalityFilter(e.target.value)}
+                      value={regionFilter}
+                      onChange={(e) =>
+                        setRegionFilter(e.target.value)
+                      }
                       className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     >
                       <option value="all">Toda la provincia</option>
-                      {municipalities.map((m) => (
-                        <option key={m} value={m}>
-                          {m}
+                      {regions.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
                         </option>
                       ))}
                     </select>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Mostrando {filteredPlaces.length} lugar(es) turístico(s) en Jujuy.
+                  Mostrando {filteredPlaces.length} lugar(es)
+                  turístico(s) en Jujuy.
                 </p>
               </CardContent>
             </Card>
 
-            {featuredPlaces.length > 0 && (
+            {filteredPlaces.length > 0 && (
               <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <h2 className="text-lg font-semibold">
-                    Destacados para conocer
-                  </h2>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {featuredPlaces.map((place) => (
-                    <PlaceCard
-                      key={place.id}
-                      place={place}
-                      onDetails={() => handleOpenDetails(place)}
-                      onSeeOnMap={() => {
-                        setSelectedPlaceId(place.id);
-                        setActiveTab("map");
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {nonFeaturedPlaces.length > 0 && (
-              <div className="space-y-3">
-                {featuredPlaces.length > 0 && (
-                  <Separator className="my-4" />
-                )}
                 <h2 className="text-lg font-semibold">
-                  Más lugares para explorar
+                  Lugares para explorar
                 </h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {nonFeaturedPlaces.map((place) => (
+                  {filteredPlaces.map((place) => (
                     <PlaceCard
                       key={place.id}
                       place={place}
@@ -315,7 +324,8 @@ export default function Tourism() {
                 <CardContent className="p-8 text-center">
                   <Mountain className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
                   <p className="text-muted-foreground">
-                    No encontramos lugares con esos filtros. Probá ampliar la búsqueda.
+                    No encontramos lugares con esos filtros. Probá
+                    ampliar la búsqueda.
                   </p>
                 </CardContent>
               </Card>
@@ -328,14 +338,17 @@ export default function Tourism() {
               <CardHeader>
                 <CardTitle>Mapa turístico</CardTitle>
                 <CardDescription>
-                  Visualizá los principales puntos de interés de Jujuy en un solo mapa.
+                  Visualizá los principales puntos de interés de Jujuy
+                  en un solo mapa.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <TourismMap
                   places={filteredPlaces as any}
                   selectedPlaceId={selectedPlaceId}
-                  onPlaceSelect={(id: string | null) => setSelectedPlaceId(id)}
+                  onPlaceSelect={(id: string | null) =>
+                    setSelectedPlaceId(id)
+                  }
                 />
               </CardContent>
             </Card>
@@ -350,7 +363,8 @@ export default function Tourism() {
                   Rutas y recorridos sugeridos
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Ideas de recorridos para organizar tu viaje por zonas o días.
+                  Ideas de recorridos para organizar tu viaje por zonas
+                  o días.
                 </p>
               </div>
             </div>
@@ -360,21 +374,26 @@ export default function Tourism() {
                 <CardContent className="p-8 text-center">
                   <RouteIcon className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
                   <p className="text-muted-foreground">
-                    Todavía no cargamos rutas sugeridas, las vas a ver acá cuando estén listas.
+                    Todavía no cargamos rutas sugeridas, las vas a ver
+                    acá cuando estén listas.
                   </p>
                 </CardContent>
               </Card>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
                 {routes.map((route) => (
-                  <Card key={route.id} className="hover:shadow-md transition-shadow">
+                  <Card
+                    key={route.id}
+                    className="hover:shadow-md transition-shadow"
+                  >
                     <CardHeader className="pb-2">
                       <CardTitle className="flex items-center gap-2 text-base">
                         <RouteIcon className="h-4 w-4 text-primary" />
                         {route.name}
                       </CardTitle>
                       <CardDescription>
-                        {route.start_municipality && route.end_municipality
+                        {route.start_municipality &&
+                        route.end_municipality
                           ? `${route.start_municipality} → ${route.end_municipality}`
                           : "Recorrido provincial"}
                       </CardDescription>
@@ -388,7 +407,8 @@ export default function Tourism() {
                       <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                         {route.difficulty && (
                           <Badge variant="outline">
-                            Dificultad: {formatDifficulty(route.difficulty)}
+                            Dificultad:{" "}
+                            {formatDifficulty(route.difficulty)}
                           </Badge>
                         )}
                         {route.duration_hours && (
@@ -418,7 +438,8 @@ export default function Tourism() {
                   Agenda de eventos
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Próximas fiestas, festivales y actividades turísticas en Jujuy.
+                  Próximas fiestas, festivales y actividades turísticas
+                  en Jujuy.
                 </p>
               </div>
             </div>
@@ -428,14 +449,18 @@ export default function Tourism() {
                 <CardContent className="p-8 text-center">
                   <Calendar className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
                   <p className="text-muted-foreground">
-                    Por ahora no hay eventos publicados, vuelvas a revisar más adelante.
+                    Por ahora no hay eventos publicados, volvé a
+                    revisar más adelante.
                   </p>
                 </CardContent>
               </Card>
             ) : (
               <div className="space-y-3">
                 {events.map((event) => (
-                  <Card key={event.id} className="hover:shadow-sm transition-shadow">
+                  <Card
+                    key={event.id}
+                    className="hover:shadow-sm transition-shadow"
+                  >
                     <CardContent className="p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -443,7 +468,10 @@ export default function Tourism() {
                             {event.title}
                           </h3>
                           {event.category && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {event.category}
                             </Badge>
                           )}
@@ -463,7 +491,9 @@ export default function Tourism() {
                             <span>{event.location_detail}</span>
                           )}
                           {event.price_range && (
-                            <Badge variant="secondary">{event.price_range}</Badge>
+                            <Badge variant="secondary">
+                              {event.price_range}
+                            </Badge>
                           )}
                         </div>
                         {event.short_description && (
@@ -498,8 +528,9 @@ export default function Tourism() {
       </div>
 
       {/* MODAL DETALLE DE LUGAR */}
+            {/* MODAL DETALLE DE LUGAR */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Mountain className="h-4 w-4 text-primary" />
@@ -513,60 +544,56 @@ export default function Tourism() {
           {detailsPlace && (
             <div className="space-y-4">
               {detailsPlace.image_url && (
-                <div className="overflow-hidden rounded-lg border">
+                <div className="w-full flex items-center justify-center rounded-lg border bg-black/5">
                   <img
                     src={detailsPlace.image_url}
                     alt={detailsPlace.name}
-                    className="w-full h-56 object-cover"
+                    className="max-h-[70vh] w-auto max-w-full object-contain"
                   />
                 </div>
               )}
 
               <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                {detailsPlace.municipality && (
+                {detailsPlace.region && (
                   <span className="inline-flex items-center gap-1">
                     <MapPin className="h-3 w-3" />
-                    {detailsPlace.municipality}
+                    {detailsPlace.region}
                   </span>
                 )}
                 <Badge variant="outline">
                   {formatCategory(detailsPlace.category)}
                 </Badge>
-                {detailsPlace.rating && (
-                  <span className="inline-flex items-center gap-1">
-                    <Star className="h-3 w-3" />
-                    {detailsPlace.rating.toFixed(1)}/5
-                  </span>
+                {detailsPlace.altitude_meters && (
+                  <Badge variant="secondary">
+                    {detailsPlace.altitude_meters} msnm
+                  </Badge>
                 )}
-                {detailsPlace.tags &&
-                  detailsPlace.tags.map((t) => (
-                    <Badge key={t} variant="secondary">
-                      #{t}
-                    </Badge>
-                  ))}
+                {detailsPlace.best_time_to_visit && (
+                  <Badge variant="secondary">
+                    Mejor época: {detailsPlace.best_time_to_visit}
+                  </Badge>
+                )}
               </div>
 
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold">Descripción</h4>
-                {detailsPlace.long_description ? (
+                {detailsPlace.description ? (
                   <p className="text-sm text-muted-foreground whitespace-pre-line">
-                    {detailsPlace.long_description}
+                    {detailsPlace.description}
                   </p>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    Próximamente vamos a sumar una descripción más completa para este
-                    lugar.
+                    Próximamente vamos a sumar una descripción más
+                    completa para este lugar.
                   </p>
                 )}
               </div>
 
               {detailsPlace.latitude && detailsPlace.longitude && (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-semibold">Ubicación aproximada</h4>
-                  <p className="text-xs text-muted-foreground">
-                    Coordenadas: {detailsPlace.latitude.toFixed(4)},{" "}
-                    {detailsPlace.longitude.toFixed(4)}
-                  </p>
+                  <h4 className="text-sm font-semibold">
+                    Ubicación aproximada
+                  </h4>
                   <Button
                     variant="outline"
                     size="sm"
@@ -584,6 +611,7 @@ export default function Tourism() {
           )}
         </DialogContent>
       </Dialog>
+
     </Layout>
   );
 }
@@ -615,40 +643,35 @@ function PlaceCard({
               {place.name}
             </CardTitle>
             <CardDescription className="flex items-center gap-1 mt-1">
-              {place.municipality && (
+              {place.region && (
                 <>
                   <MapPin className="h-3 w-3" />
-                  <span>{place.municipality}</span>
+                  <span>{place.region}</span>
                 </>
               )}
             </CardDescription>
           </div>
-          {place.rating && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Star className="h-3 w-3 text-yellow-500" />
-              <span>{place.rating.toFixed(1)}</span>
-            </div>
-          )}
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col gap-3">
-        {place.short_description && (
+        {place.description && (
           <p className="text-sm text-muted-foreground line-clamp-3">
-            {place.short_description}
+            {place.description}
           </p>
         )}
         <div className="flex flex-wrap gap-2 text-xs">
-          <Badge variant="outline">{formatCategory(place.category)}</Badge>
-          {place.tags &&
-            place.tags.slice(0, 2).map((t) => (
-              <Badge key={t} variant="secondary">
-                #{t}
-              </Badge>
-            ))}
-          {place.tags && place.tags.length > 2 && (
-            <span className="text-xs text-muted-foreground">
-              +{place.tags.length - 2}
-            </span>
+          <Badge variant="outline">
+            {formatCategory(place.category)}
+          </Badge>
+          {place.altitude_meters && (
+            <Badge variant="secondary">
+              {place.altitude_meters} msnm
+            </Badge>
+          )}
+          {place.best_time_to_visit && (
+            <Badge variant="secondary">
+              Mejor época: {place.best_time_to_visit}
+            </Badge>
           )}
         </div>
         <div className="grid grid-cols-2 gap-2 pt-1">

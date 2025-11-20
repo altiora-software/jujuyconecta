@@ -30,7 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface TransportLine {
   id: string;
-  name: string; // acá está la empresa: "El Urbano", "San Jorge", etc
+  name: string; // empresa: "El Urbano", "San Jorge", etc
   number: string;
   color: string;
   route_description: string | null;
@@ -53,6 +53,8 @@ interface TransportRawStop {
   order_index: number;
   stop_name: string;
   direccion: string | null;
+  latitude: string | null;
+  longitude: string | null;
 }
 
 interface TransportReport {
@@ -72,12 +74,13 @@ export default function Transport() {
   const [reports, setReports] = useState<TransportReport[]>([]);
 
   const [selectedLineId, setSelectedLineId] = useState<string>();
-  const [selectedCompanyName, setSelectedCompanyName] = useState<string | undefined>();
+  const [selectedCompanyName, setSelectedCompanyName] = useState<
+    string | undefined
+  >();
   const [activeTab, setActiveTab] = useState<"lines" | "map" | "reports">(
     "lines",
   );
 
-  // Modal de detalles
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailsLine, setDetailsLine] = useState<TransportLine | null>(null);
 
@@ -86,24 +89,28 @@ export default function Transport() {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = async () => {
     try {
-      const [linesRes, stopsRes, rawStopsRes, reportsRes] = await Promise.all([
+      const [linesRes, rawStopsRes, reportsRes] = await Promise.all([
+        // Líneas activas
         supabase
           .from("transport_lines")
           .select("*")
           .eq("active", true)
           .order("number"),
-        supabase
-          .from("transport_stops")
-          .select("*")
-          .order("order_index"),
+
+        // TODAS las paradas crudas, con coords (para mapa y detalles)
         supabase
           .from("transport_raw_stops")
-          .select("id,line_id,direction,order_index,stop_name,direccion")
+          .select(
+            "id,line_id,direction,order_index,stop_name,direccion,latitude,longitude",
+          )
           .order("order_index"),
+
+        // Reportes activos + join con líneas
         supabase
           .from("transport_reports")
           .select(`*, transport_lines (*)`)
@@ -113,14 +120,62 @@ export default function Transport() {
       ]);
 
       if (linesRes.error) throw linesRes.error;
-      if (stopsRes.error) throw stopsRes.error;
       if (rawStopsRes.error) throw rawStopsRes.error;
       if (reportsRes.error) throw reportsRes.error;
 
-      setLines(linesRes.data || []);
-      setStops(stopsRes.data || []);
-      setRawStops(rawStopsRes.data || []);
-      setReports((reportsRes.data as TransportReport[]) || []);
+      const linesMapped: TransportLine[] = (linesRes.data || []).map(
+        (l: any) => ({
+          id: l.id,
+          name: l.name,
+          number: l.number,
+          color: l.color,
+          route_description: l.route_description,
+          active: l.active,
+        }),
+      );
+
+      const rawStopsData = (rawStopsRes.data || []) as any[];
+
+      // Paradas para el MAPA: solo las que tienen lat/lon
+      const stopsMapped: TransportStop[] = rawStopsData
+        .filter((s) => s.latitude && s.longitude)
+        .map((s) => ({
+          id: s.id as string,
+          line_id: s.line_id as string,
+          name: s.stop_name as string,
+          latitude: Number(s.latitude),
+          longitude: Number(s.longitude),
+          order_index: s.order_index as number,
+        }));
+
+      // Paradas crudas completas para DETALLES
+      const rawStopsMapped: TransportRawStop[] = rawStopsData.map((s) => ({
+        id: s.id as string,
+        line_id: s.line_id as string,
+        direction: s.direction as string,
+        order_index: s.order_index as number,
+        stop_name: s.stop_name as string,
+        direccion: s.direccion as string | null,
+        latitude: s.latitude as string | null,
+        longitude: s.longitude as string | null,
+      }));
+
+      const reportsMapped = (reportsRes.data || []) as TransportReport[];
+
+      setLines(linesMapped);
+      setStops(stopsMapped);
+      setRawStops(rawStopsMapped);
+      setReports(reportsMapped);
+
+      // Si no hay línea seleccionada, elegí la primera que tenga paradas con coords
+      if (!selectedLineId && linesMapped.length > 0) {
+        const lineWithStops = linesMapped.find((line) =>
+          stopsMapped.some((s) => s.line_id === line.id),
+        );
+        if (lineWithStops) {
+          setSelectedLineId(lineWithStops.id);
+        }
+      }
     } catch (error: any) {
       console.error("Error fetching transport data:", error);
       toast({
@@ -181,7 +236,7 @@ export default function Transport() {
     return lines.filter((l) => l.name === selectedCompanyName);
   }, [lines, selectedCompanyName]);
 
-  // Paradas crudas agrupadas por sentido para la línea seleccionada
+  // Paradas crudas agrupadas por sentido para la línea seleccionada en el modal
   const detailsStopsByDirection = useMemo(() => {
     if (!detailsLine) return {};
 
@@ -252,7 +307,6 @@ export default function Transport() {
 
           {/* LÍNEAS / EMPRESAS */}
           <TabsContent value="lines" className="space-y-6">
-            {/* Filtros de empresas */}
             <div className="space-y-2">
               <h2 className="text-lg font-semibold">
                 Empresas de colectivos que llegan
@@ -288,7 +342,6 @@ export default function Transport() {
               </div>
             </div>
 
-            {/* Grid de líneas filtradas */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredLines.map((line) => {
                 const lineStops = stops.filter((s) => s.line_id === line.id);
@@ -375,6 +428,7 @@ export default function Transport() {
                           >
                             Ver en mapa
                           </Button>
+
                         </div>
                       </div>
                     </CardContent>
