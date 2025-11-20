@@ -160,12 +160,12 @@ export function Hero() {
             </div>
 
             {/* Segunda fila CTA: Asistente + Apoyar */}
-            <div className="flex gap-3 mt-2 items-center">
+            {/* <div className="flex gap-3 mt-2 items-center">
               
               <Button size="sm" variant="ghost" onClick={() => (window.location.href = "/apoyar")}>
                 <Gift className="mr-2" /> Apoyar / Donar
               </Button>
-            </div>
+            </div> */}
 
             {/* Tarjeta corta explicativa (visually separated) */}
             {/* <div className="mt-4 bg-white/90 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-md max-w-3xl w-full text-left">
