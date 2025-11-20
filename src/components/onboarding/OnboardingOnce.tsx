@@ -91,11 +91,11 @@ export function OnboardingOnce({ onOpenAssistant, storageKey = STORAGE_KEY_DEFAU
 
         {/* CTA principales */}
         <div className="mb-3 grid grid-cols-2 gap-2">
-          <Button asChild variant="ghost" className="w-full text-left">
+          {/* <Button asChild variant="ghost" className="w-full text-left">
             <Link to="/podcast" className="flex items-center gap-2 w-full">
               <Radio className="h-4 w-4" /> Ver Podcast
             </Link>
-          </Button>
+          </Button> */}
 
           <Button asChild variant="ghost" className="w-full text-left">
             <Link to="/diario" className="flex items-center gap-2 w-full">

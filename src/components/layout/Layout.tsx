@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
-import SocialLinks, { Icons } from "../common/SocialLinks";
 
 interface LayoutProps { children: ReactNode; }
 

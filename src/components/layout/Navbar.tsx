@@ -24,9 +24,9 @@ export function Navbar() {
 
   const navItems: NavItem[] = [
     { label: "Inicio", href: "/" },
-    { label: "Diario Digital", href: "/diario" },
-    { label: "Podcast", href: "/podcast" },
+    { label: "Diario Digital", href: "https://jujuyconecta.online" },
     { label: "Turismo", href: "/turismo" },
+    { label: "Transporte", href: "/transport" },
   ];
 
   // Ejemplo de servicios organizados en solapas
