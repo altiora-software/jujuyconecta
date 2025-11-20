@@ -2,11 +2,11 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Users, Briefcase, Shield, Newspaper, Mic, Gift } from "lucide-react";
+import { MapPin, Users, Briefcase, Shield, Newspaper, BusFront, Gift } from "lucide-react";
 import JujuyConectaAssistantModal from "@/components/assistant/JujuyConectaAssistantModal";
 import { OnboardingOnce } from "@/components/onboarding/OnboardingOnce";
 import { useAuth } from "@/hooks/useAuth";
-import imagenHero from "@/assets/jujuy-hero.jpg";
+import imagenHero from "@/assets/hornocal.webp";
 // import LoginRequiredDialog from "@/components/auth/LoginRequiredDialog";
 import AiTrainingModal from "@/components/aiTrainingModal/AiTrainingModal";
 
@@ -125,29 +125,36 @@ export function Hero() {
             {/* CTA principal */}
             <div className="w-full max-w-2xl flex flex-col xs:flex-row gap-3 justify-center items-center">
               <div className="flex gap-3 w-full xs:w-auto flex-wrap justify-center">
-                <Button 
+                {/* <Button 
                   size="lg"
                   className="w-full xs:w-auto"
                   onClick={handleOpenAssistant}
                 >
                   <Briefcase className="mr-2" /> Habla con el asistente!
+                </Button> */}
+                <Button
+                  size="lg"
+                  className="w-full xs:w-auto"
+                  onClick={() => (window.location.href = "/transport")}
+                >
+                  <BusFront className="mr-2" /> Que colectivo me lleva?
                 </Button>
                 <Button
                   variant="outline"
                   size="lg"
                   className="w-full xs:w-auto hover:animate-glow"
-                  onClick={() => (window.location.href = "/diario")}
+                  onClick={() => (window.location.href = "https://jujuyconecta.online")}
                 >
-                  <Newspaper className="mr-2" /> Lee nuestro diario digital
+                  <Newspaper className="mr-2" /> Enterate las mejores noticias
                 </Button>
 
-                <Button
+                {/* <Button
                   size="lg"
                   className="w-full xs:w-auto"
                   onClick={() => (window.location.href = "/podcast")}
                 >
                   <Mic className="mr-2" /> Escucha nuestro videopodcast
-                </Button>
+                </Button> */}
 
               </div>
             </div>
