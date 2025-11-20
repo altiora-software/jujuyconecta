@@ -125,18 +125,11 @@ export function Hero() {
             {/* CTA principal */}
             <div className="w-full max-w-2xl flex flex-col xs:flex-row gap-3 justify-center items-center">
               <div className="flex gap-3 w-full xs:w-auto flex-wrap justify-center">
-                {/* <Button 
-                  size="lg"
-                  className="w-full xs:w-auto"
-                  onClick={handleOpenAssistant}
-                >
-                  <Briefcase className="mr-2" /> Habla con el asistente!
-                </Button> */}
                 <Button
                   size="lg"
                   className="w-full xs:w-auto"
                   onClick={() => (window.location.href = "/transport")}
-                >
+                  >
                   <BusFront className="mr-2" /> Que colectivo me lleva?
                 </Button>
                 <Button
@@ -144,10 +137,17 @@ export function Hero() {
                   size="lg"
                   className="w-full xs:w-auto hover:animate-glow"
                   onClick={() => (window.location.href = "https://jujuyconecta.online")}
-                >
+                  >
                   <Newspaper className="mr-2" /> Enterate las mejores noticias
                 </Button>
 
+                  <Button 
+                    size="lg"
+                    className="w-full xs:w-auto"
+                    onClick={handleOpenAssistant}
+                  >
+                    <Briefcase className="mr-2" /> Habla con el asistente!
+                  </Button>
                 {/* <Button
                   size="lg"
                   className="w-full xs:w-auto"
