@@ -103,11 +103,11 @@ export function OnboardingOnce({ onOpenAssistant, storageKey = STORAGE_KEY_DEFAU
             </Link>
           </Button>
 
-          <Button asChild variant="ghost" className="w-full text-left">
+          {/* <Button asChild variant="ghost" className="w-full text-left">
             <Link to="/apoyar" className="flex items-center gap-2 w-full">
               <Heart className="h-4 w-4" /> Apoyar / Donar
             </Link>
-          </Button>
+          </Button> */}
 
           {/* <Button asChild variant="ghost" className="w-full text-left">
             <Link to="/tienda" className="flex items-center gap-2 w-full">
