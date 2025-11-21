@@ -9,17 +9,14 @@ const SERVICES: Record<string, Service[]> = {
   Plataforma: [
     { label: "Portal de Noticias", href: "/servicios/portal-noticias", category: "Plataforma", description: "Noticias locales, reportajes y actualidad de Jujuy." },
     { label: "Agenda Comunitaria", href: "/servicios/agenda", category: "Plataforma", description: "Eventos, ferias y actividades culturales." },
-    { label: "Directorio Local", href: "/servicios/directorio", category: "Plataforma", description: "Negocios y servicios de la provincia." },
   ],
   Emprendimientos: [
     { label: "Marketplace Local", href: "/servicios/marketplace", category: "Emprendimientos", description: "Vende y descubre productos de emprendedores jujeños." },
-    { label: "Asesoría de Negocios", href: "/servicios/asesoria-startup", category: "Emprendimientos", description: "Mentoría y acompañamiento para proyectos." },
   ],
   Formación: [
     { label: "Alertas de Seguridad", href: "/security", category: "Plataforma", description: "Sistema de avisos y notificaciones urgentes." },
     { label: "Cursos y Talleres", href: "/servicios/cursos", category: "Formación", description: "Capacitación técnica y oficios para la comunidad." },
-    { label: "Mentorías", href: "/servicios/mentorias", category: "Formación", description: "Acompañamiento personalizado para emprendedores." },
-  ],
+    ],
   "Servicios Públicos": [
     { label: "Recursos Sociales", href: "/resources", category: "Servicios Públicos", description: "Programas, trámites y ayuda social." },
     { label: "Transporte y Mapas", href: "/transport", category: "Servicios Públicos", description: "Horarios, rutas y mapas interactivos." },

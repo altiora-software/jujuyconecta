@@ -53,7 +53,6 @@ export function Navbar() {
     Plataforma: [
       { label: "Portal de Noticias", href: "/diario" },
       { label: "Agenda Comunitaria", href: "/servicios/agenda" },
-      { label: "Directorio Local", href: "/servicios/directorio" },
     ],
     Emprendimientos: [
       { label: "Marketplace Local", href: "/servicios/marketplace" },
@@ -62,7 +61,6 @@ export function Navbar() {
     Formación: [
       { label: "Alertas de Seguridad", href: "/security" },
       { label: "Cursos y Talleres", href: "/servicios/cursos" },
-      { label: "Mentorías", href: "/servicios/mentorias" },
     ],
     "Turismo": [
     { label: "Mapa Turístico", href: "/turismo" },              // o una subruta tipo /turismo/mapa si la tenés
@@ -146,18 +144,6 @@ export function Navbar() {
       keywords: ["agenda", "eventos", "actividades", "calendario", "comunidad"],
     },
     {
-      label: "Directorio Local",
-      href: "/servicios/directorio",
-      type: "servicio",
-      keywords: [
-        "directorio",
-        "comercios",
-        "negocios",
-        "emprendimientos",
-        "pymes",
-      ],
-    },
-    {
       label: "Marketplace Local",
       href: "/servicios/marketplace",
       type: "servicio",
@@ -193,12 +179,6 @@ export function Navbar() {
       href: "/servicios/cursos",
       type: "servicio",
       keywords: ["cursos", "talleres", "formación", "aprender"],
-    },
-    {
-      label: "Mentorías",
-      href: "/servicios/mentorias",
-      type: "servicio",
-      keywords: ["mentoría", "mentorias", "mentores", "acompañamiento"],
     },
     {
       label: "Recursos Sociales",

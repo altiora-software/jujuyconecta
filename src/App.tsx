@@ -17,11 +17,13 @@ import DiarioPresentacion from "./pages/Diario";
 import ApoyarPage from "./pages/Apoyar";
 import Agenda from "./pages/servicios/Agenda";
 import AllServicesPage from "./pages/AllServicesPage";
-import Mantenimiento from "./pages/servicios/Directorio";
+// import Mantenimiento from "./pages/servicios/Directorio";
 import { ScrollToTop } from "./components/common/ScrollUp";
 import Tourism from "./pages/Tourism";
 import { InstallAppButton } from "./components/pwa/InstallAppButton";
 import MarketplacePage from "./pages/servicios/Marketplace";
+import CoursesPage from "./pages/servicios/Cursos";
+import AsesoriaStartupPage from "./pages/servicios/Asesoria";
 
 const queryClient = new QueryClient();
 
@@ -40,11 +42,10 @@ const App = () => (
         <Route path="/diario" element={<DiarioPresentacion />} />
         <Route path="/apoyar" element={<ApoyarPage />} />
         <Route path="/servicios/agenda" element={<Agenda />} />
-        <Route path="/servicios/directorio" element={<Mantenimiento />} />
-        <Route path="/servicios/cursos" element={<Mantenimiento />} />
-        <Route path="/servicios/mentorias" element={<Mantenimiento />} />
-        <Route path="/servicios/asesoria-startup" element={<Mantenimiento />} />
+        {/* <Route path="/servicios/directorio" element={<Mantenimiento />} /> */}
+        <Route path="/servicios/asesoria-startup" element={<AsesoriaStartupPage />} />
         <Route path="/servicios/marketplace" element={<MarketplacePage />} />
+        <Route path="/servicios/cursos" element={<CoursesPage />} />
         <Route path="/servicios" element={<AllServicesPage />} />
         <Route path="/terminos" element={<TermsAndConditions />} />
         <Route path="/privacidad" element={<PrivacyPolicy />} />
