@@ -271,39 +271,57 @@ export function ModuleGrid() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="w-full max-w-6xl mx-auto grid gap-6 sm:gap-8 md:grid-cols-2">
           {modules.map((module) => {
             const Icon = module.icon;
             return (
               <Card
                 key={module.key}
-                className={`transition-smooth ${getColorClasses(module.color)} hover:scale-[1.02]`}
+                className={`h-full transition-smooth ${getColorClasses(
+                  module.color
+                )} hover:scale-[1.02]`}
               >
                 <CardHeader>
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center space-x-3">
-                      <div className={`p-3 rounded-lg ${getIconColorClasses(module.color)}`}>
+                      <div
+                        className={`p-3 rounded-lg ${getIconColorClasses(
+                          module.color
+                        )}`}
+                      >
                         <Icon className="h-6 w-6" />
                       </div>
                       <div>
-                        <CardTitle className="text-xl">{module.title}</CardTitle>
-                        <Badge variant="secondary" className="mt-1 text-xs">
+                        <CardTitle className="text-lg sm:text-xl">
+                          {module.title}
+                        </CardTitle>
+                        <Badge variant="secondary" className="mt-1 text-[11px] sm:text-xs">
                           {loading ? "Cargando..." : module.stats}
                         </Badge>
                       </div>
                     </div>
+
                     <Link to={module.href}>
-                      <Button variant="ghost" size="sm" aria-label={`Ir a ${module.title}`}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        aria-label={`Ir a ${module.title}`}
+                      >
                         <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>
                   </div>
-                  <CardDescription className="text-base mt-2">{module.description}</CardDescription>
+
+                  <CardDescription className="text-sm sm:text-base mt-2">
+                    {module.description}
+                  </CardDescription>
                 </CardHeader>
 
                 <CardContent>
                   <div className="space-y-2 mb-4">
-                    <h4 className="text-sm font-medium text-muted-foreground mb-2">Actividad reciente:</h4>
+                    <h4 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">
+                      Actividad reciente:
+                    </h4>
                     {loading ? (
                       <div className="space-y-2">
                         <div className="h-3 bg-muted rounded w-3/4 animate-pulse" />
@@ -312,13 +330,18 @@ export function ModuleGrid() {
                       </div>
                     ) : module.recent.length > 0 ? (
                       module.recent.map((item, idx) => (
-                        <div key={idx} className="flex items-center space-x-2 text-sm">
+                        <div
+                          key={idx}
+                          className="flex items-center space-x-2 text-xs sm:text-sm"
+                        >
                           <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                           <span className="truncate">{item}</span>
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-muted-foreground">Sin novedades por ahora.</p>
+                      <p className="text-sm text-muted-foreground">
+                        Sin novedades por ahora.
+                      </p>
                     )}
                   </div>
 
@@ -333,6 +356,7 @@ export function ModuleGrid() {
             );
           })}
         </div>
+
         <AboutJujuyConecta />
         {/* Notification CTA */}
         {/* <div className="mt-16 text-center">

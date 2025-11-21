@@ -214,7 +214,7 @@ export default function MarketplacePage() {
     const created = new Date(createdAt);
     const now = new Date();
     const diffDays = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
-    return diffDays <= 7;
+    return diffDays <= 7; // menos de una semana
   };
 
   const formatDate = (dateStr?: string) => {
@@ -229,55 +229,42 @@ export default function MarketplacePage() {
 
   return (
     <Layout>
-      <div className="container mx-auto max-w-6xl px-4 py-8 space-y-8">
-        {/* HEADER estilo Jujuy Conecta (mismo patrón que turismo/transport/jobs) */}
-        <section className="space-y-4">
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div className="container mx-auto max-w-6xl px-4 py-6 md:py-10 space-y-8">
+        {/* Hero y contexto */}
+        <section className="space-y-5">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-3 max-w-xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-gradient-hero/10 px-3 py-1 text-xs md:text-sm shadow-soft">
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs md:text-sm shadow-sm">
                 <Sparkles className="h-4 w-4 text-primary" />
-                <span className="font-medium">Marketplace Local de Jujuy</span>
+                <span>Marketplace Local de Jujuy · versión beta</span>
               </div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-1">
-                  Emprendimientos y comercios jujeños en un solo lugar
-                </h1>
-                <p className="text-sm md:text-base text-muted-foreground max-w-xl">
-                  Descubrí productos, servicios y proyectos locales, y hablales directo por WhatsApp
-                  sin intermediarios.
-                </p>
-              </div>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
+                Encontrá emprendedores, comercios y servicios,
+                <span className="text-primary"> y hablales directo por WhatsApp.</span>
+              </h1>
+              <p className="text-sm md:text-base text-muted-foreground">
+                Nada de formularios eternos. Elegís el emprendimiento, ves qué ofrece
+                y en un toque escribís a la persona que está detrás del proyecto.
+              </p>
 
-              {/* Stats igual mood que otras secciones */}
-              <div className="grid grid-cols-3 gap-3 max-w-xs text-xs md:text-sm">
-                <Card className="border-border/60 bg-card/80 shadow-none">
-                  <CardContent className="px-3 py-2 flex flex-col gap-0.5">
-                    <span className="text-lg font-semibold">{totalItems}</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      emprendimientos
-                    </span>
-                  </CardContent>
-                </Card>
-                <Card className="border-border/60 bg-card/80 shadow-none">
-                  <CardContent className="px-3 py-2 flex flex-col gap-0.5">
-                    <span className="text-lg font-semibold">{totalMunicipalities}</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      municipios
-                    </span>
-                  </CardContent>
-                </Card>
-                <Card className="border-border/60 bg-card/80 shadow-none">
-                  <CardContent className="px-3 py-2 flex flex-col gap-0.5">
-                    <span className="text-lg font-semibold">{totalCategories}</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      rubros
-                    </span>
-                  </CardContent>
-                </Card>
+              {/* Stats */}
+              <div className="mt-2 grid grid-cols-3 gap-3 max-w-xs text-xs md:text-sm">
+                <div className="rounded-lg border bg-card/70 px-3 py-2">
+                  <p className="font-semibold">{totalItems}</p>
+                  <p className="text-muted-foreground text-[11px]">emprendimientos</p>
+                </div>
+                <div className="rounded-lg border bg-card/70 px-3 py-2">
+                  <p className="font-semibold">{totalMunicipalities}</p>
+                  <p className="text-muted-foreground text-[11px]">municipios</p>
+                </div>
+                <div className="rounded-lg border bg-card/70 px-3 py-2">
+                  <p className="font-semibold">{totalCategories}</p>
+                  <p className="text-muted-foreground text-[11px]">rubros</p>
+                </div>
               </div>
             </div>
 
-            <Card className="min-w-[260px] max-w-sm border-dashed bg-card/90 shadow-soft">
+            <Card className="min-w-[260px] max-w-sm border-dashed shadow-sm bg-gradient-to-b from-background to-muted/60">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Store className="h-4 w-4 text-primary" />
@@ -289,12 +276,12 @@ export default function MarketplacePage() {
               </CardHeader>
               <CardContent className="flex flex-col gap-2 pt-0 text-xs md:text-sm">
                 <p className="text-muted-foreground">
-                  Vas a poder:
+                  La idea es que tengas:
                 </p>
                 <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-                  <li>Aparecer en el mapa de Jujuy Conecta.</li>
-                  <li>Tener botón directo a WhatsApp e Instagram.</li>
-                  <li>Elegir rubro, zona y etiquetas para que te encuentren fácil.</li>
+                  <li>Aparición en el mapa de Jujuy Conecta.</li>
+                  <li>Botón directo a tu WhatsApp e Instagram.</li>
+                  <li>Rubro, zona y etiquetas para que te encuentren fácil.</li>
                 </ul>
                 <Button size="sm" className="w-full mt-1" disabled>
                   Alta de emprendimientos (próximamente)
@@ -305,81 +292,68 @@ export default function MarketplacePage() {
 
           <Separator />
 
-          {/* FILTROS en Card, igual patrón que turismo/empleos */}
-          <Card className="border-border/70 bg-card/90">
-            <CardContent className="pt-4 space-y-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Filter className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">Buscar y filtrar emprendimientos</span>
+          {/* Buscador y filtros */}
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex-1 flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar por producto, servicio, rubro o barrio"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-8"
+                />
               </div>
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div className="flex-1 flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por producto, servicio, rubro o barrio"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={handleClearFilters}
-                    title="Limpiar filtros"
-                    className="transition-smooth"
-                  >
-                    <Filter className="h-4 w-4" />
-                  </Button>
-                </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={handleClearFilters}
+                title="Limpiar filtros"
+              >
+                <Filter className="h-4 w-4" />
+              </Button>
+            </div>
 
-                <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                  <select
-                    className="h-9 rounded-md border border-input bg-background px-3 text-xs md:text-sm"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                  >
-                    <option value="todas">Todos los rubros</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+            <div className="flex flex-col gap-2 md:flex-row md:items-center">
+              <select
+                className="h-9 rounded-md border bg-background px-3 text-xs md:text-sm"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option value="todas">Todos los rubros</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
 
-                  <select
-                    className="h-9 rounded-md border border-input bg-background px-3 text-xs md:text-sm"
-                    value={selectedMunicipality}
-                    onChange={(e) => setSelectedMunicipality(e.target.value)}
-                  >
-                    <option value="todos">Toda la provincia</option>
-                    {municipalities.map((mun) => (
-                      <option key={mun} value={mun}>
-                        {mun}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                Mostrando {filteredItems.length} emprendimiento(s) según tus filtros.
-              </p>
-            </CardContent>
-          </Card>
+              <select
+                className="h-9 rounded-md border bg-background px-3 text-xs md:text-sm"
+                value={selectedMunicipality}
+                onChange={(e) => setSelectedMunicipality(e.target.value)}
+              >
+                <option value="todos">Toda la provincia</option>
+                {municipalities.map((mun) => (
+                  <option key={mun} value={mun}>
+                    {mun}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </section>
 
-        {/* TABS estilo sistema (mismo mood que transporte/turismo) */}
+        {/* Tabs */}
         <section className="space-y-4">
-          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
-            <TabsList className="w-full grid grid-cols-2 md:inline-flex md:w-auto md:gap-2">
+          <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+            <TabsList className="w-full flex flex-wrap gap-2 justify-start">
               {TABS.map((tab) => (
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
-                  className="flex items-center justify-center gap-2 text-xs md:text-sm data-[state=active]:shadow-soft data-[state=active]:bg-card"
+                  className="flex items-center gap-2 text-xs md:text-sm data-[state=active]:shadow-sm"
                 >
                   <tab.icon className="h-4 w-4" />
                   <span>{tab.label}</span>
@@ -387,14 +361,11 @@ export default function MarketplacePage() {
               ))}
             </TabsList>
 
-            <TabsContent value={selectedTab}>
+            <TabsContent value={selectedTab} className="mt-4">
               {loading ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <Card
-                      key={i}
-                      className="rounded-xl bg-muted/40 border-border/60 animate-pulse"
-                    >
+                    <Card key={i} className="animate-pulse rounded-xl">
                       <CardHeader className="pb-3">
                         <div className="h-4 w-32 bg-muted rounded mb-2" />
                         <div className="h-3 w-24 bg-muted rounded" />
@@ -411,20 +382,18 @@ export default function MarketplacePage() {
                   ))}
                 </div>
               ) : filteredItems.length === 0 ? (
-                <Card className="border-dashed">
-                  <CardContent className="py-10 text-center space-y-3">
-                    <Store className="h-8 w-8 text-muted-foreground mx-auto" />
-                    <div className="space-y-1">
-                      <p className="font-medium">Todavía no hay resultados para este filtro.</p>
-                      <p className="text-sm text-muted-foreground">
-                        Probá con otra palabra, cambiá de rubro o quitá alguno de los filtros.
-                      </p>
-                    </div>
-                    <Button variant="outline" size="sm" onClick={handleClearFilters}>
-                      Quitar filtros
-                    </Button>
-                  </CardContent>
-                </Card>
+                <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
+                  <Store className="h-8 w-8 text-muted-foreground" />
+                  <div className="space-y-1">
+                    <p className="font-medium">Todavía no hay resultados para este filtro.</p>
+                    <p className="text-sm text-muted-foreground">
+                      Probá con otra palabra, cambiá de rubro o quitá alguno de los filtros.
+                    </p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={handleClearFilters}>
+                    Quitar filtros
+                  </Button>
+                </div>
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredItems.map((item) => {
@@ -435,8 +404,8 @@ export default function MarketplacePage() {
                     return (
                       <Card
                         key={item.id}
-                        className={`group flex flex-col rounded-xl border bg-card/90 backdrop-blur-sm hover:shadow-soft hover:-translate-y-[3px] transition-smooth ${
-                          item.is_featured ? "border-primary/70" : "border-border/70"
+                        className={`group flex flex-col rounded-xl border bg-card/80 backdrop-blur hover:shadow-lg transition-all hover:-translate-y-[2px] ${
+                          item.is_featured ? "border-primary/70" : "border-border"
                         }`}
                       >
                         {item.image_url && (
@@ -450,7 +419,7 @@ export default function MarketplacePage() {
                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
                             <div className="absolute left-2 top-2 flex flex-col gap-1">
                               {item.is_featured && (
-                                <Badge className="flex items-center gap-1 text-[10px] md:text-xs bg-gradient-hero text-white shadow">
+                                <Badge className="flex items-center gap-1 text-[10px] md:text-xs bg-primary/90 text-white shadow">
                                   <Star className="h-3 w-3 fill-yellow-300 text-yellow-300" />
                                   Destacado
                                 </Badge>
@@ -533,7 +502,7 @@ export default function MarketplacePage() {
                             </div>
                           )}
 
-                          {/* Footer de acciones, mismo enfoque que jobs (CTA claro a la derecha) */}
+                          {/* Footer de acciones */}
                           <div className="mt-2 pt-2 border-t flex items-center gap-2">
                             {whatsappLink && (
                               <Button
@@ -588,8 +557,8 @@ export default function MarketplacePage() {
           </Tabs>
         </section>
 
-        {/* FOOTER INFO, mismo tono que otras páginas */}
-        <section>
+        {/* Mini sección info */}
+        <section className="mt-4">
           <Card className="border-dashed bg-muted/40">
             <CardContent className="py-3 px-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <div className="space-y-1">
@@ -597,23 +566,22 @@ export default function MarketplacePage() {
                   El Marketplace de Jujuy Conecta va a crecer con la comunidad.
                 </p>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  Vamos a sumar reseñas, mapa interactivo, perfiles de emprendedores
-                  y campañas especiales por fechas clave, para que comprar local sea siempre
-                  la primera opción.
+                  La idea es sumar sistema de reseñas, mapa interactivo, perfiles de emprendedores
+                  y campañas especiales por fecha, para que comprar local sea la primera opción.
                 </p>
               </div>
             </CardContent>
           </Card>
         </section>
 
-        {/* DIALOG DETALLE, adaptado al mismo patrón */}
+        {/* Dialog de detalle */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-lg">
             {selectedItem && (
               <>
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
-                    <Store className="h-5 w-5 text-primary" />
+                    <Store className="h-5 w-5" />
                     {selectedItem.name}
                   </DialogTitle>
                   <DialogDescription className="space-y-1">
@@ -645,7 +613,7 @@ export default function MarketplacePage() {
                         className="h-full w-full object-cover"
                       />
                       {selectedItem.has_delivery && (
-                        <Badge className="absolute right-2 bottom-2 flex items-center gap-1 bg-background/90 backdrop-blur">
+                        <Badge className="absolute right-2 bottom-2 flex items-center gap-1">
                           <Truck className="h-3 w-3" />
                           Envío disponible
                         </Badge>

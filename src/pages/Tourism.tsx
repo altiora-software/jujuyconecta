@@ -243,7 +243,7 @@ export default function Tourism() {
                   </div>
                 </div>
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-black-50">
-                  Planificá tu viaje como local
+                  Planificá tu viaje
                 </h1>
                 <p className="text-sm md:text-base text-black-50/90 max-w-xl">
                   Descubrí pueblos, cerros, quebradas y selvas. Armá tu

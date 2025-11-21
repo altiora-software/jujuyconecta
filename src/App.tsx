@@ -21,6 +21,7 @@ import Mantenimiento from "./pages/servicios/Directorio";
 import { ScrollToTop } from "./components/common/ScrollUp";
 import Tourism from "./pages/Tourism";
 import { InstallAppButton } from "./components/pwa/InstallAppButton";
+import MarketplacePage from "./pages/servicios/Marketplace";
 
 const queryClient = new QueryClient();
 
@@ -43,7 +44,7 @@ const App = () => (
         <Route path="/servicios/cursos" element={<Mantenimiento />} />
         <Route path="/servicios/mentorias" element={<Mantenimiento />} />
         <Route path="/servicios/asesoria-startup" element={<Mantenimiento />} />
-        <Route path="/servicios/marketplace" element={<Mantenimiento />} />
+        <Route path="/servicios/marketplace" element={<MarketplacePage />} />
         <Route path="/servicios" element={<AllServicesPage />} />
         <Route path="/terminos" element={<TermsAndConditions />} />
         <Route path="/privacidad" element={<PrivacyPolicy />} />
