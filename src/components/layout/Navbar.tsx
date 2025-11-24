@@ -56,7 +56,7 @@ export function Navbar() {
     ],
     Emprendimientos: [
       { label: "Marketplace Local", href: "/servicios/marketplace" },
-      { label: "Asesoría de Negocios", href: "/servicios/asesoria-startup" },
+      // { label: "Asesoría de Negocios", href: "/servicios/asesoria-startup" },
     ],
     Formación: [
       { label: "Alertas de Seguridad", href: "/security" },

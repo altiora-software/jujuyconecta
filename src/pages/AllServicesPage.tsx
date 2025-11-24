@@ -11,7 +11,7 @@ const SERVICES: Record<string, Service[]> = {
     { label: "Agenda Comunitaria", href: "/servicios/agenda", category: "Plataforma", description: "Eventos, ferias y actividades culturales." },
   ],
   Emprendimientos: [
-    { label: "Marketplace Local", href: "/servicios/marketplace", category: "Emprendimientos", description: "Vende y descubre productos de emprendedores jujeños." },
+    { label: "Marketplace Local", href: "/servicios/marketplace", category: "Emprendimientos", description: "Vendé y descubrí productos de emprendedores jujeños." },
   ],
   Formación: [
     { label: "Alertas de Seguridad", href: "/security", category: "Plataforma", description: "Sistema de avisos y notificaciones urgentes." },
