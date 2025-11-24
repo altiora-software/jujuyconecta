@@ -29,7 +29,6 @@ export function Hero() {
 
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
 
-  // NEW: estado para el modal de login
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -65,153 +64,127 @@ export function Hero() {
   const handleOpenAssistant = useCallback(async () => {
     if (authLoading) return;
     if (!user) {
-      // setLoginDialogOpen(true);
       setOpen(true);
       return;
     }
     setOpen(true);
-    // setAssistantOpen(true);
   }, [authLoading, user]);
 
-  // Callback que se ejecuta cuando el usuario aceptó términos y clickea "Continuar con Google"
   const handleContinueWithGoogle = useCallback(async () => {
     await signInWithGoogle();
-    // si el login fue exitoso, el hook debería actualizar "user" y se cerrará el modal con onClose
   }, [signInWithGoogle]);
+
 
   const Stat = ({ icon, value, label }: { icon: React.ReactNode; value: number | null; label: string }) => (
     <div className="text-center">
-      <div className="h-8 w-8 mx-auto mb-2 text-yellow-400">{icon}</div>
-      <div className="text-2xl font-bold tabular-nums text-black">
-        {loading ? <span className="inline-block h-6 w-16 bg-white/30 rounded animate-pulse" /> : value ?? 0}
+      <div className="h-8 w-8 mx-auto mb-2 text-yellow-400">
+        {icon}
       </div>
-      <div className="text-sm text-black/90 font-medium">{label}</div>
+  
+      <div
+        className="
+          text-3xl
+          font-extrabold
+          tabular-nums
+          text-black
+          drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]
+        "
+      >
+        {loading ? (
+          <span className="inline-block h-6 w-16 bg-white/30 rounded animate-pulse" />
+        ) : (
+          value ?? 0
+        )}
+      </div>
+  
+      <div className="text-sm font-semibold text-black">
+        {label}
+      </div>
     </div>
   );
+  
+  
 
   return (
     <section
       className="relative overflow-hidden text-black"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      {/* Capa base: imagen full + overlay verde translúcido */}
       <div className="absolute inset-0">
         <img
           src={imagenHero}
-          alt="Paisaje representativo de Jujuy — Jujuy Conecta"
+          alt="Jujuy desde arriba, colores del Hornocal, conectando toda la provincia en una sola plataforma"
           className="w-full h-full object-cover object-center scale-[1.15] sm:scale-[1.2] lg:scale-[1.25] transition-transform duration-700"
           loading="lazy"
         />
-        {/* Verde más translúcido para que se vea la imagen */}
         <div className="absolute inset-0 bg-gradient-hero/45 sm:bg-gradient-hero/40 lg:bg-gradient-hero/35" />
-        {/* Blobs suaves (ocultos en xs para no tapar) */}
         <div className="hidden sm:block absolute -top-24 -left-24 w-64 h-64 bg-white/25 rounded-full blur-3xl" />
         <div className="hidden sm:block absolute -bottom-28 -right-28 w-[28rem] h-[28rem] bg-white/20 rounded-full blur-3xl" />
       </div>
 
-      {/* Contenido */}
       <div className="relative z-10">
         <div className="container mx-auto px-4">
           <div className="min-h-[70svh] sm:min-h-[68svh] lg:min-h-[60svh] flex flex-col items-center justify-center text-center gap-6 py-12 sm:py-14 lg:py-20">
-            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight">
-              Jujuy Conecta <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-800 to-blue-500">la plataforma que une información, cultura y servicios.</span>
-            </h1>
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">
+              Todo Jujuy en un lugar claro y fácil de usar.
+            </span>
+          </h1>
 
-            <p className="max-w-[56rem] text-base sm:text-lg lg:text-xl/7 opacity-95">
-              Somos el medio digital que conecta a la gente con <strong>información local</strong>, <strong>servicios útiles</strong> y <strong>comunidad</strong>.
-              Publicamos noticias y reportajes en nuestro diario digital, producimos un videopodcast con historias y entrevistas, y mantenemos herramientas y recursos para facilitar la vida en Jujuy.
-            </p>
+          <p className="max-w-[56rem] text-base sm:text-lg lg:text-xl/7 opacity-95">
+            Colectivos, mapas, empleos, ayuda social y noticias al día.  
+            Todo organizado para que encuentres lo que necesitás sin perder tiempo.
+          </p>
 
-            {/* CTA principal */}
             <div className="w-full max-w-2xl flex flex-col xs:flex-row gap-3 justify-center items-center">
               <div className="flex gap-3 w-full xs:w-auto flex-wrap justify-center">
                 <Button
                   size="lg"
                   className="w-full xs:w-auto"
                   onClick={() => (window.location.href = "/transport")}
-                  >
-                  <BusFront className="mr-2" /> Que colectivo me lleva?
+                >
+                  <BusFront className="mr-2" /> Encontrar mi colectivo ahora
                 </Button>
+
                 <Button
                   variant="outline"
                   size="lg"
                   className="w-full xs:w-auto hover:animate-glow"
                   onClick={() => (window.location.href = "https://jujuyconecta.online")}
-                  >
-                  <Newspaper className="mr-2" /> Enterate las mejores noticias
+                >
+                  <Newspaper className="mr-2" /> Ver qué está pasando hoy
                 </Button>
 
-                  <Button 
-                    size="lg"
-                    className="w-full xs:w-auto"
-                    onClick={handleOpenAssistant}
-                  >
-                    <Briefcase className="mr-2" /> Proximamente conocé al asistente!
-                  </Button>
-                {/* <Button
+                <Button 
                   size="lg"
                   className="w-full xs:w-auto"
-                  onClick={() => (window.location.href = "/podcast")}
+                  onClick={handleOpenAssistant}
                 >
-                  <Mic className="mr-2" /> Escucha nuestro videopodcast
-                </Button> */}
-
+                  <Briefcase className="mr-2" /> Probar el asistente de Jujuy
+                </Button>
               </div>
             </div>
 
-            {/* Segunda fila CTA: Asistente + Apoyar */}
-            {/* <div className="flex gap-3 mt-2 items-center">
-              
-              <Button size="sm" variant="ghost" onClick={() => (window.location.href = "/apoyar")}>
-                <Gift className="mr-2" /> Apoyar / Donar
-              </Button>
-            </div> */}
-
-            {/* Tarjeta corta explicativa (visually separated) */}
-            {/* <div className="mt-4 bg-white/90 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-md max-w-3xl w-full text-left">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <div className="text-sm font-semibold text-slate-700">Qué hacemos</div>
-                  <div className="mt-1 text-sm text-slate-800">
-                    Publicamos noticias locales, promovemos emprendimientos, organizamos eventos (catas, encuentros) y ofrecemos recursos — todo en un solo lugar.
-                  </div>
-                </div>
-                <div className="flex gap-4 items-center">
-                  <div className="text-xs text-slate-600">¿Querés publicar o colaborar?</div>
-                  <Button size="sm" onClick={() => (window.location.href = "/contacto")}>Contactanos</Button>
-                </div>
-              </div>
-            </div> */}
-
-            {/* Stats: 2 columnas en móvil, 4 en md+ */}
             <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-4 ">
-              <Stat icon={<MapPin />} value={counts.lines} label="Líneas activas" />
-              <Stat icon={<Users />} value={counts.resources} label="Recursos activos" />
-              <Stat icon={<Briefcase />} value={counts.jobs} label="Empleos activos" />
-              <Stat icon={<Shield />} value={counts.alerts} label="Alertas activas" />
+              <Stat icon={<MapPin />} value={counts.lines} label="Líneas para no perder tiempo" />
+              <Stat icon={<Users />} value={counts.resources} label="Lugares donde te dan una mano" />
+              <Stat icon={<Briefcase />} value={counts.jobs} label="Oportunidades de trabajo activas" />
+              <Stat icon={<Shield />} value={counts.alerts} label="Alertas para que no te agarren desprevenido" />
             </div>
 
-            {/* Disclaimer corto (legible en mobile) */}
             <p className="text-xs sm:text-[13px] text-blue/80 max-w-[34rem] mt-2">
-              Datos de fuentes públicas; podrían cambiar. Verificá con fuentes oficiales. Para temas editoriales escribinos a contacto@jujuyconecta.com
+              Los datos pueden cambiar según el día y la fuente. Usá la info como guía y, si algo no cierra, escribinos a contacto@jujuyconecta.com para revisarlo.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Onboarding + Modales */}
       <OnboardingOnce onOpenAssistant={handleOpenAssistant} />
       <AiTrainingModal
         open={open}
         onClose={() => setOpen(false)}
         supportEmail="jujuyconecta@gmail.com"
       />
-
-      {/* <LoginRequiredDialog
-        open={loginDialogOpen && !user}
-        onClose={() => setLoginDialogOpen(false)}
-        onContinueWithGoogle={handleContinueWithGoogle}
-      /> */}
 
       {assistantOpen && user && (
         <JujuyConectaAssistantModal open={assistantOpen} onClose={() => setAssistantOpen(false)} />
