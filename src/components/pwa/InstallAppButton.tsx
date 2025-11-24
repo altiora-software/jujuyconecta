@@ -15,7 +15,7 @@ export function InstallAppButton() {
                  text-sm font-semibold text-white shadow-lg
                  flex items-center justify-center gap-2"
     >
-      <span>Agreganos a tu inicio!</span>
+      <span>Instalar Jujuy Conecta</span>
     </button>
   );
 }
