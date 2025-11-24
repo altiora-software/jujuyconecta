@@ -158,9 +158,10 @@ export function Hero() {
                 <Button 
                   size="lg"
                   className="w-full xs:w-auto"
-                  onClick={handleOpenAssistant}
+                  onClick={() => (window.location.href = "/turismo")}
+                  
                 >
-                  <Briefcase className="mr-2" /> Probar el asistente de Jujuy
+                  <Briefcase className="mr-2" /> Conocé la provincia
                 </Button>
               </div>
             </div>
