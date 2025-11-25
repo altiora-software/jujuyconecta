@@ -44,7 +44,7 @@ export function Navbar() {
 
   const navItems: NavItem[] = [
     { label: "Inicio", href: "/" },
-    { label: "Diario Digital", href: "https://jujuyconecta.online" },
+    { label: "Diario Digital", href: "/diario" },
     { label: "Turismo", href: "/turismo" },
     { label: "Transporte", href: "/transport" },
   ];  
@@ -85,8 +85,8 @@ export function Navbar() {
     },
     {
       label: "Diario Digital",
-      href: "https://jujuyconecta.online",
-      type: "externo",
+      href: "/diario",
+      type: "seccion",
       keywords: [
         "diario",
         "noticias",

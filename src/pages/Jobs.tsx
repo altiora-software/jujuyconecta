@@ -1,377 +1,139 @@
+// src/app/empleos/page.tsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { supabase } from "@/integrations/supabase/client";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
-
-import {
-  Store,
-  ShoppingBag,
-  MapPin,
-  Search,
-  Phone,
-  Instagram,
-  Globe,
-  Star,
-  Sparkles,
-  Filter,
-  Truck,
-  MessageCircle,
-  Clock,
-} from "lucide-react";
-
-interface MarketplaceItem {
-  id: string;
-  name: string;
-  slug?: string | null;
-  description: string | null;
-  short_description?: string | null;
-  category: string;
-  type: "producto" | "servicio" | "emprendimiento" | null;
-  municipality: string | null;
-  region?: string | null;
-  address?: string | null;
-  whatsapp?: string | null;
-  phone?: string | null;
-  instagram?: string | null;
-  website?: string | null;
-  image_url?: string | null;
-  tags?: string[] | null;
-  is_featured?: boolean | null;
-  has_delivery?: boolean | null;
-  created_at?: string;
-}
+import { useJobsListings } from "@/hooks/useJobsListings";
+import { JobsHeader } from "@/components/jobs/JobsHeader";
+import { JobsFilters } from "@/components/jobs/JobsFilters";
+import { JobCard } from "@/components/jobs/JobCard";
+import { JobDetailDialog } from "@/components/jobs/JobDetailDialog";
+import { JobListing } from "@/components/types/jobs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Briefcase } from "lucide-react";
 
 const TABS = [
-  { id: "todos", label: "Todo Jujuy", icon: Store },
-  { id: "productos", label: "Productos", icon: ShoppingBag },
-  { id: "servicios", label: "Servicios", icon: Sparkles },
-  { id: "destacados", label: "Destacados", icon: Star },
+  { id: "todas", label: "Todas", icon: Briefcase },
+  { id: "destacadas", label: "Destacadas", icon: Briefcase },
 ];
 
-export default function MarketplacePage() {
-  const [items, setItems] = useState<MarketplaceItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState<string>("todos");
+export default function JobsPage() {
+  const { jobs, loading } = useJobsListings({ onlyPublished: true });
+
+  const [selectedTab, setSelectedTab] = useState<string>("todas");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("todas");
   const [selectedMunicipality, setSelectedMunicipality] = useState<string>("todos");
-  const [selectedItem, setSelectedItem] = useState<MarketplaceItem | null>(null);
+  const [selectedJobType, setSelectedJobType] = useState<string>("todos");
+  const [selectedModality, setSelectedModality] = useState<string>("todas");
+
+  const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("marketplace_items")
-          .select("*")
-          .order("is_featured", { ascending: false })
-          .order("created_at", { ascending: false });
-
-        if (error) {
-          console.error("Error cargando marketplace_items", error);
-          toast({
-            title: "Error al cargar el marketplace",
-            description: "No se pudieron cargar los emprendimientos. Probá de nuevo en unos minutos.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        setItems((data || []) as MarketplaceItem[]);
-      } catch (err) {
-        console.error("Error inesperado en MarketplacePage", err);
-        toast({
-          title: "Error inesperado",
-          description: "Ocurrió un problema cargando los datos.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchItems();
-  }, [toast]);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
-    items.forEach((item) => {
-      if (item.category) set.add(item.category);
+    jobs.forEach((job) => {
+      if (job.category) set.add(job.category);
     });
     return Array.from(set).sort();
-  }, [items]);
+  }, [jobs]);
 
   const municipalities = useMemo(() => {
     const set = new Set<string>();
-    items.forEach((item) => {
-      if (item.municipality) set.add(item.municipality);
+    jobs.forEach((job) => {
+      if (job.municipality) set.add(job.municipality);
     });
     return Array.from(set).sort();
-  }, [items]);
+  }, [jobs]);
 
-  const totalItems = items.length;
+  const totalJobs = jobs.length;
   const totalMunicipalities = municipalities.length;
   const totalCategories = categories.length;
 
-  const filteredItems = useMemo(() => {
-    return items.filter((item) => {
-      if (selectedTab === "productos" && item.type !== "producto") return false;
-      if (selectedTab === "servicios" && item.type !== "servicio") return false;
-      if (selectedTab === "destacados" && !item.is_featured) return false;
+  const filteredJobs = useMemo(() => {
+    return jobs.filter((job) => {
+      if (selectedTab === "destacadas" && !job.is_featured) return false;
 
-      if (selectedCategory !== "todas" && item.category !== selectedCategory) {
+      if (selectedCategory !== "todas" && job.category !== selectedCategory) return false;
+
+      if (selectedMunicipality !== "todos" && job.municipality !== selectedMunicipality) {
         return false;
       }
 
-      if (selectedMunicipality !== "todos" && item.municipality !== selectedMunicipality) {
-        return false;
-      }
+      if (selectedJobType !== "todos" && job.job_type !== selectedJobType) return false;
+
+      if (selectedModality !== "todas" && job.modality !== selectedModality) return false;
 
       if (searchTerm.trim().length > 0) {
         const term = searchTerm.toLowerCase();
-        const dataHaystack = [
-          item.name,
-          item.description,
-          item.short_description,
-          item.category,
-          item.municipality,
-          item.address,
-          item.tags?.join(" "),
+        const haystack = [
+          job.title,
+          job.company_name,
+          job.category,
+          job.description,
+          job.municipality,
+          job.city,
         ]
           .filter(Boolean)
           .join(" ")
           .toLowerCase();
 
-        if (!dataHaystack.includes(term)) {
-          return false;
-        }
+        if (!haystack.includes(term)) return false;
       }
 
       return true;
     });
-  }, [items, selectedTab, selectedCategory, selectedMunicipality, searchTerm]);
-
-  const handleOpenDetails = (item: MarketplaceItem) => {
-    setSelectedItem(item);
-    setDialogOpen(true);
-  };
+  }, [
+    jobs,
+    selectedTab,
+    selectedCategory,
+    selectedMunicipality,
+    selectedJobType,
+    selectedModality,
+    searchTerm,
+  ]);
 
   const handleClearFilters = () => {
     setSelectedCategory("todas");
     setSelectedMunicipality("todos");
+    setSelectedJobType("todos");
+    setSelectedModality("todas");
     setSearchTerm("");
-    setSelectedTab("todos");
+    setSelectedTab("todas");
   };
 
-  const formatTypeLabel = (type: MarketplaceItem["type"]) => {
-    if (type === "producto") return "Producto";
-    if (type === "servicio") return "Servicio";
-    if (type === "emprendimiento") return "Emprendimiento";
-    return "Emprendimiento local";
-  };
-
-  const buildWhatsAppLink = (phone?: string | null, name?: string) => {
-    if (!phone) return null;
-    const clean = phone.replace(/[^\d]/g, "");
-    const texto = encodeURIComponent(
-      `Hola, vi tu emprendimiento en el Marketplace de Jujuy Conecta y quiero más info sobre: ${name ?? "tu emprendimiento"}.`
-    );
-    return `https://wa.me/${clean}?text=${texto}`;
-  };
-
-  const isNewItem = (createdAt?: string) => {
-    if (!createdAt) return false;
-    const created = new Date(createdAt);
-    const now = new Date();
-    const diffDays = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
-    return diffDays <= 7;
-  };
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return null;
-    const d = new Date(dateStr);
-    if (Number.isNaN(d.getTime())) return null;
-    return d.toLocaleDateString("es-AR", {
-      day: "2-digit",
-      month: "short",
-    });
+  const handleOpenDetails = (job: JobListing) => {
+    setSelectedJob(job);
+    setDialogOpen(true);
   };
 
   return (
     <Layout>
       <div className="container mx-auto max-w-6xl px-4 py-8 space-y-8">
-        {/* HEADER estilo Jujuy Conecta (mismo patrón que turismo/transport/jobs) */}
-        <section className="space-y-4">
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div className="space-y-3 max-w-xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-gradient-hero/10 px-3 py-1 text-xs md:text-sm shadow-soft">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <span className="font-medium">Marketplace Local de Jujuy</span>
-              </div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-1">
-                  Emprendimientos y comercios jujeños en un solo lugar
-                </h1>
-                <p className="text-sm md:text-base text-muted-foreground max-w-xl">
-                  Descubrí productos, servicios y proyectos locales, y hablales directo por WhatsApp
-                  sin intermediarios.
-                </p>
-              </div>
+        <JobsHeader
+          totalJobs={totalJobs}
+          totalMunicipalities={totalMunicipalities}
+          totalCategories={totalCategories}
+        />
 
-              {/* Stats igual mood que otras secciones */}
-              <div className="grid grid-cols-3 gap-3 max-w-xs text-xs md:text-sm">
-                <Card className="border-border/60 bg-card/80 shadow-none">
-                  <CardContent className="px-3 py-2 flex flex-col gap-0.5">
-                    <span className="text-lg font-semibold">{totalItems}</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      emprendimientos
-                    </span>
-                  </CardContent>
-                </Card>
-                <Card className="border-border/60 bg-card/80 shadow-none">
-                  <CardContent className="px-3 py-2 flex flex-col gap-0.5">
-                    <span className="text-lg font-semibold">{totalMunicipalities}</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      municipios
-                    </span>
-                  </CardContent>
-                </Card>
-                <Card className="border-border/60 bg-card/80 shadow-none">
-                  <CardContent className="px-3 py-2 flex flex-col gap-0.5">
-                    <span className="text-lg font-semibold">{totalCategories}</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      rubros
-                    </span>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+        <JobsFilters
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          selectedMunicipality={selectedMunicipality}
+          onMunicipalityChange={setSelectedMunicipality}
+          selectedJobType={selectedJobType}
+          onJobTypeChange={setSelectedJobType}
+          selectedModality={selectedModality}
+          onModalityChange={setSelectedModality}
+          categories={categories}
+          municipalities={municipalities}
+          onClearFilters={handleClearFilters}
+          resultsCount={filteredJobs.length}
+        />
 
-            <Card className="min-w-[260px] max-w-sm border-dashed bg-card/90 shadow-soft">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Store className="h-4 w-4 text-primary" />
-                  ¿Tenés un emprendimiento?
-                </CardTitle>
-                <CardDescription className="text-xs md:text-sm">
-                  Muy pronto vas a poder pedir tu ficha verificada en el Marketplace.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-2 pt-0 text-xs md:text-sm">
-                <p className="text-muted-foreground">
-                  Vas a poder:
-                </p>
-                <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-                  <li>Aparecer en el mapa de Jujuy Conecta.</li>
-                  <li>Tener botón directo a WhatsApp e Instagram.</li>
-                  <li>Elegir rubro, zona y etiquetas para que te encuentren fácil.</li>
-                </ul>
-                <Button size="sm" className="w-full mt-1" disabled>
-                  Alta de emprendimientos (próximamente)
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Separator />
-
-          {/* FILTROS en Card, igual patrón que turismo/empleos */}
-          <Card className="border-border/70 bg-card/90">
-            <CardContent className="pt-4 space-y-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Filter className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">Buscar y filtrar emprendimientos</span>
-              </div>
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div className="flex-1 flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por producto, servicio, rubro o barrio"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={handleClearFilters}
-                    title="Limpiar filtros"
-                    className="transition-smooth"
-                  >
-                    <Filter className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                  <select
-                    className="h-9 rounded-md border border-input bg-background px-3 text-xs md:text-sm"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                  >
-                    <option value="todas">Todos los rubros</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-
-                  <select
-                    className="h-9 rounded-md border border-input bg-background px-3 text-xs md:text-sm"
-                    value={selectedMunicipality}
-                    onChange={(e) => setSelectedMunicipality(e.target.value)}
-                  >
-                    <option value="todos">Toda la provincia</option>
-                    {municipalities.map((mun) => (
-                      <option key={mun} value={mun}>
-                        {mun}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                Mostrando {filteredItems.length} emprendimiento(s) según tus filtros.
-              </p>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* TABS estilo sistema (mismo mood que transporte/turismo) */}
         <section className="space-y-4">
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
             <TabsList className="w-full grid grid-cols-2 md:inline-flex md:w-auto md:gap-2">
@@ -395,374 +157,56 @@ export default function MarketplacePage() {
                       key={i}
                       className="rounded-xl bg-muted/40 border-border/60 animate-pulse"
                     >
-                      <CardHeader className="pb-3">
+                      <CardContent className="space-y-2 p-4">
                         <div className="h-4 w-32 bg-muted rounded mb-2" />
                         <div className="h-3 w-24 bg-muted rounded" />
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <div className="h-3 w-full bg-muted rounded" />
+                        <div className="h-3 w-full bg-muted rounded mt-2" />
                         <div className="h-3 w-2/3 bg-muted rounded" />
-                        <div className="flex gap-2 pt-2">
-                          <div className="h-6 w-16 bg-muted rounded-full" />
-                          <div className="h-6 w-20 bg-muted rounded-full" />
-                        </div>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
-              ) : filteredItems.length === 0 ? (
+              ) : filteredJobs.length === 0 ? (
                 <Card className="border-dashed">
                   <CardContent className="py-10 text-center space-y-3">
-                    <Store className="h-8 w-8 text-muted-foreground mx-auto" />
+                    <Briefcase className="h-8 w-8 text-muted-foreground mx-auto" />
                     <div className="space-y-1">
-                      <p className="font-medium">Todavía no hay resultados para este filtro.</p>
+                      <p className="font-medium">No encontramos empleos con estos filtros.</p>
                       <p className="text-sm text-muted-foreground">
                         Probá con otra palabra, cambiá de rubro o quitá alguno de los filtros.
                       </p>
                     </div>
-                    <Button variant="outline" size="sm" onClick={handleClearFilters}>
-                      Quitar filtros
-                    </Button>
                   </CardContent>
                 </Card>
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredItems.map((item) => {
-                    const whatsappLink = buildWhatsAppLink(item.whatsapp ?? item.phone, item.name);
-                    const isNew = isNewItem(item.created_at);
-                    const createdShort = formatDate(item.created_at);
-
-                    return (
-                      <Card
-                        key={item.id}
-                        className={`group flex flex-col rounded-xl border bg-card/90 backdrop-blur-sm hover:shadow-soft hover:-translate-y-[3px] transition-smooth ${
-                          item.is_featured ? "border-primary/70" : "border-border/70"
-                        }`}
-                      >
-                        {item.image_url && (
-                          <div className="relative h-40 w-full overflow-hidden rounded-t-xl">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={item.image_url}
-                              alt={item.name}
-                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
-                            <div className="absolute left-2 top-2 flex flex-col gap-1">
-                              {item.is_featured && (
-                                <Badge className="flex items-center gap-1 text-[10px] md:text-xs bg-gradient-hero text-white shadow">
-                                  <Star className="h-3 w-3 fill-yellow-300 text-yellow-300" />
-                                  Destacado
-                                </Badge>
-                              )}
-                              {isNew && (
-                                <Badge className="text-[10px] md:text-xs bg-emerald-500 text-white">
-                                  Nuevo
-                                </Badge>
-                              )}
-                            </div>
-                            {item.has_delivery && (
-                              <Badge className="absolute right-2 bottom-2 text-[10px] md:text-xs flex items-center gap-1 bg-background/90 backdrop-blur">
-                                <Truck className="h-3 w-3" />
-                                Envío
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-
-                        <CardHeader className="pb-2 pt-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="space-y-1">
-                              <CardTitle className="text-base md:text-lg line-clamp-1">
-                                {item.name}
-                              </CardTitle>
-                              <CardDescription className="text-xs md:text-sm line-clamp-2">
-                                {item.short_description || item.description}
-                              </CardDescription>
-                            </div>
-                          </div>
-                        </CardHeader>
-
-                        <CardContent className="pt-0 pb-3 flex-1 flex flex-col gap-2">
-                          <div className="flex flex-wrap items-center gap-2 text-xs md:text-[13px] text-muted-foreground">
-                            <Badge
-                              variant="outline"
-                              className="flex items-center gap-1 text-[11px] border-dashed"
-                            >
-                              <Sparkles className="h-3 w-3" />
-                              {formatTypeLabel(item.type)}
-                            </Badge>
-
-                            {item.category && (
-                              <Badge variant="secondary" className="text-[11px]">
-                                {item.category}
-                              </Badge>
-                            )}
-
-                            {item.municipality && (
-                              <span className="inline-flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {item.municipality}
-                              </span>
-                            )}
-
-                            {createdShort && (
-                              <span className="inline-flex items-center gap-1 text-[11px]">
-                                <Clock className="h-3 w-3" />
-                                {createdShort}
-                              </span>
-                            )}
-                          </div>
-
-                          {item.tags && item.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 pt-1">
-                              {item.tags.slice(0, 3).map((tag) => (
-                                <Badge
-                                  key={tag}
-                                  variant="outline"
-                                  className="text-[10px] md:text-[11px] font-normal"
-                                >
-                                  #{tag}
-                                </Badge>
-                              ))}
-                              {item.tags.length > 3 && (
-                                <span className="text-[10px] text-muted-foreground">
-                                  +{item.tags.length - 3}
-                                </span>
-                              )}
-                            </div>
-                          )}
-
-                          {/* Footer de acciones, mismo enfoque que jobs (CTA claro a la derecha) */}
-                          <div className="mt-2 pt-2 border-t flex items-center gap-2">
-                            {whatsappLink && (
-                              <Button
-                                type="button"
-                                size="sm"
-                                className="flex-1 text-xs md:text-sm"
-                                onClick={() => {
-                                  window.open(whatsappLink, "_blank");
-                                }}
-                              >
-                                <MessageCircle className="h-4 w-4 mr-1" />
-                                Hablar por WhatsApp
-                              </Button>
-                            )}
-
-                            <Button
-                              type="button"
-                              size="icon"
-                              variant="outline"
-                              className="shrink-0"
-                              onClick={() => handleOpenDetails(item)}
-                              title="Ver ficha completa"
-                            >
-                              <Store className="h-4 w-4" />
-                            </Button>
-
-                            {item.instagram && (
-                              <Button
-                                type="button"
-                                size="icon"
-                                variant="outline"
-                                className="shrink-0"
-                                onClick={() => {
-                                  const url = item.instagram?.startsWith("http")
-                                    ? item.instagram
-                                    : `https://instagram.com/${item.instagram}`;
-                                  window.open(url, "_blank");
-                                }}
-                                title="Ver en Instagram"
-                              >
-                                <Instagram className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+                  {filteredJobs.map((job) => (
+                    <JobCard key={job.id} job={job} onOpenDetails={handleOpenDetails} />
+                  ))}
                 </div>
               )}
             </TabsContent>
           </Tabs>
         </section>
 
-        {/* FOOTER INFO, mismo tono que otras páginas */}
         <section>
           <Card className="border-dashed bg-muted/40">
             <CardContent className="py-3 px-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium">
-                  El Marketplace de Jujuy Conecta va a crecer con la comunidad.
+                  La bolsa de trabajo de Jujuy Conecta va a crecer todos los días.
                 </p>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  Vamos a sumar reseñas, mapa interactivo, perfiles de emprendedores
-                  y campañas especiales por fechas clave, para que comprar local sea siempre
-                  la primera opción.
+                  Vamos a sumar avisos verificados, filtros por experiencia, sistema de reseñas
+                  y estadísticas para empleadores. La idea es simple: que buscar laburo en Jujuy no
+                  sea estar perdido, sino tener un lugar claro donde empezar.
                 </p>
               </div>
             </CardContent>
           </Card>
         </section>
 
-        {/* DIALOG DETALLE, adaptado al mismo patrón */}
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="max-w-lg">
-            {selectedItem && (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Store className="h-5 w-5 text-primary" />
-                    {selectedItem.name}
-                  </DialogTitle>
-                  <DialogDescription className="space-y-1">
-                    <div className="flex flex-wrap gap-2 items-center text-xs md:text-sm">
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        <Sparkles className="h-3 w-3" />
-                        {formatTypeLabel(selectedItem.type)}
-                      </Badge>
-                      {selectedItem.category && (
-                        <Badge variant="secondary">{selectedItem.category}</Badge>
-                      )}
-                      {selectedItem.municipality && (
-                        <span className="inline-flex items-center gap-1 text-muted-foreground">
-                          <MapPin className="h-3 w-3" />
-                          {selectedItem.municipality}
-                        </span>
-                      )}
-                    </div>
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="space-y-4">
-                  {selectedItem.image_url && (
-                    <div className="relative h-52 w-full overflow-hidden rounded-lg">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={selectedItem.image_url}
-                        alt={selectedItem.name}
-                        className="h-full w-full object-cover"
-                      />
-                      {selectedItem.has_delivery && (
-                        <Badge className="absolute right-2 bottom-2 flex items-center gap-1 bg-background/90 backdrop-blur">
-                          <Truck className="h-3 w-3" />
-                          Envío disponible
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-
-                  {(selectedItem.description || selectedItem.short_description) && (
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {selectedItem.description || selectedItem.short_description}
-                    </p>
-                  )}
-
-                  {selectedItem.address && (
-                    <div className="flex items-start gap-2 text-sm">
-                      <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                      <div>
-                        <p className="font-medium">Dirección</p>
-                        <p className="text-muted-foreground">{selectedItem.address}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {(selectedItem.phone || selectedItem.whatsapp) && (
-                      <div className="flex items-start gap-2 text-sm">
-                        <Phone className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium">Contacto</p>
-                          {selectedItem.phone && (
-                            <p className="text-muted-foreground">{selectedItem.phone}</p>
-                          )}
-                          {selectedItem.whatsapp && (
-                            <p className="text-muted-foreground">
-                              WhatsApp: {selectedItem.whatsapp}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {(selectedItem.instagram || selectedItem.website) && (
-                      <div className="flex flex-col gap-1 text-sm">
-                        {selectedItem.instagram && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const url = selectedItem.instagram?.startsWith("http")
-                                ? selectedItem.instagram
-                                : `https://instagram.com/${selectedItem.instagram}`;
-                              window.open(url, "_blank");
-                            }}
-                            className="inline-flex items-center gap-2 text-primary hover:underline text-sm"
-                          >
-                            <Instagram className="h-4 w-4" />
-                            Ver en Instagram
-                          </button>
-                        )}
-                        {selectedItem.website && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const url = selectedItem.website?.startsWith("http")
-                                ? selectedItem.website
-                                : `https://${selectedItem.website}`;
-                              window.open(url, "_blank");
-                            }}
-                            className="inline-flex items-center gap-2 text-primary hover:underline text-sm"
-                          >
-                            <Globe className="h-4 w-4" />
-                            Ver sitio web
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {selectedItem.tags && selectedItem.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {selectedItem.tags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="outline"
-                          className="text-[11px] font-normal"
-                        >
-                          #{tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="pt-2 flex flex-col gap-2 sm:flex-row sm:justify-end">
-                    {buildWhatsAppLink(
-                      selectedItem.whatsapp ?? selectedItem.phone,
-                      selectedItem.name
-                    ) && (
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          const link = buildWhatsAppLink(
-                            selectedItem.whatsapp ?? selectedItem.phone,
-                            selectedItem.name
-                          );
-                          if (link) window.open(link, "_blank");
-                        }}
-                        className="flex-1 sm:flex-none"
-                      >
-                        <MessageCircle className="h-4 w-4 mr-2" />
-                        Escribir por WhatsApp
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
+        <JobDetailDialog open={dialogOpen} onOpenChange={setDialogOpen} job={selectedJob} />
       </div>
     </Layout>
   );

@@ -150,7 +150,7 @@ export function Hero() {
                   variant="outline"
                   size="lg"
                   className="w-full xs:w-auto hover:animate-glow"
-                  onClick={() => (window.location.href = "https://jujuyconecta.online")}
+                  onClick={() => (window.location.href = "/diario")}
                 >
                   <Newspaper className="mr-2" /> Ver qué está pasando hoy
                 </Button>

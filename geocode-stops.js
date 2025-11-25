@@ -22,7 +22,7 @@ async function geocodeAddress(query) {
 
   const res = await fetch(url.toString(), {
     headers: {
-      "User-Agent": "JujuyConecta/1.0 (contacto@jujuyconecta.online)",
+      "User-Agent": "JujuyConecta/1.0 (jujuyconecta@gmail.com)",
     },
   });
 
