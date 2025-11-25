@@ -23,7 +23,7 @@ export default function Mantenimiento(): JSX.Element {
             Volver al inicio
           </a>
           <a
-            href="/diario"
+            href="https://diario.jujuyconecta.com"
             className="border border-white text-black font-semibold px-6 py-3 rounded-lg hover:bg-white hover:text-blue-900 transition-colors"
           >
             Ver nuestro diario digital

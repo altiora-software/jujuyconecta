@@ -44,14 +44,14 @@ export function Navbar() {
 
   const navItems: NavItem[] = [
     { label: "Inicio", href: "/" },
-    { label: "Diario Digital", href: "/diario" },
+    { label: "Diario Digital", href: "https://diario.jujuyconecta.com" },
     { label: "Turismo", href: "/turismo" },
     { label: "Transporte", href: "/transport" },
   ];  
 
   const servicesByTab: Record<string, { label: string; href: string }[]> = {
     Plataforma: [
-      { label: "Portal de Noticias", href: "/diario" },
+      { label: "Portal de Noticias", href: "https://diario.jujuyconecta.com" },
       { label: "Agenda Comunitaria", href: "/servicios/agenda" },
     ],
     Emprendimientos: [
@@ -85,7 +85,7 @@ export function Navbar() {
     },
     {
       label: "Diario Digital",
-      href: "/diario",
+      href: "https://diario.jujuyconecta.com",
       type: "seccion",
       keywords: [
         "diario",
@@ -133,7 +133,7 @@ export function Navbar() {
     // Servicios
     {
       label: "Portal de Noticias",
-      href: "/diario",
+      href: "https://diario.jujuyconecta.com",
       type: "servicio",
       keywords: ["noticias", "diario", "portal", "información local"],
     },
