@@ -1,4 +1,5 @@
 export interface TransportLine {
+    company_name: any;
     id: string;
     name: string;
     number: string;
@@ -35,5 +36,26 @@ export interface TransportLine {
     status: "active" | "resolved" | "dismissed";
     created_at: string;
     transport_lines: TransportLine;
+  }
+  
+  export interface IntercityRouteUI {
+    id: string;
+    company_name: string;        // obtenido de transport_companies
+    origin_city: string;
+    destination_city: string;
+    notes?: string | null;
+    weekday_times: string[];
+    weekend_times: string[];
+  }
+  export interface IntercityRoute {
+    id: string;
+    company_id: string;
+    origin_city: string;
+    destination_city: string;
+    notes?: string | null;
+  }
+  export interface IntercityCompany {
+    id: string;
+    name: string;
   }
   

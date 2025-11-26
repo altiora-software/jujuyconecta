@@ -13,6 +13,9 @@ import { ReportsTab } from "@/components/transport/ReportsTab";
 import { LineDetailsDialog } from "@/components/transport/LineDetailsDialog";
 import { TransportLine } from "@/components/transport/types";
 
+// Vista actual del módulo de transporte
+type TransportViewMode = "urban" | "intercity";
+
 // -----------------------------
 // GA HELPER
 // -----------------------------
@@ -30,6 +33,8 @@ function trackGAEvent(eventName: string, params?: Record<string, any>) {
 export default function TransportPage() {
   const {
     loading,
+
+    // URBANO
     lines,
     stops,
     rawStops,
@@ -42,10 +47,17 @@ export default function TransportPage() {
     filteredLines,
     totalStops,
     linesWithReports,
+
+    // PROVINCIAL
+    intercityCompanies,
+    intercityRoutes,
+    intercitySchedulesCount,
   } = useTransportData();
 
   const [activeTab, setActiveTab] =
     useState<"lines" | "map" | "reports">("lines");
+
+  const [viewMode, setViewMode] = useState<TransportViewMode>("urban");
 
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailsLine, setDetailsLine] = useState<TransportLine | null>(null);
@@ -71,6 +83,7 @@ export default function TransportPage() {
       line_name: line.name,
       company: line.company_name,
       has_reports: reports.some((r) => r.line_id === line.id),
+      view_mode: viewMode,
     });
   };
 
@@ -84,6 +97,7 @@ export default function TransportPage() {
 
     trackGAEvent("transport_line_see_on_map", {
       line_id: lineId,
+      view_mode: viewMode,
     });
   };
 
@@ -96,6 +110,7 @@ export default function TransportPage() {
     trackGAEvent("transport_select_line", {
       line_id: lineId,
       source, // "list" | "company_filter" | "details"
+      view_mode: viewMode,
     });
   };
 
@@ -107,6 +122,7 @@ export default function TransportPage() {
 
     trackGAEvent("transport_tab_change", {
       tab: v,
+      view_mode: viewMode,
     });
   };
 
@@ -114,10 +130,11 @@ export default function TransportPage() {
   // Company filter
   // -----------------------------
   const handleCompanyFilterChange = (company: string | null) => {
-    setSelectedCompanyName(company);
+    setSelectedCompanyName(company || null);
 
     trackGAEvent("transport_filter_company", {
       company: company || "all",
+      view_mode: viewMode,
     });
   };
 
@@ -129,12 +146,36 @@ export default function TransportPage() {
 
     trackGAEvent("transport_select_from_map", {
       line_id: lineId,
+      view_mode: viewMode,
+    });
+  };
+
+  // -----------------------------
+  // View mode change (urbano / interurbano)
+  // -----------------------------
+  const handleViewModeChange = (mode: TransportViewMode) => {
+    if (mode === viewMode) return;
+
+    setViewMode(mode);
+
+    // reset de selección al cambiar de universo
+    setSelectedLineId(undefined);
+    setSelectedCompanyName(null);
+    setActiveTab("lines");
+
+    trackGAEvent("transport_view_mode_change", {
+      view_mode: mode,
     });
   };
 
   if (loading) {
     return <TransportLoadingSkeleton />;
   }
+
+  // métricas provinciales
+  const intercityCompanyCount = new Set(
+    intercityRoutes.map((r) => r.company_name)
+  ).size;
 
   return (
     <Layout>
@@ -143,11 +184,19 @@ export default function TransportPage() {
 
         <div className="container mx-auto px-4 py-8 md:py-12 space-y-8">
           <TransportHero
+            // urbano
             linesCount={lines.length}
             companyCount={companyNames.length}
             totalStops={totalStops}
             reportsCount={reports.length}
             linesWithReports={linesWithReports}
+            // provincial
+            intercityRouteCount={intercityRoutes.length}
+            intercityCompanyCount={intercityCompanyCount}
+            intercitySchedulesCount={intercitySchedulesCount}
+            // modo
+            viewMode={viewMode}
+            onModeChange={handleViewModeChange}
           />
 
           <Tabs
@@ -183,6 +232,7 @@ export default function TransportPage() {
 
             <TabsContent value="lines">
               <LinesTab
+                // urbano
                 lines={lines}
                 filteredLines={filteredLines}
                 stops={stops}
@@ -196,6 +246,9 @@ export default function TransportPage() {
                 }
                 setActiveTab={setActiveTab}
                 openDetails={openDetails}
+                // provincial
+                viewMode={viewMode}
+                intercityRoutes={intercityRoutes}
               />
             </TabsContent>
 
@@ -205,6 +258,7 @@ export default function TransportPage() {
                 stops={stops}
                 selectedLineId={selectedLineId}
                 setSelectedLineId={handleSelectLineFromMap}
+                viewMode={viewMode}
               />
             </TabsContent>
 

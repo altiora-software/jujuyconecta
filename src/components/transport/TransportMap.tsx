@@ -248,9 +248,9 @@ export function TransportMap({
           <div className="text-xs text-muted-foreground">
             Línea seleccionada:{" "}
             <span className="font-semibold text-primary">
-              {selectedLine.number} · {selectedLine.name}
+              {/* {selectedLine.number} · {selectedLine.name} */}
             </span>
-            <span className="ml-1">· {filteredStops.length} paradas</span>
+            {/* <span className="ml-1">· {filteredStops.length} paradas</span> */}
           </div>
         ) : (
           <div className="text-xs text-muted-foreground flex items-center gap-1">
