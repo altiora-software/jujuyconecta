@@ -27,6 +27,14 @@ interface SearchItem {
   keywords: string[];
 }
 
+// Helper de analytics simple para GA4 (gtag)
+function trackEvent(action: string, params?: Record<string, any>) {
+  if (typeof window === "undefined") return;
+  const w = window as any;
+  if (!w.gtag) return;
+  w.gtag("event", action, params || {});
+}
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
@@ -48,7 +56,7 @@ export function Navbar() {
     { label: "Diario Digital", href: "https://diario.jujuyconecta.com" },
     { label: "Turismo", href: "/turismo" },
     { label: "Transporte", href: "/transport" },
-  ];  
+  ];
 
   const servicesByTab: Record<string, { label: string; href: string }[]> = {
     Plataforma: [
@@ -63,10 +71,10 @@ export function Navbar() {
       { label: "Alertas de Seguridad", href: "/security" },
       { label: "Cursos y Talleres", href: "/servicios/cursos" },
     ],
-    "Turismo": [
-    { label: "Mapa Turístico", href: "/turismo" },              // o una subruta tipo /turismo/mapa si la tenés
-    { label: "Rutas y Recorridos", href: "/turismo?rutas=true" },
-    { label: "Eventos Turísticos", href: "/turismo?tab=events" },
+    Turismo: [
+      { label: "Mapa Turístico", href: "/turismo" },
+      { label: "Rutas y Recorridos", href: "/turismo?rutas=true" },
+      { label: "Eventos Turísticos", href: "/turismo?tab=events" },
     ],
     "Servicios Públicos": [
       { label: "Recursos Sociales ", href: "/resources" },
@@ -75,7 +83,7 @@ export function Navbar() {
     ],
   };
 
-  // Índice de búsqueda global, mezclando navegación + servicios + keywords
+  // Índice de búsqueda global
   const SEARCH_ITEMS: SearchItem[] = [
     // Navegación principal
     {
@@ -222,13 +230,12 @@ export function Navbar() {
     },
   ];
 
-  const searchItems = SEARCH_ITEMS; // si después querés fusionar dinámico, partís de acá
+  const searchItems = SEARCH_ITEMS;
 
   const runSearch = (query: string) => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
 
-    // tokens simples por espacios
     const tokens = q.split(/\s+/).filter(Boolean);
 
     const scored = searchItems
@@ -239,7 +246,6 @@ export function Navbar() {
           item.keywords.join(" ")
         ).toLowerCase();
 
-        // cada token que aparezca suma puntos
         let score = 0;
         for (const t of tokens) {
           if (haystack.includes(t)) {
@@ -247,7 +253,6 @@ export function Navbar() {
           }
         }
 
-        // bonus si el label incluye el query completo
         if (item.label.toLowerCase().includes(q)) {
           score += 3;
         }
@@ -261,6 +266,13 @@ export function Navbar() {
   };
 
   const goToSearchItem = (item: SearchItem) => {
+    trackEvent("search_result_click", {
+      label: item.label,
+      href: item.href,
+      type: item.type,
+      context: "modal",
+    });
+
     if (item.type === "externo" || item.href.startsWith("http")) {
       window.open(item.href, "_blank", "noopener,noreferrer");
     } else {
@@ -275,6 +287,12 @@ export function Navbar() {
 
     const results = runSearch(q);
 
+    trackEvent("search_submit", {
+      query: q,
+      results_count: results.length,
+      location: "navbar",
+    });
+
     if (!results.length) {
       toast({
         title: "Sin resultados",
@@ -282,10 +300,23 @@ export function Navbar() {
           "No encontramos nada relacionado a esa búsqueda. Probá con otra palabra clave.",
         variant: "destructive",
       });
+
+      trackEvent("search_no_results", {
+        query: q,
+        location: "navbar",
+      });
+
       return;
     }
 
     if (results.length === 1) {
+      trackEvent("search_direct_navigation", {
+        query: q,
+        label: results[0].label,
+        href: results[0].href,
+        type: results[0].type,
+      });
+
       goToSearchItem(results[0]);
       toast({
         title: "Te llevamos a",
@@ -296,10 +327,16 @@ export function Navbar() {
       return;
     }
 
+    // múltiples resultados
     setSearchResults(results.slice(0, 30));
     setIsSearchResultsOpen(true);
     setSearchQuery("");
     setIsMenuOpen(false);
+
+    trackEvent("search_results_modal_open", {
+      query: q,
+      results_count: results.length,
+    });
 
     toast({
       title: "Resultados de búsqueda",
@@ -308,16 +345,31 @@ export function Navbar() {
   };
 
   const handleNotificationClick = async () => {
+    trackEvent("navbar_notifications_click", {
+      permission_state: permission,
+    });
+
     if (permission === "default") {
       const result = await requestPermission();
+      trackEvent("notifications_permission_request_result", {
+        result,
+      });
+
       if (result === "granted") {
         sendTestNotification();
         toast({
           title: "¡Notificaciones activadas!",
           description: "Ahora podés recibir alertas personalizadas.",
         });
+
+        trackEvent("notifications_permission_granted", {
+          source: "navbar_button",
+        });
       }
     } else if (permission === "granted") {
+      trackEvent("notifications_center_open", {
+        source: "navbar_button",
+      });
       navigate("/notifications");
     } else {
       toast({
@@ -325,6 +377,10 @@ export function Navbar() {
         description:
           "Activá las notificaciones en la configuración del navegador.",
         variant: "destructive",
+      });
+
+      trackEvent("notifications_blocked_warning_shown", {
+        source: "navbar_button",
       });
     }
   };
@@ -336,12 +392,17 @@ export function Navbar() {
         servicesRef.current &&
         !servicesRef.current.contains(e.target as Node)
       ) {
+        if (isServicesOpen) {
+          trackEvent("navbar_services_close", {
+            context: "desktop",
+          });
+        }
         setIsServicesOpen(false);
       }
     }
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
-  }, []);
+  }, [isServicesOpen]);
 
   const getTypeBadge = (type: SearchItemType) => {
     if (type === "seccion") return <Badge variant="outline">Sección</Badge>;
@@ -356,7 +417,15 @@ export function Navbar() {
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
+            <Link
+              to="/"
+              className="flex items-center space-x-2"
+              onClick={() =>
+                trackEvent("navbar_logo_click", {
+                  href: "/",
+                })
+              }
+            >
               <div className="h-8 w-8 rounded-lg bg-gradient-hero flex items-center justify-center shadow-glow">
                 <span className="text-white font-bold text-sm">JC</span>
               </div>
@@ -372,7 +441,12 @@ export function Navbar() {
                 <Input
                   placeholder="Buscar transporte, turismo, empleos, seguridad..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    trackEvent("search_input_change", {
+                      location: "navbar_desktop",
+                    });
+                  }}
                   className="pl-10 bg-muted/50 border-0 focus:bg-background transition-smooth"
                 />
               </form>
@@ -381,7 +455,17 @@ export function Navbar() {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-2">
               {navItems.map((item) => (
-                <Link key={item.href} to={item.href}>
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={() =>
+                    trackEvent("navbar_nav_click", {
+                      label: item.label,
+                      href: item.href,
+                      context: "desktop",
+                    })
+                  }
+                >
                   <Button
                     variant={
                       location.pathname === item.href ? "default" : "ghost"
@@ -399,7 +483,18 @@ export function Navbar() {
                   variant="ghost"
                   size="sm"
                   className="flex items-center space-x-2"
-                  onClick={() => setIsServicesOpen((s) => !s)}
+                  onClick={() => {
+                    const next = !isServicesOpen;
+                    setIsServicesOpen(next);
+                    trackEvent(
+                      next
+                        ? "navbar_services_open"
+                        : "navbar_services_close",
+                      {
+                        context: "desktop",
+                      }
+                    );
+                  }}
                   aria-expanded={isServicesOpen}
                   aria-controls="services-dropdown"
                 >
@@ -421,7 +516,13 @@ export function Navbar() {
                       {Object.keys(servicesByTab).map((tab) => (
                         <button
                           key={tab}
-                          onClick={() => setActiveServiceTab(tab)}
+                          onClick={() => {
+                            setActiveServiceTab(tab);
+                            trackEvent("navbar_services_tab_change", {
+                              tab,
+                              context: "desktop",
+                            });
+                          }}
                           className={`px-3 py-1 rounded-md text-sm font-medium transition ${
                             activeServiceTab === tab
                               ? "bg-primary text-white"
@@ -439,7 +540,15 @@ export function Navbar() {
                         <Link
                           key={s.href}
                           to={s.href}
-                          onClick={() => setIsServicesOpen(false)}
+                          onClick={() => {
+                            setIsServicesOpen(false);
+                            trackEvent("navbar_service_click", {
+                              label: s.label,
+                              href: s.href,
+                              tab: activeServiceTab,
+                              context: "desktop",
+                            });
+                          }}
                         >
                           <div className="p-2 rounded hover:bg-primary/10 transition cursor-pointer">
                             <div className="text-sm font-semibold">
@@ -456,7 +565,12 @@ export function Navbar() {
                     <div className="mt-3 flex justify-end">
                       <Link
                         to="/servicios"
-                        onClick={() => setIsServicesOpen(false)}
+                        onClick={() => {
+                          setIsServicesOpen(false);
+                          trackEvent("navbar_services_all_click", {
+                            context: "desktop",
+                          });
+                        }}
                       >
                         <Button size="sm" variant="outline">
                           Ver todos los servicios
@@ -487,6 +601,9 @@ export function Navbar() {
                 )}
               </Button>
 
+              {/* PWA menu item opcional */}
+              <InstallAppMenuItem />
+
               <AuthButton />
             </div>
 
@@ -495,7 +612,14 @@ export function Navbar() {
               variant="ghost"
               size="sm"
               className="md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={() => {
+                const next = !isMenuOpen;
+                setIsMenuOpen(next);
+                trackEvent(
+                  next ? "navbar_mobile_menu_open" : "navbar_mobile_menu_close",
+                  {}
+                );
+              }}
             >
               {isMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -515,7 +639,12 @@ export function Navbar() {
                   <Input
                     placeholder="Buscar en Jujuy Conecta..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      trackEvent("search_input_change", {
+                        location: "navbar_mobile",
+                      });
+                    }}
                     className="pl-10"
                   />
                 </form>
@@ -526,13 +655,18 @@ export function Navbar() {
                     <Link
                       key={item.href}
                       to={item.href}
-                      onClick={() => setIsMenuOpen(false)}
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        trackEvent("navbar_nav_click", {
+                          label: item.label,
+                          href: item.href,
+                          context: "mobile",
+                        });
+                      }}
                     >
                       <Button
                         variant={
-                          location.pathname === item.href
-                            ? "default"
-                            : "ghost"
+                          location.pathname === item.href ? "default" : "ghost"
                         }
                         className="w-full justify-start"
                       >
@@ -545,16 +679,21 @@ export function Navbar() {
                     <Button
                       variant="ghost"
                       className="w-full justify-between"
-                      onClick={() =>
-                        setMobileServicesOpen((s) => !s)
-                      }
+                      onClick={() => {
+                        const next = !mobileServicesOpen;
+                        setMobileServicesOpen(next);
+                        trackEvent(
+                          next
+                            ? "navbar_services_open"
+                            : "navbar_services_close",
+                          { context: "mobile" }
+                        );
+                      }}
                     >
                       <span>Servicios</span>
                       <ChevronDown
                         className={`h-4 w-4 transition-transform ${
-                          mobileServicesOpen
-                            ? "rotate-180"
-                            : "rotate-0"
+                          mobileServicesOpen ? "rotate-180" : "rotate-0"
                         }`}
                       />
                     </Button>
@@ -565,7 +704,13 @@ export function Navbar() {
                           {Object.keys(servicesByTab).map((tab) => (
                             <button
                               key={tab}
-                              onClick={() => setActiveServiceTab(tab)}
+                              onClick={() => {
+                                setActiveServiceTab(tab);
+                                trackEvent("navbar_services_tab_change", {
+                                  tab,
+                                  context: "mobile",
+                                });
+                              }}
                               className={`px-3 py-1 rounded-md text-sm font-medium min-w-0 truncate ${
                                 activeServiceTab === tab
                                   ? "bg-primary text-white"
@@ -579,34 +724,43 @@ export function Navbar() {
                         </div>
 
                         <div className="space-y-2">
-                          {servicesByTab[activeServiceTab].map(
-                            (s) => (
-                              <Link
-                                key={s.href}
-                                to={s.href}
-                                onClick={() => {
-                                  setIsMenuOpen(false);
-                                  setMobileServicesOpen(false);
-                                }}
-                                className="block w-full"
-                              >
-                                <div className="p-2 w-full box-border rounded hover:bg-muted/40 transition cursor-pointer">
-                                  <div className="text-sm font-semibold truncate">
-                                    {s.label}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground truncate">
-                                    Ir a {s.label}
-                                  </div>
+                          {servicesByTab[activeServiceTab].map((s) => (
+                            <Link
+                              key={s.href}
+                              to={s.href}
+                              onClick={() => {
+                                setIsMenuOpen(false);
+                                setMobileServicesOpen(false);
+                                trackEvent("navbar_service_click", {
+                                  label: s.label,
+                                  href: s.href,
+                                  tab: activeServiceTab,
+                                  context: "mobile",
+                                });
+                              }}
+                              className="block w-full"
+                            >
+                              <div className="p-2 w-full box-border rounded hover:bg-muted/40 transition cursor-pointer">
+                                <div className="text-sm font-semibold truncate">
+                                  {s.label}
                                 </div>
-                              </Link>
-                            ),
-                          )}
+                                <div className="text-xs text-muted-foreground truncate">
+                                  Ir a {s.label}
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
                         </div>
 
                         <div className="flex justify-end">
                           <Link
                             to="/servicios"
-                            onClick={() => setIsMenuOpen(false)}
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                              trackEvent("navbar_services_all_click", {
+                                context: "mobile",
+                              });
+                            }}
                           >
                             <Button size="sm" variant="outline">
                               Ver todos
@@ -630,14 +784,19 @@ export function Navbar() {
       {/* Modal de resultados de búsqueda */}
       <Dialog
         open={isSearchResultsOpen}
-        onOpenChange={setIsSearchResultsOpen}
+        onOpenChange={(open) => {
+          setIsSearchResultsOpen(open);
+          if (!open) {
+            trackEvent("search_results_modal_close", {});
+          }
+        }}
       >
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Resultados de búsqueda</DialogTitle>
             <DialogDescription className="text-xs">
-              Elegí a dónde querés ir. Podés volver a buscar desde la
-              barra superior cuando quieras.
+              Elegí a dónde querés ir. Podés volver a buscar desde la barra
+              superior cuando quieras.
             </DialogDescription>
           </DialogHeader>
 
