@@ -1,4 +1,3 @@
-// src/app/empleos/page.tsx
 "use client";
 
 import { useMemo, useState } from "react";
@@ -11,7 +10,7 @@ import { JobDetailDialog } from "@/components/jobs/JobDetailDialog";
 import { JobListing } from "@/components/types/jobs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Briefcase } from "lucide-react";
+import { Briefcase, ChevronDown, ChevronUp } from "lucide-react";
 
 const TABS = [
   { id: "todas", label: "Todas", icon: Briefcase },
@@ -24,12 +23,14 @@ export default function JobsPage() {
   const [selectedTab, setSelectedTab] = useState<string>("todas");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("todas");
-  const [selectedMunicipality, setSelectedMunicipality] = useState<string>("todos");
+  const [selectedMunicipality, setSelectedMunicipality] =
+    useState<string>("todos");
   const [selectedJobType, setSelectedJobType] = useState<string>("todos");
   const [selectedModality, setSelectedModality] = useState<string>("todas");
 
   const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showRoadmap, setShowRoadmap] = useState(false);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -55,15 +56,21 @@ export default function JobsPage() {
     return jobs.filter((job) => {
       if (selectedTab === "destacadas" && !job.is_featured) return false;
 
-      if (selectedCategory !== "todas" && job.category !== selectedCategory) return false;
+      if (selectedCategory !== "todas" && job.category !== selectedCategory)
+        return false;
 
-      if (selectedMunicipality !== "todos" && job.municipality !== selectedMunicipality) {
+      if (
+        selectedMunicipality !== "todos" &&
+        job.municipality !== selectedMunicipality
+      ) {
         return false;
       }
 
-      if (selectedJobType !== "todos" && job.job_type !== selectedJobType) return false;
+      if (selectedJobType !== "todos" && job.job_type !== selectedJobType)
+        return false;
 
-      if (selectedModality !== "todas" && job.modality !== selectedModality) return false;
+      if (selectedModality !== "todas" && job.modality !== selectedModality)
+        return false;
 
       if (searchTerm.trim().length > 0) {
         const term = searchTerm.toLowerCase();
@@ -135,7 +142,11 @@ export default function JobsPage() {
         />
 
         <section className="space-y-4">
-          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
+          <Tabs
+            value={selectedTab}
+            onValueChange={setSelectedTab}
+            className="space-y-4"
+          >
             <TabsList className="w-full grid grid-cols-2 md:inline-flex md:w-auto md:gap-2">
               {TABS.map((tab) => (
                 <TabsTrigger
@@ -171,9 +182,12 @@ export default function JobsPage() {
                   <CardContent className="py-10 text-center space-y-3">
                     <Briefcase className="h-8 w-8 text-muted-foreground mx-auto" />
                     <div className="space-y-1">
-                      <p className="font-medium">No encontramos empleos con estos filtros.</p>
+                      <p className="font-medium">
+                        No encontramos empleos con estos filtros.
+                      </p>
                       <p className="text-sm text-muted-foreground">
-                        Probá con otra palabra, cambiá de rubro o quitá alguno de los filtros.
+                        Probá con otra palabra, cambiá de rubro o quitá alguno
+                        de los filtros.
                       </p>
                     </div>
                   </CardContent>
@@ -181,7 +195,11 @@ export default function JobsPage() {
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredJobs.map((job) => (
-                    <JobCard key={job.id} job={job} onOpenDetails={handleOpenDetails} />
+                    <JobCard
+                      key={job.id}
+                      job={job}
+                      onOpenDetails={handleOpenDetails}
+                    />
                   ))}
                 </div>
               )}
@@ -189,24 +207,68 @@ export default function JobsPage() {
           </Tabs>
         </section>
 
+        {/* Roadmap / texto largo plegable */}
         <section>
           <Card className="border-dashed bg-muted/40">
-            <CardContent className="py-3 px-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <button
+              type="button"
+              onClick={() => setShowRoadmap((s) => !s)}
+              className="w-full flex items-center justify-between px-4 py-3 text-left"
+            >
               <div className="space-y-1">
                 <p className="text-sm font-medium">
-                  La bolsa de trabajo de Jujuy Conecta va a crecer todos los días.
+                  ¿Cómo va a crecer la bolsa de trabajo de Jujuy Conecta?
                 </p>
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  Vamos a sumar avisos verificados, filtros por experiencia, sistema de reseñas
-                  y estadísticas para empleadores. La idea es simple: que buscar laburo en Jujuy no
-                  sea estar perdido, sino tener un lugar claro donde empezar.
+                <p className="text-xs text-muted-foreground">
+                  Te contamos qué estamos construyendo, solo si te interesa
+                  verlo.
                 </p>
               </div>
-            </CardContent>
+              <span className="ml-4 rounded-full border bg-card/70 p-1">
+                {showRoadmap ? (
+                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                )}
+              </span>
+            </button>
+
+            {showRoadmap && (
+              <CardContent className="pt-0 px-4 pb-4 animate-in fade-in slide-in-from-top-1">
+                <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
+                  <p>
+                    La bolsa de trabajo de Jujuy Conecta va a crecer todos los
+                    días. Vamos a sumar avisos verificados, filtros por
+                    experiencia, sistema de reseñas y estadísticas para
+                    empleadores.
+                  </p>
+                  <p>
+                    La idea es simple: que buscar laburo en Jujuy no sea estar
+                    perdido, sino tener un lugar claro donde empezar, comparar
+                    y filtrar por lo que realmente te importa.
+                  </p>
+                  <ul className="mt-2 list-disc pl-5 space-y-1">
+                    <li>Más rubros y oficios locales, no solo trabajos formales.</li>
+                    <li>
+                      Integración con WhatsApp y correo para postularte en pocos
+                      pasos.
+                    </li>
+                    <li>
+                      Herramientas para que el empleador pueda ver impacto real
+                      de sus avisos.
+                    </li>
+                  </ul>
+                </div>
+              </CardContent>
+            )}
           </Card>
         </section>
 
-        <JobDetailDialog open={dialogOpen} onOpenChange={setDialogOpen} job={selectedJob} />
+        <JobDetailDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          job={selectedJob}
+        />
       </div>
     </Layout>
   );

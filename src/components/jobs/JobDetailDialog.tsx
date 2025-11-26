@@ -1,4 +1,3 @@
-// src/components/jobs/JobDetailDialog.tsx
 "use client";
 
 import {
@@ -21,7 +20,10 @@ import {
   Phone,
   Globe,
   ListChecks,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
+import { useState } from "react";
 
 interface JobDetailDialogProps {
   open: boolean;
@@ -50,13 +52,19 @@ function formatSalary(job: JobListing) {
 
   const currency = job.salary_currency || "ARS";
   if (job.salary_from && job.salary_to) {
-    return `${currency} ${job.salary_from.toLocaleString("es-AR")} - ${job.salary_to.toLocaleString("es-AR")} / mes`;
+    return `${currency} ${job.salary_from.toLocaleString(
+      "es-AR"
+    )} - ${job.salary_to.toLocaleString("es-AR")} / mes`;
   }
   if (job.salary_from) {
-    return `Desde ${currency} ${job.salary_from.toLocaleString("es-AR")} / mes`;
+    return `Desde ${currency} ${job.salary_from.toLocaleString(
+      "es-AR"
+    )} / mes`;
   }
   if (job.salary_to) {
-    return `Hasta ${currency} ${job.salary_to.toLocaleString("es-AR")} / mes`;
+    return `Hasta ${currency} ${job.salary_to.toLocaleString(
+      "es-AR"
+    )} / mes`;
   }
   return null;
 }
@@ -71,7 +79,49 @@ function buildWhatsAppLink(job: JobListing) {
   return `https://wa.me/${clean}?text=${texto}`;
 }
 
-export function JobDetailDialog({ open, onOpenChange, job }: JobDetailDialogProps) {
+interface CollapsibleBlockProps {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}
+
+function CollapsibleBlock({
+  title,
+  children,
+  defaultOpen = true,
+}: CollapsibleBlockProps) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className="border rounded-lg bg-muted/30">
+      <button
+        type="button"
+        onClick={() => setOpen((s) => !s)}
+        className="w-full flex items-center justify-between px-3 py-2 text-left"
+      >
+        <span className="text-sm font-medium">{title}</span>
+        <span className="ml-2 rounded-full bg-card p-1">
+          {open ? (
+            <ChevronUp className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          )}
+        </span>
+      </button>
+      {open && (
+        <div className="px-3 pb-3 pt-1 text-sm text-muted-foreground whitespace-pre-line">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function JobDetailDialog({
+  open,
+  onOpenChange,
+  job,
+}: JobDetailDialogProps) {
   if (!job) return null;
 
   const salaryText = formatSalary(job);
@@ -86,7 +136,9 @@ export function JobDetailDialog({ open, onOpenChange, job }: JobDetailDialogProp
             {job.title}
           </DialogTitle>
           <DialogDescription className="space-y-1">
-            <p className="font-medium text-foreground">{job.company_name}</p>
+            <p className="font-medium text-foreground">
+              {job.company_name || "Empresa de Jujuy"}
+            </p>
             <div className="flex flex-wrap gap-2 items-center text-xs md:text-sm">
               <Badge variant="outline">{formatJobType(job.job_type)}</Badge>
               <Badge variant="secondary">{formatModality(job.modality)}</Badge>
@@ -118,50 +170,52 @@ export function JobDetailDialog({ open, onOpenChange, job }: JobDetailDialogProp
             </div>
           )}
 
-          {job.description && (
-            <div>
-              <p className="font-medium mb-1">Descripción del puesto</p>
-              <p className="text-muted-foreground whitespace-pre-line">
+          {/* Bloques plegables para texto largo */}
+          <div className="space-y-3">
+            {job.description && (
+              <CollapsibleBlock title="Descripción del puesto" defaultOpen>
                 {job.description}
-              </p>
-            </div>
-          )}
+              </CollapsibleBlock>
+            )}
 
-          {job.requirements && (
-            <div>
-              <p className="font-medium mb-1">Requisitos</p>
-              <p className="text-muted-foreground whitespace-pre-line">
+            {job.requirements && (
+              <CollapsibleBlock title="Requisitos">
                 {job.requirements}
-              </p>
-            </div>
-          )}
+              </CollapsibleBlock>
+            )}
 
-          {job.responsibilities && (
-            <div>
-              <p className="font-medium mb-1">Responsabilidades</p>
-              <p className="text-muted-foreground whitespace-pre-line">
+            {job.responsibilities && (
+              <CollapsibleBlock title="Responsabilidades">
                 {job.responsibilities}
-              </p>
-            </div>
-          )}
+              </CollapsibleBlock>
+            )}
 
-          {job.benefits && (
-            <div>
-              <p className="font-medium mb-1">Beneficios</p>
-              <p className="text-muted-foreground whitespace-pre-line">
+            {job.benefits && (
+              <CollapsibleBlock title="Beneficios">
                 {job.benefits}
-              </p>
-            </div>
-          )}
+              </CollapsibleBlock>
+            )}
+
+            {job.application_instructions && (
+              <CollapsibleBlock title="Cómo postularte">
+                {job.application_instructions}
+              </CollapsibleBlock>
+            )}
+          </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            {(job.address || job.city || job.region) && (
+            {(job.address || job.city || job.region || job.municipality) && (
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
                 <div>
                   <p className="font-medium">Ubicación</p>
                   <p className="text-muted-foreground">
-                    {job.address && <>{job.address}<br /></>}
+                    {job.address && (
+                      <>
+                        {job.address}
+                        <br />
+                      </>
+                    )}
                     {job.municipality && `${job.municipality}, `}
                     {"Jujuy"}
                   </p>
@@ -176,7 +230,9 @@ export function JobDetailDialog({ open, onOpenChange, job }: JobDetailDialogProp
                   <div>
                     <p className="font-medium">Contacto</p>
                     {job.contact_email && (
-                      <p className="text-muted-foreground">{job.contact_email}</p>
+                      <p className="text-muted-foreground">
+                        {job.contact_email}
+                      </p>
                     )}
                     {job.contact_phone && (
                       <p className="text-muted-foreground">
@@ -193,15 +249,6 @@ export function JobDetailDialog({ open, onOpenChange, job }: JobDetailDialogProp
               </div>
             )}
           </div>
-
-          {job.application_instructions && (
-            <div>
-              <p className="font-medium mb-1">Cómo postularte</p>
-              <p className="text-muted-foreground whitespace-pre-line">
-                {job.application_instructions}
-              </p>
-            </div>
-          )}
 
           <div className="pt-2 flex flex-col gap-2 sm:flex-row sm:justify-end">
             {whatsappLink && (

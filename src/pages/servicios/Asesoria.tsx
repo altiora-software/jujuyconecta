@@ -151,7 +151,7 @@ export default function AsesoriaStartupPage() {
           <div className="space-y-3">
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
               Sesiones uno a uno para ordenar tu negocio
-              <span className="text-primary"> sin humo, sin promesas mágicas.</span>
+              <span className="text-primary"> sin promesas mágicas.</span>
             </h1>
             <p className="text-sm md:text-base text-muted-foreground max-w-2xl">
               No es un curso grabado ni un programa eterno. Es una asesoría táctica para que tomes
