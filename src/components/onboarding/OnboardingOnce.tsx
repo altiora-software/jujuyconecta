@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MessageCircle, Radio, Newspaper, Heart, ShoppingCart, Calendar, Users, X } from "lucide-react";
+import { InstallAppMenuItem } from "../pwa/InstallAppMenuItem";
 
 type Props = {
   onOpenAssistant?: () => void;
@@ -102,7 +103,7 @@ export function OnboardingOnce({ onOpenAssistant, storageKey = STORAGE_KEY_DEFAU
               <Newspaper className="h-4 w-4" /> Ver Diario
             </Link>
           </Button>
-
+          <InstallAppMenuItem/>
           {/* <Button asChild variant="ghost" className="w-full text-left">
             <Link to="/apoyar" className="flex items-center gap-2 w-full">
               <Heart className="h-4 w-4" /> Apoyar / Donar

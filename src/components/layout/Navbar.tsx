@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { InstallAppMenuItem } from "../pwa/InstallAppMenuItem";
 
 type NavItem = { label: string; href: string };
 

@@ -29,7 +29,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    {/* <InstallAppButton /> */}
+    <InstallAppButton />
     <Toaster />
     <Sonner />
     <BrowserRouter>
