@@ -37,14 +37,18 @@ export function Hero() {
         const [a,b,c,d] = await Promise.all([
           supabase.from("transport_lines").select("*", { count:"exact", head:true }).eq("active", true),
           supabase.from("social_resources").select("*", { count:"exact", head:true }).eq("active", true),
-          supabase.from("jobs").select("*", { count:"exact", head:true }).eq("active", true),
+          supabase.from("jobs_listings")
+          .select("*")
+          .order("is_featured", { ascending: false })
+          .order("published_at", { ascending: false }),
           supabase.from("security_alerts").select("*", { count:"exact", head:true }).eq("active", true),
         ]);
         if (a.error || b.error || c.error || d.error) throw (a.error || b.error || c.error || d.error);
+        console.log('c',c);
         setCounts({
           lines: a.count ?? 0,
           resources: b.count ?? 0,
-          jobs: c.count ?? 0,
+          jobs: c.data.length ?? 0,
           alerts: d.count ?? 0,
         });
       } catch (e) {

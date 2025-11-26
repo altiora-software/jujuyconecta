@@ -109,19 +109,18 @@ export function ModuleGrid() {
 
         // Empleos
         {
-          const { count, error } = await supabase
-            .from("jobs")
-            .select("*", { count: "exact", head: true })
-            .eq("active", true);
+          const { data, error } = await supabase
+          .from("jobs_listings")
+          .select("*")
+          .order("is_featured", { ascending: false })
+          .order("published_at", { ascending: false });
           if (error) throw error;
-          setJobsCount(count ?? 0);
+          setJobsCount(data.length ?? 0);
         }
         {
           const { data, error } = await supabase
-            .from("jobs")
-            .select("id, title, location, active, featured, created_at")
-            .eq("active", true)
-            .order("featured", { ascending: false })
+            .from("jobs_listings")
+            .select("id, title, city, schedule, company_name, created_at")
             .order("created_at", { ascending: false })
             .limit(3);
           if (error) throw error;

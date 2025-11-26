@@ -88,7 +88,7 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         supabase
           .from("social_resources")
           .select("*", { count: "exact", head: true }),
-        supabase.from("jobs").select("*", { count: "exact", head: true }),
+          supabase.from("job_submissions").select("*", { count: "exact", head: true }),
         supabase
           .from("security_alerts")
           .select("*", { count: "exact", head: true }),
