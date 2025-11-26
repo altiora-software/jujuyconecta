@@ -1,126 +1,27 @@
 // public/sw.js
-// Service Worker para Jujuy Conecta PWA
-// Versión SAFE: no toca HTML ni navegaciones, solo estáticos e imágenes
+// Service Worker mínimo para Jujuy Conecta
+// - Mantiene la instalación PWA
+// - Mantiene notificaciones push
+// - NO intercepta fetch, así que no puede romper Next.js
 
-const STATIC_CACHE = "jujuy-conecta-static-v3";
-const DYNAMIC_CACHE = "jujuy-conecta-dynamic-v1";
+const SW_VERSION = "jc-sw-minimal-v1";
 
-const STATIC_ASSETS = [
-  "/manifest.json",
-  "/jc.ico",
-  "/jc.png",
-  "/og-diario.jpg", // sacalo si no existe
-];
-
-// Install: precache de assets estáticos básicos
+// Install
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
-  );
-
+  // No precacheamos nada para evitar conflictos
   self.skipWaiting();
 });
 
-// Activate: limpiar caches viejos
+// Activate
 self.addEventListener("activate", (event) => {
-  const allowedCaches = [STATIC_CACHE, DYNAMIC_CACHE];
-
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => !allowedCaches.includes(key))
-          .map((key) => caches.delete(key))
-      )
-    )
-  );
-
-  self.clients.claim();
+  // Si en el futuro querés limpiar caches viejos, lo podés hacer acá
+  event.waitUntil(self.clients.claim());
 });
 
-// Fetch:
-// - NO interceptar navegaciones (HTML) -> dejamos que el navegador haga lo suyo
-// - _next/static -> cache-first
-// - imágenes -> cache-first
-// - otros GET mismos origen -> network-first con fallback a cache
-self.addEventListener("fetch", (event) => {
-  const { request } = event;
-
-  if (request.method !== "GET") return;
-
-  const url = new URL(request.url);
-
-  // 1) Navegaciones: NO interceptar (evitamos romper Next)
-  if (request.mode === "navigate") {
-    return;
-  }
-
-  // Solo nos metemos con mismo origen
-  const isSameOrigin = url.origin === self.location.origin;
-  if (!isSameOrigin) {
-    return; // no tocamos cosas externas (APIs de terceros, etc.)
-  }
-
-  // 2) Assets de Next (JS/CSS estático) -> cache-first
-  if (url.pathname.startsWith("/_next/static/")) {
-    event.respondWith(
-      caches.open(STATIC_CACHE).then((cache) =>
-        cache.match(request).then((cached) => {
-          if (cached) return cached;
-
-          return fetch(request)
-            .then((response) => {
-              // solo cacheamos respuestas válidas
-              if (response.ok) {
-                cache.put(request, response.clone());
-              }
-              return response;
-            })
-            .catch(() => cached || Promise.reject());
-        })
-      )
-    );
-    return;
-  }
-
-  // 3) Imágenes -> cache-first
-  if (request.destination === "image") {
-    event.respondWith(
-      caches.open(STATIC_CACHE).then((cache) =>
-        cache.match(request).then((cached) => {
-          if (cached) return cached;
-
-          return fetch(request)
-            .then((response) => {
-              if (response.ok) {
-                cache.put(request, response.clone());
-              }
-              return response;
-            })
-            .catch(() => cached || Promise.reject());
-        })
-      )
-    );
-    return;
-  }
-
-  // 4) Otros GET mismo origen -> network-first con fallback a cache dinámico
-  event.respondWith(
-    fetch(request)
-      .then((response) => {
-        const clone = response.clone();
-        if (response.ok) {
-          caches.open(DYNAMIC_CACHE).then((cache) => cache.put(request, clone));
-        }
-        return response;
-      })
-      .catch(() =>
-        caches.match(request).then((cached) => cached || Promise.reject())
-      )
-  );
-});
+// IMPORTANTE: NO HAY fetch event
+// Eso significa que todas las requests las maneja el navegador normal,
+// sin que el SW meta mano. La app funciona igual que sin SW,
+// pero seguís teniendo SW para instalación y push.
 
 // Push notification event
 self.addEventListener("push", (event) => {
