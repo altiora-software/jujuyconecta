@@ -6,26 +6,36 @@ const supa = createClient(
   process.env.SUPA_SERVICE_ROLE_KEY as string
 );
 
+const ALLOWED_ORIGIN = "http://localhost:8080";
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const origin = req.headers.origin;
+
+  // CORS
+  if (origin === ALLOWED_ORIGIN) {
+    res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+    res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  }
+
+  // preflight
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
     const [lines, social, jobs, alerts] = await Promise.all([
-      // asumo que transport_lines tiene estas columnas y campo active
-      supa
-        .from("transport_lines")
-        .select("id,name,number,color,active")
-        .eq("active", true),
+      supa.from("transport_lines").select("id,name,number,color,active").eq("active", true),
 
-      // social_resources: uses type, address, verified, active
       supa
         .from("social_resources")
         .select("id,name,type,address,verified,active")
         .eq("active", true),
 
-      // jobs_listings: usa company_name, city/municipality, is_featured, published_at, status
       supa
         .from("jobs_listings")
         .select("id,title,company_name,city,municipality,is_featured,published_at,status")
@@ -34,7 +44,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .order("published_at", { ascending: false })
         .limit(20),
 
-      // security_alerts: category, severity, active, featured, created_at
       supa
         .from("security_alerts")
         .select("id,title,category,severity,active,featured,created_at")
@@ -59,6 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       jobs: jobs.data ?? [],
       alerts: alerts.data ?? [],
     });
+
   } catch (err) {
     console.error("api/home error:", err);
     return res.status(500).json({ error: "Internal server error" });
