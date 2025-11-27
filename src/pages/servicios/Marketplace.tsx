@@ -38,7 +38,6 @@ import {
   Phone,
   Instagram,
   Globe,
-  Star,
   Sparkles,
   Filter,
   Truck,
@@ -46,43 +45,42 @@ import {
   Clock,
 } from "lucide-react";
 
-interface MarketplaceItem {
+interface LocalBusiness {
   id: string;
   name: string;
-  slug?: string | null;
-  description: string | null;
-  short_description?: string | null;
   category: string;
-  type: "producto" | "servicio" | "emprendimiento" | null;
-  municipality: string | null;
-  region?: string | null;
+  type: string; // texto en la tabla, esperamos "producto" | "servicio" | "emprendimiento"
+  municipality: string;
   address?: string | null;
   whatsapp?: string | null;
   phone?: string | null;
   instagram?: string | null;
   website?: string | null;
   image_url?: string | null;
+  source_url?: string | null;
+  source_type?: string | null;
   tags?: string[] | null;
-  is_featured?: boolean | null;
   has_delivery?: boolean | null;
+  latitude?: number | null;
+  longitude?: number | null;
   created_at?: string;
+  updated_at?: string;
 }
 
 const TABS = [
   { id: "todos", label: "Todo Jujuy", icon: Store },
   { id: "productos", label: "Productos", icon: ShoppingBag },
   { id: "servicios", label: "Servicios", icon: Sparkles },
-  { id: "destacados", label: "Destacados", icon: Star },
 ];
 
 export default function MarketplacePage() {
-  const [items, setItems] = useState<MarketplaceItem[]>([]);
+  const [items, setItems] = useState<LocalBusiness[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState<string>("todos");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("todas");
   const [selectedMunicipality, setSelectedMunicipality] = useState<string>("todos");
-  const [selectedItem, setSelectedItem] = useState<MarketplaceItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<LocalBusiness | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { toast } = useToast();
@@ -92,22 +90,22 @@ export default function MarketplacePage() {
       try {
         setLoading(true);
         const { data, error } = await supabase
-          .from("marketplace_items")
+          .from("local_businesses")
           .select("*")
-          .order("is_featured", { ascending: false })
           .order("created_at", { ascending: false });
 
         if (error) {
-          console.error("Error cargando marketplace_items", error);
+          console.error("Error cargando local_businesses", error);
           toast({
             title: "Error al cargar el marketplace",
-            description: "No se pudieron cargar los emprendimientos. Probá de nuevo en unos minutos.",
+            description:
+              "No se pudieron cargar los emprendimientos. Probá de nuevo en unos minutos.",
             variant: "destructive",
           });
           return;
         }
 
-        setItems((data || []) as MarketplaceItem[]);
+        setItems((data || []) as LocalBusiness[]);
       } catch (err) {
         console.error("Error inesperado en MarketplacePage", err);
         toast({
@@ -147,7 +145,6 @@ export default function MarketplacePage() {
     return items.filter((item) => {
       if (selectedTab === "productos" && item.type !== "producto") return false;
       if (selectedTab === "servicios" && item.type !== "servicio") return false;
-      if (selectedTab === "destacados" && !item.is_featured) return false;
 
       if (selectedCategory !== "todas" && item.category !== selectedCategory) {
         return false;
@@ -161,8 +158,6 @@ export default function MarketplacePage() {
         const term = searchTerm.toLowerCase();
         const dataHaystack = [
           item.name,
-          item.description,
-          item.short_description,
           item.category,
           item.municipality,
           item.address,
@@ -181,7 +176,7 @@ export default function MarketplacePage() {
     });
   }, [items, selectedTab, selectedCategory, selectedMunicipality, searchTerm]);
 
-  const handleOpenDetails = (item: MarketplaceItem) => {
+  const handleOpenDetails = (item: LocalBusiness) => {
     setSelectedItem(item);
     setDialogOpen(true);
   };
@@ -193,10 +188,12 @@ export default function MarketplacePage() {
     setSelectedTab("todos");
   };
 
-  const formatTypeLabel = (type: MarketplaceItem["type"]) => {
-    if (type === "producto") return "Producto";
-    if (type === "servicio") return "Servicio";
-    if (type === "emprendimiento") return "Emprendimiento";
+  const formatTypeLabel = (type?: string | null) => {
+    if (!type) return "Emprendimiento local";
+    const t = type.toLowerCase();
+    if (t === "producto") return "Producto";
+    if (t === "servicio") return "Servicio";
+    if (t === "emprendimiento") return "Emprendimiento";
     return "Emprendimiento local";
   };
 
@@ -204,7 +201,9 @@ export default function MarketplacePage() {
     if (!phone) return null;
     const clean = phone.replace(/[^\d]/g, "");
     const texto = encodeURIComponent(
-      `Hola, vi tu emprendimiento en el Marketplace de Jujuy Conecta y quiero más info sobre: ${name ?? "tu emprendimiento"}.`
+      `Hola, vi tu emprendimiento en el Marketplace de Jujuy Conecta y quiero más info sobre: ${
+        name ?? "tu emprendimiento"
+      }.`
     );
     return `https://wa.me/${clean}?text=${texto}`;
   };
@@ -214,7 +213,7 @@ export default function MarketplacePage() {
     const created = new Date(createdAt);
     const now = new Date();
     const diffDays = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
-    return diffDays <= 7; // menos de una semana
+    return diffDays <= 7;
   };
 
   const formatDate = (dateStr?: string) => {
@@ -397,16 +396,19 @@ export default function MarketplacePage() {
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredItems.map((item) => {
-                    const whatsappLink = buildWhatsAppLink(item.whatsapp ?? item.phone, item.name);
+                    const whatsappLink = buildWhatsAppLink(
+                      item.whatsapp ?? item.phone,
+                      item.name
+                    );
                     const isNew = isNewItem(item.created_at);
                     const createdShort = formatDate(item.created_at);
 
                     return (
                       <Card
                         key={item.id}
-                        className={`group flex flex-col rounded-xl border bg-card/80 backdrop-blur hover:shadow-lg transition-all hover:-translate-y-[2px] ${
-                          item.is_featured ? "border-primary/70" : "border-border"
-                        }`}
+                        className={
+                          "group flex flex-col rounded-xl border bg-card/80 backdrop-blur hover:shadow-lg transition-all hover:-translate-y-[2px]"
+                        }
                       >
                         {item.image_url && (
                           <div className="relative h-40 w-full overflow-hidden rounded-t-xl">
@@ -418,12 +420,6 @@ export default function MarketplacePage() {
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
                             <div className="absolute left-2 top-2 flex flex-col gap-1">
-                              {item.is_featured && (
-                                <Badge className="flex items-center gap-1 text-[10px] md:text-xs bg-primary/90 text-white shadow">
-                                  <Star className="h-3 w-3 fill-yellow-300 text-yellow-300" />
-                                  Destacado
-                                </Badge>
-                              )}
                               {isNew && (
                                 <Badge className="text-[10px] md:text-xs bg-emerald-500 text-white">
                                   Nuevo
@@ -446,7 +442,8 @@ export default function MarketplacePage() {
                                 {item.name}
                               </CardTitle>
                               <CardDescription className="text-xs md:text-sm line-clamp-2">
-                                {item.short_description || item.description}
+                                {item.address ||
+                                  `${item.category} en ${item.municipality}`}
                               </CardDescription>
                             </div>
                           </div>
@@ -619,12 +616,6 @@ export default function MarketplacePage() {
                         </Badge>
                       )}
                     </div>
-                  )}
-
-                  {(selectedItem.description || selectedItem.short_description) && (
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {selectedItem.description || selectedItem.short_description}
-                    </p>
                   )}
 
                   {selectedItem.address && (

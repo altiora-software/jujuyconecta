@@ -28,6 +28,7 @@ import { JobsManager } from "./JobsManager";
 import { SecurityAlertsManager } from "./SecurityAlertsManager";
 import { TransportReportsManager } from "./TransportReportsManager";
 import { TourismPlacesManager } from "./TourismPlacesManager";
+import { MarketplaceManager } from "./MarketplaceManager";
 // Cuando tengas managers específicos, los importás acá
 // import { MarketplaceManager } from "./MarketplaceManager";
 // import { CommunityAgendaManager } from "./CommunityAgendaManager";
@@ -97,14 +98,13 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           .from("tourism_places")
           .select("*", { count: "exact", head: true }),
         supabase
-          .from("marketplace_items")
+          .from("local_businesses")
           .select("*", { count: "exact", head: true }),
-        // si tu tabla de agenda se llama distinto, cambiá "community_events"
         supabase
           .from("community_events")
           .select("*", { count: "exact", head: true }),
       ]);
-
+      console.log(marketplaceCount)
       setStats({
         totalLines: linesCount || 0,
         totalReports: reportsCount || 0,
@@ -315,22 +315,7 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
           {/* Cuando tengas los managers reales, reemplazás estos placeholders */}
           <TabsContent value="marketplace" className="mt-6">
-            {/* <MarketplaceManager onUpdate={refreshStats} /> */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Marketplace Local</CardTitle>
-                <CardDescription>
-                  Administración de emprendimientos publicados en el marketplace.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Acá va a vivir el módulo para revisar, aprobar y editar fichas
-                  de emprendedores. Podés crear un componente
-                  MarketplaceManager y montarlo en este lugar.
-                </p>
-              </CardContent>
-            </Card>
+            <MarketplaceManager onUpdate={refreshStats} />
           </TabsContent>
 
           <TabsContent value="agenda" className="mt-6">

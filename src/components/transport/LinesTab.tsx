@@ -147,10 +147,10 @@ export function LinesTab({
                       <div className="flex flex-wrap items-center gap-2 mb-1">
                         <CardTitle className="text-base md:text-lg leading-snug">
                           {route.origin_city} → {route.destination_city}
-                        </CardTitle>
+                        </CardTitle><br/>
                         <Badge
-                          variant="outline"
-                          className="text-[11px] px-2 py-0.5"
+                          variant="secondary"
+                          className="text-[11px] px-2 py-0.5 bg-gradient-to-br from-green-100/6 via-background to-green-500/6"
                         >
                           {route.company_name}
                         </Badge>
@@ -161,22 +161,6 @@ export function LinesTab({
                       </CardDescription>
                     </div>
                     <Clock className="h-5 w-5 text-muted-foreground" />
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 text-[11px] md:text-xs">
-                    <Badge variant="outline">
-                      {total} salida{total !== 1 && "s"} cargadas
-                    </Badge>
-                    {totalWeekday > 0 && (
-                      <Badge variant="secondary">
-                        {totalWeekday} de lunes a viernes
-                      </Badge>
-                    )}
-                    {totalWeekend > 0 && (
-                      <Badge variant="secondary">
-                        {totalWeekend} fin de semana
-                      </Badge>
-                    )}
                   </div>
 
                   <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
