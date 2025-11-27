@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ type TransportLine = {
   number: string;
   name: string;
   active: boolean;
-  created_at: string;
+  created_at?: string;
 };
 
 type SocialResource = {
@@ -26,7 +25,7 @@ type SocialResource = {
   verified: boolean;
   schedule: string | null;
   needs: string[] | null;
-  created_at: string;
+  created_at?: string;
 };
 
 type Job = {
@@ -35,7 +34,7 @@ type Job = {
   location: string;
   active: boolean;
   featured: boolean;
-  created_at: string;
+  created_at?: string;
 };
 
 type SecurityAlert = {
@@ -44,7 +43,14 @@ type SecurityAlert = {
   category: string;
   active: boolean;
   featured: boolean;
-  created_at: string;
+  created_at?: string;
+};
+
+type HomeResponse = {
+  lines: any[];
+  social: any[];
+  jobs: any[];
+  alerts: any[];
 };
 
 export function ModuleGrid() {
@@ -69,84 +75,71 @@ export function ModuleGrid() {
       try {
         setLoading(true);
 
-        // Transporte
-        {
-          const { count, error } = await supabase
-            .from("transport_lines")
-            .select("*", { count: "exact", head: true })
-            .eq("active", true);
-          if (error) throw error;
-          setTransportCount(count ?? 0);
-        }
-        {
-          const { data, error } = await supabase
-            .from("transport_lines")
-            .select("id, number, name, active, created_at")
-            .order("created_at", { ascending: false })
-            .limit(3);
-          if (error) throw error;
-          setRecentLines(data || []);
+        const res = await fetch("/api/home");
+        if (!res.ok) {
+          throw new Error("Error al cargar datos desde /api/home");
         }
 
-        // Recursos sociales
-        {
-          const { count, error } = await supabase
-            .from("social_resources")
-            .select("*", { count: "exact", head: true })
-            .eq("active", true);
-          if (error) throw error;
-          setResourcesCount(count ?? 0);
-        }
-        {
-          const { data, error } = await supabase
-            .from("social_resources")
-            .select("id, name, active, verified, schedule, needs, created_at")
-            .order("created_at", { ascending: false })
-            .limit(3);
-          if (error) throw error;
-          setRecentResources(data || []);
-        }
+        const json = (await res.json()) as HomeResponse;
 
-        // Empleos
-        {
-          const { data, error } = await supabase
-          .from("jobs_listings")
-          .select("*")
-          .order("is_featured", { ascending: false })
-          .order("published_at", { ascending: false });
-          if (error) throw error;
-          setJobsCount(data.length ?? 0);
-        }
-        {
-          const { data, error } = await supabase
-            .from("jobs_listings")
-            .select("id, title, city, schedule, company_name, created_at")
-            .order("created_at", { ascending: false })
-            .limit(3);
-          if (error) throw error;
-          setRecentJobs(data || []);
-        }
+        const lines = json.lines ?? [];
+        const social = json.social ?? [];
+        const jobs = json.jobs ?? [];
+        const alerts = json.alerts ?? [];
 
-        // Seguridad
-        {
-          const { count, error } = await supabase
-            .from("security_alerts")
-            .select("*", { count: "exact", head: true })
-            .eq("active", true);
-          if (error) throw error;
-          setSecurityCount(count ?? 0);
-        }
-        {
-          const { data, error } = await supabase
-            .from("security_alerts")
-            .select("id, title, category, active, featured, created_at")
-            .eq("active", true)
-            .order("featured", { ascending: false })
-            .order("created_at", { ascending: false })
-            .limit(3);
-          if (error) throw error;
-          setRecentAlerts(data || []);
-        }
+        // Conteos
+        setTransportCount(lines.length);
+        setResourcesCount(social.length);
+        setJobsCount(jobs.length);
+        setSecurityCount(alerts.length);
+
+        // Recientes transporte (tomamos los primeros 3)
+        setRecentLines(
+          lines.slice(0, 3).map((l: any) => ({
+            id: l.id,
+            number: l.number ?? "",
+            name: l.name ?? "",
+            active: l.active ?? true,
+            created_at: l.created_at,
+          }))
+        );
+
+        // Recientes recursos sociales (primeros 3)
+        setRecentResources(
+          social.slice(0, 3).map((r: any) => ({
+            id: r.id,
+            name: r.name ?? "",
+            active: r.active ?? true,
+            verified: r.verified ?? false,
+            schedule: r.schedule ?? null,
+            needs: r.needs ?? null,
+            created_at: r.created_at,
+          }))
+        );
+
+        // Recientes empleos (primeros 3) – derivamos location, active, featured
+        setRecentJobs(
+          jobs.slice(0, 3).map((j: any) => ({
+            id: j.id,
+            title: j.title ?? "",
+            location: j.city ?? j.municipality ?? "",
+            active: j.status ? j.status === "published" : true,
+            featured: j.is_featured ?? false,
+            created_at: j.created_at ?? j.published_at,
+          }))
+        );
+
+        // Recientes alertas (primeros 3)
+        setRecentAlerts(
+          alerts.slice(0, 3).map((a: any) => ({
+            id: a.id,
+            title: a.title ?? "",
+            category: a.category ?? "",
+            active: a.active ?? true,
+            featured: a.featured ?? false,
+            created_at: a.created_at,
+          }))
+        );
       } catch (e: any) {
         console.error(e);
         toast({
@@ -357,26 +350,6 @@ export function ModuleGrid() {
         </div>
 
         <AboutJujuyConecta />
-        {/* Notification CTA */}
-        {/* <div className="mt-16 text-center">
-          <Card className="max-w-md mx-auto border-primary/20 bg-gradient-primary/5">
-            <CardHeader>
-              <div className="flex justify-center mb-2">
-                <Bell className="h-8 w-8 text-primary" />
-              </div>
-              <CardTitle className="text-xl">Activá tus alertas</CardTitle>
-              <CardDescription>Recibí notificaciones personalizadas sobre transporte, empleos y más</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link to="/notifications">
-                <Button className="w-full shadow-glow">
-                  Configurar notificaciones
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div> */}
       </div>
     </section>
   );

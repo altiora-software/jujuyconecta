@@ -1,17 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Users, Briefcase, Shield, Newspaper, BusFront, Gift } from "lucide-react";
+import { MapPin, Users, Briefcase, Shield, Newspaper, BusFront } from "lucide-react";
 import JujuyConectaAssistantModal from "@/components/assistant/JujuyConectaAssistantModal";
 import { OnboardingOnce } from "@/components/onboarding/OnboardingOnce";
 import { useAuth } from "@/hooks/useAuth";
 import imagenHero from "@/assets/hornocal.webp";
-// import LoginRequiredDialog from "@/components/auth/LoginRequiredDialog";
 import AiTrainingModal from "@/components/aiTrainingModal/AiTrainingModal";
-
-
-
 
 type Counts = {
   lines: number | null;
@@ -22,47 +17,64 @@ type Counts = {
 
 export function Hero() {
   const [open, setOpen] = useState(false);
-  const [counts, setCounts] = useState<Counts>({ lines: null, resources: null, jobs: null, alerts: null });
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const [counts, setCounts] = useState<Counts>({
+    lines: null,
+    resources: null,
+    jobs: null,
+    alerts: null,
+  });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const [assistantOpen, setAssistantOpen] = useState(false);
-
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
 
-  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-
+  // 🔥 NUEVO: cargar stats desde /api/home
   useEffect(() => {
-    (async () => {
+    let cancelled = false;
+
+    const load = async () => {
       try {
-        const [a,b,c,d] = await Promise.all([
-          supabase.from("transport_lines").select("*", { count:"exact", head:true }).eq("active", true),
-          supabase.from("social_resources").select("*", { count:"exact", head:true }).eq("active", true),
-          supabase.from("jobs_listings")
-          .select("*")
-          .order("is_featured", { ascending: false })
-          .order("published_at", { ascending: false }),
-          supabase.from("security_alerts").select("*", { count:"exact", head:true }).eq("active", true),
-        ]);
-        if (a.error || b.error || c.error || d.error) throw (a.error || b.error || c.error || d.error);
-        console.log('c',c);
+        const res = await fetch("/api/home");
+
+        if (!res.ok) throw new Error("Error fetching /api/home");
+
+        const json = await res.json();
+
+        if (cancelled) return;
+
+        // json debe tener: { lines[], social[], jobs[], alerts[] }
         setCounts({
-          lines: a.count ?? 0,
-          resources: b.count ?? 0,
-          jobs: c.data.length ?? 0,
-          alerts: d.count ?? 0,
+          lines: json.lines?.length ?? 0,
+          resources: json.social?.length ?? 0,
+          jobs: json.jobs?.length ?? 0,
+          alerts: json.alerts?.length ?? 0,
         });
-      } catch (e) {
-        console.error(e);
-        toast({
-          title: "No se pudieron cargar los datos",
-          description: "Mostramos números aproximados mientras se reintenta.",
-          variant: "destructive",
-        });
-        setCounts((p) => ({ lines: p.lines ?? 0, resources: p.resources ?? 0, jobs: p.jobs ?? 0, alerts: p.alerts ?? 0 }));
+      } catch (err) {
+        if (!cancelled) {
+          console.error("Hero /api/home error:", err);
+          toast({
+            title: "No se pudieron cargar los datos",
+            description: "Mostramos números aproximados mientras se reintenta.",
+            variant: "destructive",
+          });
+
+          setCounts((p) => ({
+            lines: p.lines ?? 0,
+            resources: p.resources ?? 0,
+            jobs: p.jobs ?? 0,
+            alerts: p.alerts ?? 0,
+          }));
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
-    })();
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [toast]);
 
   const handleOpenAssistant = useCallback(async () => {
@@ -78,13 +90,18 @@ export function Hero() {
     await signInWithGoogle();
   }, [signInWithGoogle]);
 
-
-  const Stat = ({ icon, value, label }: { icon: React.ReactNode; value: number | null; label: string }) => (
+  const Stat = ({
+    icon,
+    value,
+    label,
+  }: {
+    icon: React.ReactNode;
+    value: number | null;
+    label: string;
+  }) => (
     <div className="text-center">
-      <div className="h-8 w-8 mx-auto mb-2 text-yellow-400">
-        {icon}
-      </div>
-  
+      <div className="h-8 w-8 mx-auto mb-2 text-yellow-400">{icon}</div>
+
       <div
         className="
           text-3xl
@@ -100,14 +117,10 @@ export function Hero() {
           value ?? 0
         )}
       </div>
-  
-      <div className="text-sm font-semibold text-black">
-        {label}
-      </div>
+
+      <div className="text-sm font-semibold text-black">{label}</div>
     </div>
   );
-  
-  
 
   return (
     <section
@@ -129,16 +142,17 @@ export function Hero() {
       <div className="relative z-10">
         <div className="container mx-auto px-4">
           <div className="min-h-[70svh] sm:min-h-[68svh] lg:min-h-[60svh] flex flex-col items-center justify-center text-center gap-6 py-12 sm:py-14 lg:py-20">
-          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight">
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">
-              Todo Jujuy en un lugar claro y fácil de usar.
-            </span>
-          </h1>
 
-          <p className="max-w-[56rem] text-base sm:text-lg lg:text-xl/7 opacity-95">
-            Colectivos, mapas, empleos, ayuda social y noticias al día.  
-            Todo organizado para que encuentres lo que necesitás sin perder tiempo.
-          </p>
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">
+                Todo Jujuy en un lugar claro y fácil de usar.
+              </span>
+            </h1>
+
+            <p className="max-w-[56rem] text-base sm:text-lg lg:text-xl/7 opacity-95">
+              Colectivos, mapas, empleos, ayuda social y noticias al día.  
+              Todo organizado para que encuentres lo que necesitás sin perder tiempo.
+            </p>
 
             <div className="w-full max-w-2xl flex flex-col xs:flex-row gap-3 justify-center items-center">
               <div className="flex gap-3 w-full xs:w-auto flex-wrap justify-center">
@@ -159,11 +173,10 @@ export function Hero() {
                   <Newspaper className="mr-2" /> Ver qué está pasando hoy
                 </Button>
 
-                <Button 
+                <Button
                   size="lg"
                   className="w-full xs:w-auto"
                   onClick={() => (window.location.href = "/turismo")}
-                  
                 >
                   <Briefcase className="mr-2" /> Conocé la provincia
                 </Button>
@@ -178,13 +191,15 @@ export function Hero() {
             </div>
 
             <p className="text-xs sm:text-[13px] text-blue/80 max-w-[34rem] mt-2">
-              Los datos pueden cambiar según el día y la fuente. Usá la info como guía y, si algo no cierra, escribinos a contacto@jujuyconecta.com para revisarlo.
+              Los datos pueden cambiar según el día y la fuente. Usá la info como guía y, si algo no cierra, escribinos a jujuyconecta@gmail.com para revisarlo.
             </p>
+
           </div>
         </div>
       </div>
 
       <OnboardingOnce onOpenAssistant={handleOpenAssistant} />
+
       <AiTrainingModal
         open={open}
         onClose={() => setOpen(false)}
