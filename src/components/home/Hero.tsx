@@ -41,8 +41,6 @@ export function Hero() {
         const json = await res.json();
 
         if (cancelled) return;
-
-        // json debe tener: { lines[], social[], jobs[], alerts[] }
         setCounts({
           lines: json.lines?.length ?? 0,
           resources: json.social?.length ?? 0,

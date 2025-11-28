@@ -14,6 +14,82 @@ export type Database = {
   }
   public: {
     Tables: {
+      notification_preferences: {
+        Row: {
+          id: string;
+          user_id: string;
+      
+          global_enabled: boolean;
+      
+          portal_noticias: boolean;
+          agenda_comunitaria: boolean;
+          marketplace_local: boolean;
+          alertas_seguridad: boolean;
+          cursos_talleres: boolean;
+          mapa_turistico: boolean;
+          rutas_recorridos: boolean;
+          eventos_turisticos: boolean;
+          recursos_sociales: boolean;
+          transporte_mapas: boolean;
+          bolsa_trabajo_local: boolean;
+      
+          created_at: string;
+          updated_at: string;
+        };
+      
+        Insert: {
+          id?: string;
+          user_id: string;
+      
+          global_enabled?: boolean;
+      
+          portal_noticias?: boolean;
+          agenda_comunitaria?: boolean;
+          marketplace_local?: boolean;
+          alertas_seguridad?: boolean;
+          cursos_talleres?: boolean;
+          mapa_turistico?: boolean;
+          rutas_recorridos?: boolean;
+          eventos_turisticos?: boolean;
+          recursos_sociales?: boolean;
+          transporte_mapas?: boolean;
+          bolsa_trabajo_local?: boolean;
+      
+          created_at?: string;
+          updated_at?: string;
+        };
+      
+        Update: {
+          id?: string;
+          user_id?: string;
+      
+          global_enabled?: boolean;
+      
+          portal_noticias?: boolean;
+          agenda_comunitaria?: boolean;
+          marketplace_local?: boolean;
+          alertas_seguridad?: boolean;
+          cursos_talleres?: boolean;
+          mapa_turistico?: boolean;
+          rutas_recorridos?: boolean;
+          eventos_turisticos?: boolean;
+          recursos_sociales?: boolean;
+          transporte_mapas?: boolean;
+          bolsa_trabajo_local?: boolean;
+      
+          created_at?: string;
+          updated_at?: string;
+        };
+      
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      }      
       job_submissions: {
         Row: {
           id: string;

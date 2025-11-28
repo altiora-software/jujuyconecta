@@ -139,8 +139,8 @@ export function JobsHeader({
                     : ""
                 }`}
               >
-                <p className="text-[11px] text-amber-50 mb-1">Rubros</p>
-                <p className="text-lg font-semibold text-amber-50">
+                <p className="text-[11px] text-black-50 mb-1">Rubros</p>
+                <p className="text-lg font-semibold text-black-50">
                   {totalCategories}
                 </p>
               </div>
