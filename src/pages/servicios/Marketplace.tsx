@@ -65,6 +65,7 @@ interface LocalBusiness {
   longitude?: number | null;
   created_at?: string;
   updated_at?: string;
+  is_featured?: boolean | null;
 }
 
 const TABS = [
@@ -92,6 +93,7 @@ export default function MarketplacePage() {
         const { data, error } = await supabase
           .from("local_businesses")
           .select("*")
+          .order("is_featured", { ascending: false })
           .order("created_at", { ascending: false });
 
         if (error) {
@@ -410,30 +412,43 @@ export default function MarketplacePage() {
                           "group flex flex-col rounded-xl border bg-card/80 backdrop-blur hover:shadow-lg transition-all hover:-translate-y-[2px]"
                         }
                       >
-                        {item.image_url && (
-                          <div className="relative h-40 w-full overflow-hidden rounded-t-xl">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={item.image_url}
-                              alt={item.name}
-                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
-                            <div className="absolute left-2 top-2 flex flex-col gap-1">
-                              {isNew && (
-                                <Badge className="text-[10px] md:text-xs bg-emerald-500 text-white">
-                                  Nuevo
+                        {/* Imagen o placeholder */}
+                        <div className="relative h-40 w-full overflow-hidden rounded-t-xl bg-muted flex items-center justify-center">
+                          {item.image_url ? (
+                            <>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={item.image_url}
+                                alt={item.name}
+                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
+
+                              {/* Badges */}
+                              <div className="absolute left-2 top-2 flex flex-col gap-1">
+                                {item.is_featured && (
+                                  <Badge className="text-[10px] md:text-xs bg-yellow-500 text-black flex items-center gap-1">
+                                    <Sparkles className="h-3 w-3" />
+                                    Destacado
+                                  </Badge>
+                                )}
+                              </div>
+
+                              {item.has_delivery && (
+                                <Badge className="absolute right-2 bottom-2 text-[10px] md:text-xs flex items-center gap-1 bg-background/90 backdrop-blur">
+                                  <Truck className="h-3 w-3" />
+                                  Envío
                                 </Badge>
                               )}
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center gap-1 text-muted-foreground opacity-70">
+                              <Store className="h-6 w-6" />
+                              <span className="text-[11px]">Sin imagen</span>
                             </div>
-                            {item.has_delivery && (
-                              <Badge className="absolute right-2 bottom-2 text-[10px] md:text-xs flex items-center gap-1 bg-background/90 backdrop-blur">
-                                <Truck className="h-3 w-3" />
-                                Envío
-                              </Badge>
-                            )}
-                          </div>
-                        )}
+                          )}
+                        </div>
+
 
                         <CardHeader className="pb-2 pt-3">
                           <div className="flex items-start justify-between gap-2">
@@ -601,22 +616,32 @@ export default function MarketplacePage() {
                 </DialogHeader>
 
                 <div className="space-y-4">
-                  {selectedItem.image_url && (
-                    <div className="relative h-52 w-full overflow-hidden rounded-lg">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={selectedItem.image_url}
-                        alt={selectedItem.name}
-                        className="h-full w-full object-cover"
-                      />
-                      {selectedItem.has_delivery && (
-                        <Badge className="absolute right-2 bottom-2 flex items-center gap-1">
-                          <Truck className="h-3 w-3" />
-                          Envío disponible
-                        </Badge>
-                      )}
-                    </div>
-                  )}
+                
+                  {/* Imagen o placeholder en el diálogo */}
+                  <div className="relative h-52 w-full overflow-hidden rounded-lg bg-muted flex items-center justify-center">
+                    {selectedItem.image_url ? (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={selectedItem.image_url}
+                          alt={selectedItem.name}
+                          className="h-full w-full object-cover"
+                        />
+                        {selectedItem.has_delivery && (
+                          <Badge className="absolute right-2 bottom-2 flex items-center gap-1 bg-background/80 backdrop-blur">
+                            <Truck className="h-3 w-3" />
+                            Envío disponible
+                          </Badge>
+                        )}
+                      </>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 text-muted-foreground opacity-70">
+                        <Store className="h-6 w-6" />
+                        <span className="text-sm">Sin imagen disponible</span>
+                      </div>
+                    )}
+                  </div>
+
 
                   {selectedItem.address && (
                     <div className="flex items-start gap-2 text-sm">

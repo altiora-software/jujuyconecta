@@ -21,6 +21,8 @@ import {
   Truck,
   Edit,
   Trash2,
+  Sparkles,
+  Image as ImageIcon,
 } from "lucide-react";
 import type { LocalBusiness } from "./types";
 import { BUSINESS_TYPES } from "./types";
@@ -30,6 +32,7 @@ interface MarketplaceTableDesktopProps {
   onEdit: (b: LocalBusiness) => void;
   onDelete: (id: string) => void;
   onToggleDelivery: (id: string, current: boolean | null) => void;
+  onToggleFeatured: (id: string, current: boolean | null | undefined) => void;
 }
 
 export function MarketplaceTableDesktop({
@@ -37,28 +40,49 @@ export function MarketplaceTableDesktop({
   onEdit,
   onDelete,
   onToggleDelivery,
+  onToggleFeatured,
 }: MarketplaceTableDesktopProps) {
   if (businesses.length === 0) return null;
 
   return (
     <div className="hidden md:block">
       <div className="w-full overflow-x-auto">
-        <Table className="min-w-[900px]">
+        <Table className="min-w-[1050px]">
           <TableHeader>
             <TableRow>
+              <TableHead>Imagen</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>Rubro</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Municipio</TableHead>
               <TableHead>Contacto</TableHead>
               <TableHead>Envío</TableHead>
+              <TableHead>Destacado</TableHead>
               <TableHead>Tags</TableHead>
               <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {businesses.map((b) => (
               <TableRow key={b.id}>
+                {/* IMAGEN */}
+                <TableCell>
+                  {b.image_url ? (
+                    <img
+                      src={b.image_url}
+                      alt={b.name}
+                      className="w-14 h-14 object-cover rounded-md border"
+                    />
+                  ) : (
+                    <div className="w-14 h-14 flex items-center justify-center rounded-md border bg-muted text-muted-foreground text-[10px] flex-col gap-1">
+                      <ImageIcon className="h-4 w-4 opacity-60" />
+                      Sin imagen
+                    </div>
+                  )}
+                </TableCell>
+
+                {/* NOMBRE */}
                 <TableCell>
                   <div className="flex flex-col gap-1">
                     <div className="font-medium">{b.name}</div>
@@ -71,21 +95,23 @@ export function MarketplaceTableDesktop({
                   </div>
                 </TableCell>
 
+                {/* RUBRO */}
                 <TableCell>
                   <Badge variant="outline">{b.category}</Badge>
                 </TableCell>
 
+                {/* TIPO */}
                 <TableCell>
                   <Badge variant="secondary">
-                    {
-                      BUSINESS_TYPES.find((t) => t.value === b.type)?.label ??
-                      b.type
-                    }
+                    {BUSINESS_TYPES.find((t) => t.value === b.type)?.label ??
+                      b.type}
                   </Badge>
                 </TableCell>
 
+                {/* MUNICIPIO */}
                 <TableCell>{b.municipality}</TableCell>
 
+                {/* CONTACTO */}
                 <TableCell>
                   <div className="flex flex-col gap-1 text-xs">
                     {b.whatsapp && (
@@ -109,6 +135,7 @@ export function MarketplaceTableDesktop({
                   </div>
                 </TableCell>
 
+                {/* DELIVERY */}
                 <TableCell>
                   <Badge
                     variant={b.has_delivery ? "default" : "outline"}
@@ -117,6 +144,18 @@ export function MarketplaceTableDesktop({
                   >
                     <Truck className="h-3 w-3" />
                     {b.has_delivery ? "Con envío" : "Sin info"}
+                  </Badge>
+                </TableCell>
+
+                {/* TAGS */}
+                <TableCell>
+                  <Badge
+                    variant={b.is_featured ? "default" : "outline"}
+                    className="cursor-pointer flex items-center gap-1"
+                    onClick={() => onToggleFeatured(b.id, b.is_featured)}
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    {b.is_featured ? "Destacado" : "Normal"}
                   </Badge>
                 </TableCell>
 
@@ -146,6 +185,7 @@ export function MarketplaceTableDesktop({
                   )}
                 </TableCell>
 
+                {/* ACCIONES */}
                 <TableCell>
                   <div className="flex gap-2">
                     <Button

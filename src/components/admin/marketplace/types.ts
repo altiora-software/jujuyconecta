@@ -20,6 +20,7 @@ export interface LocalBusiness {
     longitude: number | null;
     created_at: string;
     updated_at: string;
+    is_featured?: boolean | null;
   }
   
   export const BUSINESS_TYPES = [
@@ -39,6 +40,7 @@ export interface LocalBusiness {
     instagram: string;
     website: string;
     image_url: string;
+    image_file: File;
     source_url: string;
     source_type: string;
     tags: string;      // coma separada
@@ -58,6 +60,7 @@ export interface LocalBusiness {
     instagram: "",
     website: "",
     image_url: "",
+    image_file: null,
     source_url: "",
     source_type: "",
     tags: "",

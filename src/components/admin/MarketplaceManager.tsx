@@ -18,6 +18,8 @@ interface MarketplaceManagerProps {
   onUpdate?: () => void;
 }
 
+const BUCKET_NAME = "local-business-images";
+
 export const MarketplaceManager = ({ onUpdate }: MarketplaceManagerProps) => {
   const [businesses, setBusinesses] = useState<LocalBusiness[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,12 +74,46 @@ export const MarketplaceManager = ({ onUpdate }: MarketplaceManagerProps) => {
           ? true
           : formData.has_delivery === "no"
           ? false
-          : "none";
+          : null;
 
       const latitudeValue =
         formData.latitude.trim() !== "" ? parseFloat(formData.latitude) : null;
       const longitudeValue =
         formData.longitude.trim() !== "" ? parseFloat(formData.longitude) : null;
+
+      // Subida de imagen a Supabase Storage (si hay archivo nuevo)
+      let imageUrlToSave: string | null =
+        formData.image_url || editingBusiness?.image_url || null;
+
+      if (formData.image_file) {
+        const file = formData.image_file;
+        const ext = file.name.split(".").pop() || "jpg";
+
+        const uniqueName =
+          (typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}`) + `.${ext}`;
+
+        const filePath = `${uniqueName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from(BUCKET_NAME)
+          .upload(filePath, file, {
+            contentType: file.type,
+            upsert: false,
+          });
+
+        if (uploadError) {
+          console.error("Error subiendo imagen:", uploadError);
+          throw uploadError;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from(BUCKET_NAME)
+          .getPublicUrl(filePath);
+
+        imageUrlToSave = publicUrlData.publicUrl;
+      }
 
       const businessData = {
         name: formData.name,
@@ -89,7 +125,8 @@ export const MarketplaceManager = ({ onUpdate }: MarketplaceManagerProps) => {
         phone: formData.phone || null,
         instagram: formData.instagram || null,
         website: formData.website || null,
-        image_url: formData.image_url || null,
+        image_url: imageUrlToSave,
+
         source_url: formData.source_url || null,
         source_type: formData.source_type || null,
         tags: tagsArray.length ? tagsArray : null,
@@ -150,6 +187,7 @@ export const MarketplaceManager = ({ onUpdate }: MarketplaceManagerProps) => {
       instagram: business.instagram || "",
       website: business.website || "",
       image_url: business.image_url || "",
+      image_file: null,
       source_url: business.source_url || "",
       source_type: business.source_type || "",
       tags: business.tags?.join(", ") || "",
@@ -215,6 +253,35 @@ export const MarketplaceManager = ({ onUpdate }: MarketplaceManagerProps) => {
     }
   };
 
+  const toggleFeatured = async (id: string, current: boolean | null | undefined) => {
+    try {
+      const { error } = await (supabase as any)
+        .from("local_businesses")
+        .update({ is_featured: !current })
+        .eq("id", id);
+  
+      if (error) throw error;
+  
+      toast({
+        title: !current ? "Marcado como destacado" : "Quitado de destacados",
+        description: !current
+          ? "Este emprendimiento ahora aparece primero en el Marketplace."
+          : "Este emprendimiento ya no aparece como destacado.",
+      });
+  
+      fetchBusinesses();
+      onUpdate?.();
+    } catch (error) {
+      console.error("Error updating is_featured:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el estado de destacado",
+        variant: "destructive",
+      });
+    }
+  };
+
+  
   return (
     <div className="space-y-6">
       <Card>
@@ -263,6 +330,7 @@ export const MarketplaceManager = ({ onUpdate }: MarketplaceManagerProps) => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onToggleDelivery={toggleDelivery}
+                onToggleFeatured={toggleFeatured}
               />
             </>
           )}

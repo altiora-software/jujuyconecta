@@ -24,7 +24,7 @@ import {
 
 import { Plus } from "lucide-react";
 import type { FormState, LocalBusiness } from "./types";
-import { BUSINESS_TYPES, emptyFormState } from "./types";
+import { BUSINESS_TYPES } from "./types";
 
 interface MarketplaceFormDialogProps {
   open: boolean;
@@ -50,9 +50,7 @@ export function MarketplaceFormDialog({
       open={open}
       onOpenChange={(value) => {
         setOpen(value);
-        if (!value) {
-          onReset();
-        }
+        if (!value) onReset();
       }}
     >
       <DialogTrigger asChild>
@@ -81,6 +79,7 @@ export function MarketplaceFormDialog({
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="space-y-4">
+          {/* NOMBRE */}
           <div className="space-y-2">
             <Label htmlFor="name">Nombre del Emprendimiento *</Label>
             <Input
@@ -94,6 +93,7 @@ export function MarketplaceFormDialog({
             />
           </div>
 
+          {/* CATEGORY + TYPE */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="category">Rubro / Categoría *</Label>
@@ -130,6 +130,7 @@ export function MarketplaceFormDialog({
             </div>
           </div>
 
+          {/* MUNICIPIO + DIRECCION */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="municipality">Municipio *</Label>
@@ -160,6 +161,7 @@ export function MarketplaceFormDialog({
             </div>
           </div>
 
+          {/* WHATSAPP / PHONE / DELIVERY */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="whatsapp">WhatsApp</Label>
@@ -190,6 +192,7 @@ export function MarketplaceFormDialog({
 
             <div className="space-y-2">
               <Label htmlFor="has_delivery">¿Tiene delivery / envío?</Label>
+
               <Select
                 value={formData.has_delivery}
                 onValueChange={(value: "yes" | "no" | "none") =>
@@ -202,8 +205,9 @@ export function MarketplaceFormDialog({
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar" />
                 </SelectTrigger>
+
                 <SelectContent>
-                  <SelectItem value="">No especificar</SelectItem>
+                  <SelectItem value="none">No especificar</SelectItem>
                   <SelectItem value="yes">Sí, tiene envío</SelectItem>
                   <SelectItem value="no">No tiene envío</SelectItem>
                 </SelectContent>
@@ -211,6 +215,7 @@ export function MarketplaceFormDialog({
             </div>
           </div>
 
+          {/* RRSS */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="instagram">Instagram</Label>
@@ -240,24 +245,42 @@ export function MarketplaceFormDialog({
             </div>
           </div>
 
+          {/* IMAGEN: archivo + preview */}
           <div className="space-y-2">
-            <Label htmlFor="image_url">Imagen principal (URL)</Label>
+            <Label htmlFor="image_file">Imagen principal</Label>
+
+            {(formData.image_url || editingBusiness?.image_url) && (
+              <div className="mb-2">
+                <img
+                  src={formData.image_url || editingBusiness?.image_url || ""}
+                  alt="Imagen actual del emprendimiento"
+                  className="h-24 w-24 rounded-md object-cover border"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Esta es la imagen guardada actualmente. Si subís una nueva, se reemplazará.
+                </p>
+              </div>
+            )}
+
             <Input
-              id="image_url"
-              value={formData.image_url}
-              onChange={(e) =>
+              id="image_file"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? null;
                 setFormData({
                   ...formData,
-                  image_url: e.target.value,
-                })
-              }
-              placeholder="Pegá aquí la URL de la imagen"
+                  image_file: file,
+                });
+              }}
             />
+
             <p className="text-xs text-muted-foreground">
-              Más adelante podés reemplazar esto por un uploader real de Supabase Storage.
+              Se subirá a Supabase Storage cuando guardes la ficha.
             </p>
           </div>
 
+          {/* TAGS */}
           <div className="space-y-2">
             <Label htmlFor="tags">Tags / etiquetas (separadas por coma)</Label>
             <Textarea
@@ -271,6 +294,7 @@ export function MarketplaceFormDialog({
             />
           </div>
 
+          {/* COORDENADAS + FUENTES */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="latitude">Latitud</Label>
@@ -318,6 +342,7 @@ export function MarketplaceFormDialog({
             </div>
           </div>
 
+          {/* SOURCE URL */}
           <div className="space-y-2">
             <Label htmlFor="source_url">URL de la fuente</Label>
             <Input
@@ -333,6 +358,7 @@ export function MarketplaceFormDialog({
             />
           </div>
 
+          {/* BOTONES */}
           <div className="flex flex-col sm:flex-row gap-2">
             <Button type="submit" className="flex-1">
               {editingBusiness ? "Actualizar" : "Crear"} ficha

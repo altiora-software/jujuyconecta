@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,9 +29,6 @@ import { SecurityAlertsManager } from "./SecurityAlertsManager";
 import { TransportReportsManager } from "./TransportReportsManager";
 import { TourismPlacesManager } from "./TourismPlacesManager";
 import { MarketplaceManager } from "./MarketplaceManager";
-// Cuando tengas managers específicos, los importás acá
-// import { MarketplaceManager } from "./MarketplaceManager";
-// import { CommunityAgendaManager } from "./CommunityAgendaManager";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -49,6 +46,8 @@ interface DashboardStats {
   totalCommunityEvents: number;
 }
 
+const TABS_STORAGE_KEY = "adminDashboard.activeTab";
+
 export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [stats, setStats] = useState<DashboardStats>({
     totalLines: 0,
@@ -63,12 +62,34 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   });
   const [isLoading, setIsLoading] = useState(true);
 
+  // ✅ Estado controlado del tab activo + persistencia en localStorage
+  const [activeTab, setActiveTab] = useState<string>("transport");
+
   useEffect(() => {
-    fetchStats();
+    try {
+      const saved = window.localStorage.getItem(TABS_STORAGE_KEY);
+      if (saved) {
+        setActiveTab(saved);
+      }
+    } catch {
+      // si falla localStorage no rompemos nada
+    }
   }, []);
 
-  const fetchStats = async () => {
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
     try {
+      window.localStorage.setItem(TABS_STORAGE_KEY, value);
+    } catch {
+      // ignore
+    }
+  };
+
+  // ✅ fetchStats estable, no se recrea en cada render
+  const fetchStats = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
       const [
         { count: linesCount },
         { count: reportsCount },
@@ -89,11 +110,15 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         supabase
           .from("social_resources")
           .select("*", { count: "exact", head: true }),
-          supabase.from("job_submissions").select("*", { count: "exact", head: true }),
+        supabase
+          .from("job_submissions")
+          .select("*", { count: "exact", head: true }),
         supabase
           .from("security_alerts")
           .select("*", { count: "exact", head: true }),
-        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase
+          .from("profiles")
+          .select("*", { count: "exact", head: true }),
         supabase
           .from("tourism_places")
           .select("*", { count: "exact", head: true }),
@@ -104,7 +129,7 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           .from("community_events")
           .select("*", { count: "exact", head: true }),
       ]);
-      console.log(marketplaceCount)
+
       setStats({
         totalLines: linesCount || 0,
         totalReports: reportsCount || 0,
@@ -121,7 +146,11 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   const refreshStats = () => {
     fetchStats();
@@ -281,7 +310,11 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         </div>
 
         {/* Management Tabs */}
-        <Tabs defaultValue="transport" className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="transport">Transporte</TabsTrigger>
             <TabsTrigger value="resources">Recursos</TabsTrigger>
@@ -313,13 +346,11 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             <TourismPlacesManager onUpdate={refreshStats} />
           </TabsContent>
 
-          {/* Cuando tengas los managers reales, reemplazás estos placeholders */}
           <TabsContent value="marketplace" className="mt-6">
             <MarketplaceManager onUpdate={refreshStats} />
           </TabsContent>
 
           <TabsContent value="agenda" className="mt-6">
-            {/* <CommunityAgendaManager onUpdate={refreshStats} /> */}
             <Card>
               <CardHeader>
                 <CardTitle>Agenda comunitaria</CardTitle>
