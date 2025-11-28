@@ -41,15 +41,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .select("id,title,company_name,city,municipality,is_featured,published_at,status")
         .eq("status", "published")
         .order("is_featured", { ascending: false })
-        .order("published_at", { ascending: false })
-        .limit(20),
+        .order("published_at", { ascending: false }),
 
       supa
         .from("security_alerts")
         .select("id,title,category,severity,active,featured,created_at")
         .eq("active", true)
-        .order("created_at", { ascending: false })
-        .limit(30),
+        .order("created_at", { ascending: false }),
     ]);
 
     if (lines.error || social.error || jobs.error || alerts.error) {

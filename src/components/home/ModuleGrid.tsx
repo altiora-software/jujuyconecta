@@ -5,9 +5,15 @@ import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bus, Users, Briefcase, Shield, Bell, ArrowRight } from "lucide-react";
+import { Bus, Users, Briefcase, Shield, ArrowRight } from "lucide-react";
 import AboutJujuyConecta from "../about/AboutJujuyConecta";
 
 type TransportLine = {
@@ -56,13 +62,11 @@ type HomeResponse = {
 export function ModuleGrid() {
   const { toast } = useToast();
 
-  // Stats
   const [transportCount, setTransportCount] = useState<number | null>(null);
   const [resourcesCount, setResourcesCount] = useState<number | null>(null);
   const [jobsCount, setJobsCount] = useState<number | null>(null);
   const [securityCount, setSecurityCount] = useState<number | null>(null);
 
-  // Recents
   const [recentLines, setRecentLines] = useState<TransportLine[]>([]);
   const [recentResources, setRecentResources] = useState<SocialResource[]>([]);
   const [recentJobs, setRecentJobs] = useState<Job[]>([]);
@@ -76,9 +80,7 @@ export function ModuleGrid() {
         setLoading(true);
 
         const res = await fetch("/api/home");
-        if (!res.ok) {
-          throw new Error("Error al cargar datos desde /api/home");
-        }
+        if (!res.ok) throw new Error("Error al cargar datos desde /api/home");
 
         const json = (await res.json()) as HomeResponse;
 
@@ -87,13 +89,11 @@ export function ModuleGrid() {
         const jobs = json.jobs ?? [];
         const alerts = json.alerts ?? [];
 
-        // Conteos
         setTransportCount(lines.length);
         setResourcesCount(social.length);
         setJobsCount(jobs.length);
         setSecurityCount(alerts.length);
 
-        // Recientes transporte (tomamos los primeros 3)
         setRecentLines(
           lines.slice(0, 3).map((l: any) => ({
             id: l.id,
@@ -104,7 +104,6 @@ export function ModuleGrid() {
           }))
         );
 
-        // Recientes recursos sociales (primeros 3)
         setRecentResources(
           social.slice(0, 3).map((r: any) => ({
             id: r.id,
@@ -117,7 +116,6 @@ export function ModuleGrid() {
           }))
         );
 
-        // Recientes empleos (primeros 3) – derivamos location, active, featured
         setRecentJobs(
           jobs.slice(0, 3).map((j: any) => ({
             id: j.id,
@@ -129,7 +127,6 @@ export function ModuleGrid() {
           }))
         );
 
-        // Recientes alertas (primeros 3)
         setRecentAlerts(
           alerts.slice(0, 3).map((a: any) => ({
             id: a.id,
@@ -156,19 +153,31 @@ export function ModuleGrid() {
   }, [toast]);
 
   const transportStats = useMemo(
-    () => (transportCount != null ? `${transportCount} línea${transportCount === 1 ? "" : "s"} activas` : "—"),
+    () =>
+      transportCount != null
+        ? `${transportCount} línea${transportCount === 1 ? "" : "s"} activas`
+        : "—",
     [transportCount]
   );
   const resourcesStats = useMemo(
-    () => (resourcesCount != null ? `${resourcesCount} recurso${resourcesCount === 1 ? "" : "s"} activos` : "—"),
+    () =>
+      resourcesCount != null
+        ? `${resourcesCount} recurso${resourcesCount === 1 ? "" : "s"} activos`
+        : "—",
     [resourcesCount]
   );
   const jobsStats = useMemo(
-    () => (jobsCount != null ? `${jobsCount} empleo${jobsCount === 1 ? "" : "s"} disponibles` : "—"),
+    () =>
+      jobsCount != null
+        ? `${jobsCount} empleo${jobsCount === 1 ? "" : "s"} disponibles`
+        : "—",
     [jobsCount]
   );
   const alertsStats = useMemo(
-    () => (securityCount != null ? `${securityCount} alerta${securityCount === 1 ? "" : "s"} activas` : "—"),
+    () =>
+      securityCount != null
+        ? `${securityCount} alerta${securityCount === 1 ? "" : "s"} activas`
+        : "—",
     [securityCount]
   );
 
@@ -209,7 +218,9 @@ export function ModuleGrid() {
       href: "/jobs",
       color: "success",
       stats: jobsStats,
-      recent: recentJobs.map((j) => `${j.title}${j.location ? " — " + j.location : ""}`),
+      recent: recentJobs.map(
+        (j) => `${j.title}${j.location ? " — " + j.location : ""}`
+      ),
     },
     {
       key: "security",
@@ -226,15 +237,15 @@ export function ModuleGrid() {
   const getColorClasses = (color: string) => {
     switch (color) {
       case "primary":
-        return "border-primary/20 hover:border-primary/40 hover:shadow-glow";
+        return "border-primary/20 md:hover:border-primary/40 md:hover:shadow-glow";
       case "secondary":
-        return "border-secondary/20 hover:border-secondary/40 hover:shadow-glow-secondary";
+        return "border-secondary/20 md:hover:border-secondary/40 md:hover:shadow-glow-secondary";
       case "success":
-        return "border-emerald-500/20 hover:border-emerald-500/40";
+        return "border-emerald-500/20 md:hover:border-emerald-500/40";
       case "warning":
-        return "border-amber-500/20 hover:border-amber-500/40";
+        return "border-amber-500/20 md:hover:border-amber-500/40";
       default:
-        return "border-primary/20 hover:border-primary/40";
+        return "border-primary/20 md:hover:border-primary/40";
     }
   };
 
@@ -254,24 +265,26 @@ export function ModuleGrid() {
   };
 
   return (
-    <section className="py-16 bg-gradient-subtle">
+    <section className="py-12 sm:py-16 bg-gradient-subtle">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Servicios disponibles</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">
+            Servicios disponibles
+          </h2>
+          <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto">
             Accedé a la información que necesitás para moverte y crecer en Jujuy
           </p>
         </div>
 
-        <div className="w-full max-w-6xl mx-auto grid gap-6 sm:gap-8 md:grid-cols-2">
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
           {modules.map((module) => {
             const Icon = module.icon;
             return (
               <Card
                 key={module.key}
-                className={`h-full transition-smooth ${getColorClasses(
+                className={`h-full transition-transform duration-200 ${getColorClasses(
                   module.color
-                )} hover:scale-[1.02]`}
+                )} md:hover:scale-[1.02]`}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-3">
@@ -284,10 +297,10 @@ export function ModuleGrid() {
                         <Icon className="h-6 w-6" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg sm:text-xl">
+                        <CardTitle className="text-base sm:text-lg md:text-xl">
                           {module.title}
                         </CardTitle>
-                        <Badge variant="secondary" className="mt-1 text-[11px] sm:text-xs">
+                        <Badge className="mt-1 text-[10px] sm:text-[11px] md:text-xs">
                           {loading ? "Cargando..." : module.stats}
                         </Badge>
                       </div>
@@ -298,20 +311,21 @@ export function ModuleGrid() {
                         variant="ghost"
                         size="sm"
                         aria-label={`Ir a ${module.title}`}
+                        className="shrink-0"
                       >
                         <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>
                   </div>
 
-                  <CardDescription className="text-sm sm:text-base mt-2">
+                  <CardDescription className="text-xs sm:text-sm md:text-base mt-2">
                     {module.description}
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent>
                   <div className="space-y-2 mb-4">
-                    <h4 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">
+                    <h4 className="text-[11px] sm:text-xs md:text-sm font-medium text-muted-foreground mb-1 sm:mb-2">
                       Actividad reciente:
                     </h4>
                     {loading ? (
@@ -324,21 +338,21 @@ export function ModuleGrid() {
                       module.recent.map((item, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center space-x-2 text-xs sm:text-sm"
+                          className="flex items-center space-x-2 text-[11px] sm:text-xs md:text-sm"
                         >
                           <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                           <span className="truncate">{item}</span>
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         Sin novedades por ahora.
                       </p>
                     )}
                   </div>
 
                   <Link to={module.href}>
-                    <Button className="w-full" variant="outline">
+                    <Button className="w-full" variant="outline" size="sm">
                       Explorar {module.title.toLowerCase()}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
