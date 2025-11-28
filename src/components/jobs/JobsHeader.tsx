@@ -37,11 +37,11 @@ export function JobsHeader({
   return (
     <section className="space-y-4">
       <div className="grid gap-6 md:grid-cols-[minmax(0,1.6fr),minmax(0,1fr)] items-stretch">
-        {/* Card principal, estilo similar al TransportHero */}
+        {/* Card principal */}
         <div className="relative overflow-hidden rounded-3xl border border-emerald-400/40 bg-gradient-to-br from-emerald-500/20 via-background to-background p-6 md:p-8 shadow-[0_0_40px_rgba(16,185,129,0.35)]">
           <div className="absolute -right-20 -top-10 h-40 w-40 rounded-full bg-emerald-400/30 blur-2xl" />
 
-          {/* Chip superior con toggle de explicación */}
+          {/* Chip superior */}
           <button
             type="button"
             onClick={() => setShowHowItWorks((s) => !s)}
@@ -52,7 +52,7 @@ export function JobsHeader({
               Bolsa de trabajo Jujuy Conecta
             </span>
             <span className="ml-1 inline-flex items-center gap-1 text-[10px] text-black-100/80">
-              {showHowItWorks ? "Ocultar detalles" : "Cómo funciona"}
+              {showHowItWorks ? "Ocultar información" : "Qué es y cómo funciona"}
               {showHowItWorks ? (
                 <ChevronUp className="h-3 w-3" />
               ) : (
@@ -61,31 +61,33 @@ export function JobsHeader({
             </span>
           </button>
 
-          {/* Título y bajada, mismos tonos que el hero de transporte */}
+          {/* Título y bajada */}
           <div className="mt-3">
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-black-50 mb-1">
-              Oportunidades laborales reales en toda la provincia
+              Oportunidades laborales verificadas en Jujuy
             </h1>
             <p className="text-sm md:text-base text-black-100/80 max-w-xl">
-              Encontrá trabajos formales, changas y propuestas locales. Sin humo
-              ni formularios eternos, con datos claros para decidir rápido si te
-              sirve o no, y guardar lo que te interesa para verlo después desde
-              el celu.
+              Reunimos avisos de trabajo publicados por empresas, comercios,
+              estudios, organizaciones y emprendedores de la provincia.
+              Jujuy Conecta organiza la información para que veas rápido de qué
+              se trata cada propuesta y sigas el canal de contacto indicado por
+              el empleador.
             </p>
           </div>
 
-          {/* Explicación larga solo si el usuario la pide */}
+          {/* Explicación larga */}
           {showHowItWorks && (
             <p className="mt-3 text-xs md:text-sm text-black-50/85 max-w-xl">
-              Jujuy Conecta junta avisos de comercios, empresas, estudios,
-              oficios y emprendimientos de la provincia. Podés filtrar por
-              rubro, municipio, tipo de jornada y modalidad, y si instalás la
-              app tenés la bolsa de trabajo a un toque en la pantalla de inicio
-              de tu teléfono.
+              Esta sección funciona como un puente informativo: te mostramos
+              el detalle de la oferta, el lugar, el tipo de puesto y el medio
+              oficial para postularte (formulario externo, correo, WhatsApp,
+              sitio web u otro canal definido por quien publica). Jujuy Conecta
+              no recibe CVs ni participa en el proceso de selección, solo ayuda
+              a que encuentres oportunidades de manera clara y ordenada.
             </p>
           )}
 
-          {/* Stats con el mismo tipo de “cuadraditos” de colores que transporte */}
+          {/* Stats */}
           <div className="mt-4 grid grid-cols-3 gap-3 text-xs md:text-sm">
             <button
               type="button"
@@ -98,7 +100,7 @@ export function JobsHeader({
                 }`}
               >
                 <p className="text-[11px] text-black-50 mb-1">
-                  Ofertas activas
+                  Ofertas publicadas
                 </p>
                 <p className="text-lg font-semibold text-black-50">
                   {totalJobs}
@@ -145,20 +147,21 @@ export function JobsHeader({
             </button>
           </div>
 
-          {/* Panel contextual según stat seleccionada, igual idea que el panel lateral de transporte */}
+          {/* Panel contextual según stat */}
           {activeStat && (
             <div className="mt-3 rounded-2xl border border-border/60 bg-card/85 backdrop-blur-sm p-3 text-[11px] md:text-xs text-muted-foreground space-y-1">
               {activeStat === "jobs" && (
                 <>
                   <p>
-                    Estas son las ofertas que están vigentes hoy en Jujuy
-                    Conecta. Algunas se cubren rápido: si ves algo que te sirve,
-                    guardalo o contactá al toque.
+                    Estas son las ofertas que están vigentes y visibles hoy en
+                    la bolsa de trabajo de Jujuy Conecta. Algunas tienen plazos
+                    de postulación definidos por el empleador o pueden cerrarse
+                    antes si el puesto se cubre.
                   </p>
                   <p>
-                    Usá los filtros para quedarte solo con lo que tenga sentido
-                    para vos, y si instalás la app podés revisar nuevas ofertas
-                    en segundos.
+                    Leé siempre las condiciones completas y seguí el medio de
+                    contacto oficial indicado en cada aviso para enviar tu CV o
+                    completar la postulación.
                   </p>
                 </>
               )}
@@ -166,13 +169,13 @@ export function JobsHeader({
               {activeStat === "municipalities" && (
                 <>
                   <p>
-                    Ya hay avisos cargados en {totalMunicipalities} municipios
-                    de la provincia, no solo en capital. La idea es que tengas
-                    un mapa laboral real de Jujuy.
+                    Hay avisos publicados en {totalMunicipalities} municipios
+                    de la provincia. La idea es mostrar un panorama real de
+                    oportunidades laborales en Jujuy, no solo en la capital.
                   </p>
                   <p>
-                    Filtrá por municipio para ver qué hay cerca tuyo y armate
-                    tu propio radar de oportunidades locales.
+                    Podés filtrar por municipio para ver qué opciones hay cerca
+                    de tu zona y organizar mejor tu búsqueda.
                   </p>
                 </>
               )}
@@ -180,14 +183,13 @@ export function JobsHeader({
               {activeStat === "categories" && (
                 <>
                   <p>
-                    Tenés ofertas en {totalCategories} rubros: comercios,
-                    servicios, administración, oficios, tech y más. No es solo
-                    “oficina”, también laburo real de calle.
+                    Las ofertas están distribuidas en {totalCategories} rubros,
+                    que incluyen comercio, servicios, administración, oficios,
+                    salud, educación, tecnología y otros sectores.
                   </p>
                   <p>
-                    Probá cambiar de rubro en los filtros para descubrir
-                    opciones que quizás no estabas buscando, y usá Jujuy
-                    Conecta seguido para ver qué rubros se mueven más.
+                    Usá los filtros por rubro para enfocarte en los tipos de
+                    trabajo que mejor se ajustan a tu perfil y experiencia.
                   </p>
                 </>
               )}
@@ -195,7 +197,7 @@ export function JobsHeader({
           )}
         </div>
 
-        {/* Panel lateral empleadores, espejito del panel lateral de transporte */}
+        {/* Panel empleadores */}
         <div className="rounded-3xl border border-border/70 bg-card/85 backdrop-blur-sm p-5 md:p-6 flex flex-col justify-between gap-5">
           <div className="space-y-3">
             <button
@@ -207,17 +209,19 @@ export function JobsHeader({
                 <Sparkles className="h-5 w-5 mt-0.5 text-primary" />
                 <div className="space-y-1 text-sm">
                   <p className="font-medium text-foreground">
-                    ¿Ofrecés trabajo?
+                    ¿Buscás personal para tu equipo?
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Publicá tus búsquedas laborales en un lugar que la gente ya
-                    usa para transporte, noticias y oportunidades en Jujuy.
+                    Estamos construyendo un módulo para que comercios, empresas
+                    y emprendimientos de Jujuy puedan difundir sus búsquedas
+                    laborales en la misma plataforma que la gente ya usa para
+                    transporte, noticias y servicios.
                   </p>
                   <div className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                     <span>
                       {showEmployersInfo
-                        ? "Ocultar cómo va a funcionar"
-                        : "Ver cómo va a funcionar"}
+                        ? "Ocultar información"
+                        : "Ver qué se está pensando para empleadores"}
                     </span>
                     {showEmployersInfo ? (
                       <ChevronUp className="h-3 w-3" />
@@ -231,24 +235,34 @@ export function JobsHeader({
 
             {showEmployersInfo && (
               <div className="text-xs md:text-sm text-muted-foreground space-y-2 animate-in fade-in slide-in-from-top-1">
+                <p>
+                  La primera versión del módulo de empleadores va a estar
+                  enfocada en:
+                </p>
                 <ul className="list-disc pl-4 space-y-1">
-                  <li>Publicá gratis tus avisos básicos.</li>
-                  <li>Destacá los avisos que necesitás cubrir urgente.</li>
                   <li>
-                    Llegá a personas que viven realmente en Jujuy y usan la
-                    plataforma a diario.
+                    Publicar avisos con datos claros del puesto, requisitos y
+                    forma de contacto.
+                  </li>
+                  <li>
+                    Destacar búsquedas puntuales para que aparezcan primero en
+                    los listados.
+                  </li>
+                  <li>
+                    Llegar a personas que viven y trabajan en Jujuy, dentro de
+                    un entorno pensado para la provincia.
                   </li>
                 </ul>
                 <div className="flex items-center gap-2 text-[11px] text-muted-foreground/90">
                   <Users className="h-3 w-3" />
                   <span>
-                    Instalando Jujuy Conecta en el celular, vas a poder revisar
-                    avisos y postulaciones desde el mismo ícono en tu pantalla
-                    principal.
+                    Jujuy Conecta actúa como canal de difusión de avisos, no
+                    como consultora de recursos humanos ni intermediaria en la
+                    contratación.
                   </span>
                 </div>
                 <Badge variant="outline" className="self-start text-[11px]">
-                  Módulo empleadores próximamente
+                  Módulo para empleadores, próximamente
                 </Badge>
               </div>
             )}
@@ -258,7 +272,7 @@ export function JobsHeader({
                 variant="outline"
                 className="self-start text-[11px] mt-1"
               >
-                Tocá para ver los próximos pasos
+                Tocá para ver cómo se va a integrar
               </Badge>
             )}
           </div>

@@ -53,7 +53,19 @@ export default function JobsPage() {
   const totalCategories = categories.length;
 
   const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
+    // 1) Ordenar por fecha (más reciente primero)
+    const sortedJobs = [...jobs].sort((a, b) => {
+      const aDateStr = (a as any).published_at || (a as any).created_at;
+      const bDateStr = (b as any).published_at || (b as any).created_at;
+
+      const aTime = aDateStr ? new Date(aDateStr).getTime() : 0;
+      const bTime = bDateStr ? new Date(bDateStr).getTime() : 0;
+
+      return bTime - aTime; // descendente: más nuevo primero
+    });
+
+    // 2) Aplicar filtros sobre el array ya ordenado
+    return sortedJobs.filter((job) => {
       if (selectedTab === "destacadas" && !job.is_featured) return false;
 
       if (selectedCategory !== "todas" && job.category !== selectedCategory)
@@ -207,7 +219,7 @@ export default function JobsPage() {
           </Tabs>
         </section>
 
-        {/* Roadmap / texto largo plegable */}
+        {/* Roadmap */}
         <section>
           <Card className="border-dashed bg-muted/40">
             <button
@@ -248,7 +260,9 @@ export default function JobsPage() {
                     y filtrar por lo que realmente te importa.
                   </p>
                   <ul className="mt-2 list-disc pl-5 space-y-1">
-                    <li>Más rubros y oficios locales, no solo trabajos formales.</li>
+                    <li>
+                      Más rubros y oficios locales, no solo trabajos formales.
+                    </li>
                     <li>
                       Integración con WhatsApp y correo para postularte en pocos
                       pasos.
