@@ -388,11 +388,11 @@ export default function Security() {
                       {alerts.length}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-orange-300/50 bg-orange-500/10 p-3">
-                    <p className="text-[11px] text-orange-50 mb-1">
+                  <div className="rounded-2xl border border-orange-300/50 bg-black-500/10 p-3">
+                    <p className="text-[11px] text-black-50 mb-1">
                       Riesgo alto o crítico
                     </p>
-                    <p className="text-lg font-semibold text-orange-50">
+                    <p className="text-lg font-semibold text-black-50">
                       {
                         alerts.filter((a) =>
                           ["high", "critical"].includes(a.severity)
@@ -401,10 +401,10 @@ export default function Security() {
                     </p>
                   </div>
                   <div className="rounded-2xl border border-sky-300/50 bg-sky-500/10 p-3">
-                    <p className="text-[11px] text-sky-50 mb-1">
+                    <p className="text-[11px] text-black-50 mb-1">
                       Alertas destacadas
                     </p>
-                    <p className="text-lg font-semibold text-sky-50">
+                    <p className="text-lg font-semibold text-black-50">
                       {featuredAlerts.length}
                     </p>
                   </div>

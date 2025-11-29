@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 import {
   Store,
@@ -44,11 +46,13 @@ import {
   MessageCircle,
   Clock,
   Share2,
-  Edit3
+  Edit3,
 } from "lucide-react";
-import { buildEditRequestWhatsApp, buildNewListingWhatsApp, shareBusiness } from "@/components/marketplace/helpers";
-
-
+import {
+  buildEditRequestWhatsApp,
+  shareBusiness,
+} from "@/components/marketplace/helpers";
+import { NewBusinessDialog } from "@/components/marketplace/NewBusinessDialog";
 
 export interface LocalBusiness {
   id: string;
@@ -85,9 +89,14 @@ export default function MarketplacePage() {
   const [selectedTab, setSelectedTab] = useState<string>("todos");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("todas");
-  const [selectedMunicipality, setSelectedMunicipality] = useState<string>("todos");
+  const [selectedMunicipality, setSelectedMunicipality] =
+    useState<string>("todos");
   const [selectedItem, setSelectedItem] = useState<LocalBusiness | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  // nuevo: diálogo de "sumar emprendimiento"
+  const [newDialogOpen, setNewDialogOpen] = useState(false);
+  
 
   const { toast } = useToast();
 
@@ -157,7 +166,10 @@ export default function MarketplacePage() {
         return false;
       }
 
-      if (selectedMunicipality !== "todos" && item.municipality !== selectedMunicipality) {
+      if (
+        selectedMunicipality !== "todos" &&
+        item.municipality !== selectedMunicipality
+      ) {
         return false;
       }
 
@@ -181,7 +193,13 @@ export default function MarketplacePage() {
 
       return true;
     });
-  }, [items, selectedTab, selectedCategory, selectedMunicipality, searchTerm]);
+  }, [
+    items,
+    selectedTab,
+    selectedCategory,
+    selectedMunicipality,
+    searchTerm,
+  ]);
 
   const handleOpenDetails = (item: LocalBusiness) => {
     setSelectedItem(item);
@@ -219,7 +237,8 @@ export default function MarketplacePage() {
     if (!createdAt) return false;
     const created = new Date(createdAt);
     const now = new Date();
-    const diffDays = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
+    const diffDays =
+      (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
     return diffDays <= 7;
   };
 
@@ -246,22 +265,30 @@ export default function MarketplacePage() {
               </div>
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
                 Encontrá emprendedores, comercios y servicios,
-                <span className="text-primary"> y hablales directo por WhatsApp.</span>
+                <span className="text-primary">
+                  {" "}
+                  y hablales directo por WhatsApp.
+                </span>
               </h1>
               <p className="text-sm md:text-base text-muted-foreground">
-                Nada de formularios eternos. Elegís el emprendimiento, ves qué ofrece
-                y en un toque escribís a la persona que está detrás del proyecto.
+                Nada de formularios eternos. Elegís el emprendimiento, ves qué
+                ofrece y en un toque escribís a la persona que está detrás del
+                proyecto.
               </p>
 
               {/* Stats */}
               <div className="mt-2 grid grid-cols-3 gap-3 max-w-xs text-xs md:text-sm">
                 <div className="rounded-lg border bg-card/70 px-3 py-2">
                   <p className="font-semibold">{totalItems}</p>
-                  <p className="text-muted-foreground text-[11px]">emprendimientos</p>
+                  <p className="text-muted-foreground text-[11px]">
+                    emprendimientos
+                  </p>
                 </div>
                 <div className="rounded-lg border bg-card/70 px-3 py-2">
                   <p className="font-semibold">{totalMunicipalities}</p>
-                  <p className="text-muted-foreground text-[11px]">municipios</p>
+                  <p className="text-muted-foreground text-[11px]">
+                    municipios
+                  </p>
                 </div>
                 <div className="rounded-lg border bg-card/70 px-3 py-2">
                   <p className="font-semibold">{totalCategories}</p>
@@ -270,20 +297,19 @@ export default function MarketplacePage() {
               </div>
             </div>
 
-            <Card className="min-w-[260px] max-w-sm border-dashed shadow-sm bg-gradient-to-b from-background to-muted/60">
+            <Card className="max-w-sm border-dashed shadow-sm bg-gradient-to-b from-background to-muted/60">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Store className="h-4 w-4 text-primary" />
                   ¿Tenés un emprendimiento?
                 </CardTitle>
                 <CardDescription className="text-xs md:text-sm">
-                  Muy pronto vas a poder pedir tu ficha verificada en el Marketplace.
+                  Contanos tus datos básicos y lo revisamos para sumarlo al
+                  Marketplace.
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-2 pt-0 text-xs md:text-sm">
-                <p className="text-muted-foreground">
-                  La idea es que tengas:
-                </p>
+                <p className="text-muted-foreground">La idea es que tengas:</p>
                 <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
                   <li>Aparición en el mapa de Jujuy Conecta.</li>
                   <li>Botón directo a tu WhatsApp e Instagram.</li>
@@ -292,14 +318,10 @@ export default function MarketplacePage() {
                 <Button
                   size="sm"
                   className="w-full mt-1"
-                  onClick={() => {
-                    const link = buildNewListingWhatsApp();
-                    window.open(link, "_blank");
-                  }}
+                  onClick={() => setNewDialogOpen(true)}
                 >
                   Quiero sumar mi emprendimiento
                 </Button>
-
               </CardContent>
             </Card>
           </div>
@@ -399,12 +421,19 @@ export default function MarketplacePage() {
                 <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
                   <Store className="h-8 w-8 text-muted-foreground" />
                   <div className="space-y-1">
-                    <p className="font-medium">Todavía no hay resultados para este filtro.</p>
+                    <p className="font-medium">
+                      Todavía no hay resultados para este filtro.
+                    </p>
                     <p className="text-sm text-muted-foreground">
-                      Probá con otra palabra, cambiá de rubro o quitá alguno de los filtros.
+                      Probá con otra palabra, cambiá de rubro o quitá alguno de
+                      los filtros.
                     </p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={handleClearFilters}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleClearFilters}
+                  >
                     Quitar filtros
                   </Button>
                 </div>
@@ -421,9 +450,7 @@ export default function MarketplacePage() {
                     return (
                       <Card
                         key={item.id}
-                        className={
-                          "group flex flex-col rounded-xl border bg-card/80 backdrop-blur hover:shadow-lg transition-all hover:-translate-y-[2px]"
-                        }
+                        className="group flex flex-col rounded-xl border bg-card/80 backdrop-blur hover:shadow-lg transition-all hover:-translate-y-[2px]"
                       >
                         {/* Imagen o placeholder */}
                         <div className="relative h-40 w-full overflow-hidden rounded-t-xl bg-muted flex items-center justify-center">
@@ -445,6 +472,11 @@ export default function MarketplacePage() {
                                     Destacado
                                   </Badge>
                                 )}
+                                {isNew && (
+                                  <Badge className="text-[10px] md:text-xs bg-emerald-500 text-white">
+                                    Nuevo
+                                  </Badge>
+                                )}
                               </div>
 
                               {item.has_delivery && (
@@ -462,29 +494,33 @@ export default function MarketplacePage() {
                           )}
                         </div>
 
-
                         <CardHeader className="pb-2 pt-3">
                           <div className="flex items-start justify-between gap-2">
-                            <div className="space-y-1">
-                              <div className="flex aling-items">
-                              <CardTitle className="text-base md:text-lg line-clamp-1">
-                                {item.name}
-                              </CardTitle>
-                              <Button
-                                type="button"
-                                size="icon"
-                                variant="outline"
-                                className="shrink-0"
-                                onClick={() => shareBusiness(item, toast)}
-                                title="Compartir ficha"
-                              >
-                                <Share2 className="h-4 w-4" />
-                              </Button>
-                              </div>  
+                            <div className="space-y-1 w-full">
+                              <div className="flex items-center gap-2">
+                                <CardTitle className="flex-1 text-base md:text-lg line-clamp-1">
+                                  {item.name}
+                                </CardTitle>
+                                <Button
+                                  type="button"
+                                  size="icon"
+                                  variant="outline"
+                                  className="shrink-0"
+                                  onClick={() => shareBusiness(item, toast)}
+                                  title="Compartir ficha"
+                                >
+                                  <Share2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                               <CardDescription className="text-xs md:text-sm line-clamp-2">
                                 {item.address ||
                                   `${item.category} en ${item.municipality}`}
                               </CardDescription>
+                              {createdShort && (
+                                <p className="text-[10px] text-muted-foreground">
+                                  Actualizado: {createdShort}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </CardHeader>
@@ -500,7 +536,10 @@ export default function MarketplacePage() {
                             </Badge>
 
                             {item.category && (
-                              <Badge variant="secondary" className="text-[11px]">
+                              <Badge
+                                variant="secondary"
+                                className="text-[11px]"
+                              >
                                 {item.category}
                               </Badge>
                             )}
@@ -577,7 +616,6 @@ export default function MarketplacePage() {
                               </Button>
                             )}
                           </div>
-                          
                         </CardContent>
                       </Card>
                     );
@@ -597,8 +635,9 @@ export default function MarketplacePage() {
                   El Marketplace de Jujuy Conecta va a crecer con la comunidad.
                 </p>
                 <p className="text-xs md:text-sm text-muted-foreground">
-                  La idea es sumar sistema de reseñas, mapa interactivo, perfiles de emprendedores
-                  y campañas especiales por fecha, para que comprar local sea la primera opción.
+                  La idea es sumar sistema de reseñas, mapa interactivo,
+                  perfiles de emprendedores y campañas especiales por fecha,
+                  para que comprar local sea la primera opción.
                 </p>
               </div>
             </CardContent>
@@ -607,7 +646,15 @@ export default function MarketplacePage() {
 
         {/* Dialog de detalle */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="max-w-lg">
+          <DialogContent
+            className="
+              w-[95vw]
+              sm:w-full
+              sm:max-w-lg
+              max-h-[90vh]
+              overflow-y-auto
+            "
+          >
             {selectedItem && (
               <>
                 <DialogHeader>
@@ -617,12 +664,17 @@ export default function MarketplacePage() {
                   </DialogTitle>
                   <DialogDescription className="space-y-1">
                     <div className="flex flex-wrap gap-2 items-center text-xs md:text-sm">
-                      <Badge variant="outline" className="flex items-center gap-1">
+                      <Badge
+                        variant="outline"
+                        className="flex items-center gap-1"
+                      >
                         <Sparkles className="h-3 w-3" />
                         {formatTypeLabel(selectedItem.type)}
                       </Badge>
                       {selectedItem.category && (
-                        <Badge variant="secondary">{selectedItem.category}</Badge>
+                        <Badge variant="secondary">
+                          {selectedItem.category}
+                        </Badge>
                       )}
                       {selectedItem.municipality && (
                         <span className="inline-flex items-center gap-1 text-muted-foreground">
@@ -635,7 +687,6 @@ export default function MarketplacePage() {
                 </DialogHeader>
 
                 <div className="space-y-4">
-                
                   {/* Imagen o placeholder en el diálogo */}
                   <div className="relative h-52 w-full overflow-hidden rounded-lg bg-muted flex items-center justify-center">
                     {selectedItem.image_url ? (
@@ -661,13 +712,14 @@ export default function MarketplacePage() {
                     )}
                   </div>
 
-
                   {selectedItem.address && (
                     <div className="flex items-start gap-2 text-sm">
                       <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
                       <div>
                         <p className="font-medium">Dirección</p>
-                        <p className="text-muted-foreground">{selectedItem.address}</p>
+                        <p className="text-muted-foreground">
+                          {selectedItem.address}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -679,7 +731,9 @@ export default function MarketplacePage() {
                         <div>
                           <p className="font-medium">Contacto</p>
                           {selectedItem.phone && (
-                            <p className="text-muted-foreground">{selectedItem.phone}</p>
+                            <p className="text-muted-foreground">
+                              {selectedItem.phone}
+                            </p>
                           )}
                           {selectedItem.whatsapp && (
                             <p className="text-muted-foreground">
@@ -696,9 +750,10 @@ export default function MarketplacePage() {
                           <button
                             type="button"
                             onClick={() => {
-                              const url = selectedItem.instagram?.startsWith("http")
-                                ? selectedItem.instagram
-                                : `https://instagram.com/${selectedItem.instagram}`;
+                              const url =
+                                selectedItem.instagram?.startsWith("http")
+                                  ? selectedItem.instagram
+                                  : `https://instagram.com/${selectedItem.instagram}`;
                               window.open(url, "_blank");
                             }}
                             className="inline-flex items-center gap-2 text-primary hover:underline text-sm"
@@ -711,7 +766,9 @@ export default function MarketplacePage() {
                           <button
                             type="button"
                             onClick={() => {
-                              const url = selectedItem.website?.startsWith("http")
+                              const url = selectedItem.website?.startsWith(
+                                "http"
+                              )
                                 ? selectedItem.website
                                 : `https://${selectedItem.website}`;
                               window.open(url, "_blank");
@@ -778,6 +835,13 @@ export default function MarketplacePage() {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Dialog alta de emprendimiento */}
+        <NewBusinessDialog
+          open={newDialogOpen}
+          onOpenChange={setNewDialogOpen}
+        />
+
       </div>
     </Layout>
   );

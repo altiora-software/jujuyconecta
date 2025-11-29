@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      
+        marketplace_business_requests: {
+          Row: {
+            id: string;
+            business_name: string;
+            category: string | null;
+            municipality: string | null;
+            address: string | null;
+            contact_name: string | null;
+            contact_email: string | null;
+            contact_phone: string | null;
+            instagram: string | null;
+            description: string | null;
+            status: string;              // 'pending' | 'reviewed' | 'approved' | 'rejected' si después lo afinás
+            source_url: string | null;
+            created_at: string;
+            processed_at: string | null;
+          };
+      
+          Insert: {
+            id?: string;
+            business_name: string;       // NOT NULL, sin default, obligatorio
+            category?: string | null;
+            municipality?: string | null;
+            address?: string | null;
+            contact_name?: string | null;
+            contact_email?: string | null;
+            contact_phone?: string | null;
+            instagram?: string | null;
+            description?: string | null;
+            status?: string;             // tiene default 'pending', así que opcional en Insert
+            source_url?: string | null;
+            created_at?: string;         // default now(), opcional
+            processed_at?: string | null;
+          };
+      
+          Update: {
+            id?: string;
+            business_name?: string;
+            category?: string | null;
+            municipality?: string | null;
+            address?: string | null;
+            contact_name?: string | null;
+            contact_email?: string | null;
+            contact_phone?: string | null;
+            instagram?: string | null;
+            description?: string | null;
+            status?: string;
+            source_url?: string | null;
+            created_at?: string;
+            processed_at?: string | null;
+          };
+      
+          Relationships: [];
+      
+      }      
       notification_preferences: {
         Row: {
           id: string;
