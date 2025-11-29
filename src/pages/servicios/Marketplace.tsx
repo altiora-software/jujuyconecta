@@ -47,6 +47,7 @@ import {
   Clock,
   Share2,
   Edit3,
+  ChevronDown,
 } from "lucide-react";
 import {
   buildEditRequestWhatsApp,
@@ -93,7 +94,8 @@ export default function MarketplacePage() {
     useState<string>("todos");
   const [selectedItem, setSelectedItem] = useState<LocalBusiness | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-
+  const [showOwnerBox, setShowOwnerBox] = useState(false);
+  
   // nuevo: diálogo de "sumar emprendimiento"
   const [newDialogOpen, setNewDialogOpen] = useState(false);
   
@@ -297,33 +299,60 @@ export default function MarketplacePage() {
               </div>
             </div>
 
-            <Card className="max-w-sm border-dashed shadow-sm bg-gradient-to-b from-background to-muted/60">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Store className="h-4 w-4 text-primary" />
-                  ¿Tenés un emprendimiento?
-                </CardTitle>
-                <CardDescription className="text-xs md:text-sm">
-                  Contanos tus datos básicos y lo revisamos para sumarlo al
-                  Marketplace.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-2 pt-0 text-xs md:text-sm">
-                <p className="text-muted-foreground">La idea es que tengas:</p>
-                <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-                  <li>Aparición en el mapa de Jujuy Conecta.</li>
-                  <li>Botón directo a tu WhatsApp e Instagram.</li>
-                  <li>Rubro, zona y etiquetas para que te encuentren fácil.</li>
-                </ul>
-                <Button
-                  size="sm"
-                  className="w-full mt-1"
-                  onClick={() => setNewDialogOpen(true)}
-                >
-                  Quiero sumar mi emprendimiento
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="w-full lg:max-w-sm">
+            <button
+              type="button"
+              onClick={() => setShowOwnerBox((prev) => !prev)}
+              className="
+                w-full flex items-center justify-between gap-2
+                rounded-lg border bg-background px-3 py-2
+                text-xs md:text-sm font-medium
+                hover:bg-muted/70 transition-colors
+              "
+              aria-expanded={showOwnerBox}
+            >
+              <span className="flex items-center gap-2">
+                <Store className="h-4 w-4 text-primary" />
+                ¿Tenés un emprendimiento? Sumate al Marketplace
+              </span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${
+                  showOwnerBox ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {showOwnerBox && (
+              <Card className="mt-3 border-dashed shadow-sm bg-gradient-to-b from-background to-muted/60">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Store className="h-4 w-4 text-primary" />
+                    Sumá tu emprendimiento
+                  </CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
+                    Completás un formulario corto y revisamos tu ficha antes de
+                    publicarla en el Marketplace.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2 pt-0 text-xs md:text-sm">
+                  <p className="text-muted-foreground">Qué vas a tener:</p>
+                  <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
+                    <li>Aparición en el mapa de Jujuy Conecta.</li>
+                    <li>Botón directo a tu WhatsApp e Instagram.</li>
+                    <li>Rubro, zona y etiquetas para que te encuentren fácil.</li>
+                  </ul>
+                  <Button
+                    size="sm"
+                    className="w-full mt-1"
+                    onClick={() => setNewDialogOpen(true)}
+                  >
+                    Abrir formulario
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
           </div>
 
           <Separator />
@@ -384,12 +413,18 @@ export default function MarketplacePage() {
         {/* Tabs */}
         <section className="space-y-4">
           <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-            <TabsList className="w-full flex flex-wrap gap-2 justify-start">
+            <TabsList className="flex gap-2 justify-start">
               {TABS.map((tab) => (
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
-                  className="flex items-center gap-2 text-xs md:text-sm data-[state=active]:shadow-sm"
+                  className="
+                    flex items-center gap-2 px-4 py-2 rounded-md text-xs md:text-sm font-medium
+                    border transition-all
+                    data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:border-emerald-600
+                    data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 data-[state=inactive]:border-gray-300
+                    hover:bg-gray-100
+                  "
                 >
                   <tab.icon className="h-4 w-4" />
                   <span>{tab.label}</span>
@@ -397,11 +432,12 @@ export default function MarketplacePage() {
               ))}
             </TabsList>
 
+
             <TabsContent value={selectedTab} className="mt-4">
               {loading ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <Card key={i} className="animate-pulse rounded-xl">
+                    <Card key={i} className="animate-pulse rounded-xl" >
                       <CardHeader className="pb-3">
                         <div className="h-4 w-32 bg-muted rounded mb-2" />
                         <div className="h-3 w-24 bg-muted rounded" />
@@ -450,8 +486,19 @@ export default function MarketplacePage() {
                     return (
                       <Card
                         key={item.id}
-                        className="group flex flex-col rounded-xl border bg-card/80 backdrop-blur hover:shadow-lg transition-all hover:-translate-y-[2px]"
+                        onClick={() => handleOpenDetails(item)}
+                        className="
+                          group flex flex-col rounded-xl 
+                          border border-border/100 
+                          bg-background 
+                          shadow-sm 
+                          hover:shadow-md 
+                          hover:border-primary/40
+                          transition-all
+                          hover:-translate-y-[2px]
+                        "
                       >
+
                         {/* Imagen o placeholder */}
                         <div className="relative h-40 w-full overflow-hidden rounded-t-xl bg-muted flex items-center justify-center">
                           {item.image_url ? (
@@ -480,16 +527,16 @@ export default function MarketplacePage() {
                               </div>
 
                               {item.has_delivery && (
-                                <Badge className="absolute right-2 bottom-2 text-[10px] md:text-xs flex items-center gap-1 bg-background/90 backdrop-blur">
+                                <Badge className="absolute right-2 bottom-2 text-[10px] md:text-xs flex items-center gap-1 bg-background/900 backdrop-blur">
                                   <Truck className="h-3 w-3" />
                                   Envío
                                 </Badge>
                               )}
                             </>
                           ) : (
-                            <div className="flex flex-col items-center gap-1 text-muted-foreground opacity-70">
-                              <Store className="h-6 w-6" />
-                              <span className="text-[11px]">Sin imagen</span>
+                            <div className="flex flex-col items-center gap-1 text-muted-foreground bg-muted/30 w-full h-full justify-center">
+                            <Store className="h-6 w-6" />
+                              <span className="text-[11px]">Sin imagen disponible</span>
                             </div>
                           )}
                         </div>
@@ -516,11 +563,11 @@ export default function MarketplacePage() {
                                 {item.address ||
                                   `${item.category} en ${item.municipality}`}
                               </CardDescription>
-                              {createdShort && (
+                              {/* {createdShort && (
                                 <p className="text-[10px] text-muted-foreground">
                                   Actualizado: {createdShort}
                                 </p>
-                              )}
+                              )} */}
                             </div>
                           </div>
                         </CardHeader>
@@ -783,7 +830,7 @@ export default function MarketplacePage() {
                     )}
                   </div>
 
-                  {selectedItem.tags && selectedItem.tags.length > 0 && (
+                  {/* {selectedItem.tags && selectedItem.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 pt-1">
                       {selectedItem.tags.map((tag) => (
                         <Badge
@@ -795,7 +842,7 @@ export default function MarketplacePage() {
                         </Badge>
                       ))}
                     </div>
-                  )}
+                  )} */}
 
                   <div className="pt-2 flex flex-col gap-2 sm:flex-row sm:justify-end">
                     {buildWhatsAppLink(
@@ -817,7 +864,7 @@ export default function MarketplacePage() {
                         Escribir por WhatsApp
                       </Button>
                     )}
-                    <Button
+                    {/* <Button
                       type="button"
                       variant="outline"
                       className="flex-1 sm:flex-none"
@@ -828,7 +875,7 @@ export default function MarketplacePage() {
                     >
                       <Edit3 className="h-4 w-4 mr-2" />
                       Actualizar datos de esta ficha
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </>

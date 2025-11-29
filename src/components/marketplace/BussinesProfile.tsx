@@ -383,9 +383,9 @@ export function BusinessProfile({ item }: BusinessProfileProps) {
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
               <p className="text-xs md:text-sm text-muted-foreground max-w-xl">
                 Si este es tu emprendimiento y querés corregir o actualizar tus
-                datos en el Marketplace, podés pedir la edición ahora mismo.
+                datos en el Marketplace, podés pedir la edición contactandonos.
               </p>
-              <Button
+              {/* <Button
                 type="button"
                 variant="outline"
                 size="sm"
@@ -396,7 +396,7 @@ export function BusinessProfile({ item }: BusinessProfileProps) {
               >
                 <Edit3 className="h-4 w-4 mr-2" />
                 Actualizar datos de esta ficha
-              </Button>
+              </Button> */}
             </div>
           </CardContent>
         </Card>
