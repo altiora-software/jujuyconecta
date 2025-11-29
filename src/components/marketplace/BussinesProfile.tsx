@@ -202,11 +202,11 @@ export function BusinessProfile({ item }: BusinessProfileProps) {
                   <h1 className="text-xl md:text-2xl font-bold leading-tight">
                     {item.name}
                   </h1>
-                  <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm text-white/80">
+                  <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm text-white/800">
                     {item.category && (
                       <Badge
                         variant="outline"
-                        className="border-white/60 bg-black/20 text-[11px]"
+                        className="border-white/60 text-green-500 bg-black/20 text-[11px]"
                       >
                         {item.category}
                       </Badge>
@@ -217,12 +217,12 @@ export function BusinessProfile({ item }: BusinessProfileProps) {
                         {item.municipality}
                       </span>
                     )}
-                    {createdFull && (
+                    {/* {createdFull && (
                       <span className="inline-flex items-center gap-1 text-[11px]">
                         <Clock className="h-3 w-3" />
                         Actualizado el {createdFull}
                       </span>
-                    )}
+                    )} */}
                   </div>
                 </div>
 
