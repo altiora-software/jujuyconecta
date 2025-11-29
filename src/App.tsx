@@ -24,6 +24,7 @@ import { InstallAppButton } from "./components/pwa/InstallAppButton";
 import MarketplacePage from "./pages/servicios/Marketplace";
 import CoursesPage from "./pages/servicios/Cursos";
 import AsesoriaStartupPage from "./pages/servicios/Asesoria";
+import MarketplaceBusinessPage from "./pages/servicios/MarketplaceBusiness";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,10 @@ const App = () => (
         {/* <Route path="/servicios/directorio" element={<Mantenimiento />} /> */}
         <Route path="/servicios/asesoria-startup" element={<AsesoriaStartupPage />} />
         <Route path="/servicios/marketplace" element={<MarketplacePage />} />
+        <Route
+          path="/servicios/marketplace/emprendimientos/:slug"
+          element={<MarketplaceBusinessPage />}
+        />
         <Route path="/servicios/cursos" element={<CoursesPage />} />
         <Route path="/servicios" element={<AllServicesPage />} />
         <Route path="/terminos" element={<TermsAndConditions />} />

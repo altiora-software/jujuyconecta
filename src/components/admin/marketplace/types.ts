@@ -4,24 +4,24 @@ export interface LocalBusiness {
     id: string;
     name: string;
     category: string;
-    type: string;
+    type: string; // texto en la tabla, esperamos "producto" | "servicio" | "emprendimiento"
     municipality: string;
-    address: string | null;
-    whatsapp: string | null;
-    phone: string | null;
-    instagram: string | null;
-    website: string | null;
-    image_url: string | null;
-    source_url: string | null;
-    source_type: string | null;
-    tags: string[] | null;
-    has_delivery: boolean | null;
-    latitude: number | null;
-    longitude: number | null;
-    created_at: string;
-    updated_at: string;
+    address?: string | null;
+    whatsapp?: string | null;
+    phone?: string | null;
+    instagram?: string | null;
+    website?: string | null;
+    image_url?: string | null;
+    source_url?: string | null;
+    source_type?: string | null;
+    tags?: string[] | null;
+    has_delivery?: boolean | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    created_at?: string;
+    updated_at?: string;
     is_featured?: boolean | null;
-  }
+}
   
   export const BUSINESS_TYPES = [
     { value: "producto", label: "Producto" },

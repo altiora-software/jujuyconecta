@@ -12,6 +12,44 @@ import {
   IntercityRoute,
 } from "@/components/transport/types";
 
+const STOPS_PAGE_SIZE = 1000;
+
+// Helper genérico por si después querés reutilizarlo
+async function fetchAllFromTable<T>(table: string): Promise<T[]> {
+  let all: T[] = [];
+  let page = 0;
+
+  while (true) {
+    const from = page * STOPS_PAGE_SIZE;
+    const to = from + STOPS_PAGE_SIZE - 1;
+
+    const { data, error } = await supabase
+      .from(table)
+      .select("*")
+      .range(from, to);
+
+    if (error) {
+      console.error(`Error cargando página ${page} de ${table}`, error);
+      break; // si querés ser más duro acá podés hacer: throw error;
+    }
+
+    if (!data || data.length === 0) {
+      break;
+    }
+
+    all = all.concat(data as T[]);
+
+    if (data.length < STOPS_PAGE_SIZE) {
+      // última página
+      break;
+    }
+
+    page += 1;
+  }
+
+  return all;
+}
+
 export function useTransportData() {
   // ------------------------------------
   // ESTADOS
@@ -39,43 +77,46 @@ export function useTransportData() {
   const [intercitySchedulesCount, setIntercitySchedulesCount] = useState(0);
 
   // ------------------------------------
-  // FETCH URBANO
+  // FETCH URBANO (con paginación para paradas)
   // ------------------------------------
   const loadUrbanData = async () => {
     const [
       { data: linesData, error: linesError },
-      { data: stopsData, error: stopsError },
-      { data: rawStopsData, error: rawStopsError },
       { data: reportData, error: reportsError },
+      stopsData,
+      rawStopsData,
     ] = await Promise.all([
       supabase.from("transport_lines").select("*").order("number"),
-      supabase.from("transport_stops").select("*"),
-      supabase.from("transport_raw_stops").select("*"),
       supabase.from("transport_reports").select("*"),
+      fetchAllFromTable<TransportStop>("transport_stops"),
+      fetchAllFromTable<TransportRawStop>("transport_raw_stops"),
     ]);
 
     if (linesError) console.error("Error cargando líneas urbanas", linesError);
-    if (stopsError) console.error("Error cargando paradas", stopsError);
-    if (rawStopsError)
-      console.error("Error cargando raw_stops", rawStopsError);
     if (reportsError) console.error("Error cargando reportes", reportsError);
 
     const normalizedLines: TransportLine[] = (linesData || []).map(
       (l: any) => ({
         ...l,
+        // ojo: acá estabas pisando company_name con name
+        // si el schema cambió, revisá esto, pero te lo dejo igual que lo tenías
         company_name: l.name,
       })
     );
 
     setLines(normalizedLines);
-    setStops((stopsData || []) as TransportStop[]);
-    setRawStops((rawStopsData || []) as TransportRawStop[]);
+    setStops(stopsData || []);
+    setRawStops(rawStopsData || []);
     setReports((reportData || []) as TransportReport[]);
 
     const companies = Array.from(
       new Set(normalizedLines.map((l) => l.name))
     ).sort();
     setCompanyNames(companies);
+
+    // si querés ver si pasaste los 1000:
+    // console.log("total stops", (stopsData || []).length);
+    // console.log("total rawStops", (rawStopsData || []).length);
   };
 
   // ------------------------------------
@@ -84,7 +125,7 @@ export function useTransportData() {
   const fetchIntercityCompanies = async () => {
     const { data, error } = await supabase
       .from("transport_companies")
-      .select("id, name")
+      .select("id, name");
 
     if (error) {
       console.error("Error cargando empresas interurbanas", error);
@@ -171,8 +212,13 @@ export function useTransportData() {
   useEffect(() => {
     const loadAll = async () => {
       setLoading(true);
-      await Promise.all([loadUrbanData(), loadIntercityData()]);
-      setLoading(false);
+      try {
+        await Promise.all([loadUrbanData(), loadIntercityData()]);
+      } catch (e) {
+        console.error("Error cargando datos de transporte", e);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadAll();
@@ -190,6 +236,7 @@ export function useTransportData() {
 
   const linesWithReports = useMemo(() => {
     const ids = new Set(reports.map((r) => r.line_id));
+    // ojo: acá devolvés un número, no un array
     return lines.filter((l) => ids.has(l.id)).length;
   }, [lines, reports]);
 

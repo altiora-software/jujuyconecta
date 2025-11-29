@@ -43,9 +43,14 @@ import {
   Truck,
   MessageCircle,
   Clock,
+  Share2,
+  Edit3
 } from "lucide-react";
+import { buildEditRequestWhatsApp, buildNewListingWhatsApp, shareBusiness } from "@/components/marketplace/helpers";
 
-interface LocalBusiness {
+
+
+export interface LocalBusiness {
   id: string;
   name: string;
   category: string;
@@ -284,9 +289,17 @@ export default function MarketplacePage() {
                   <li>Botón directo a tu WhatsApp e Instagram.</li>
                   <li>Rubro, zona y etiquetas para que te encuentren fácil.</li>
                 </ul>
-                <Button size="sm" className="w-full mt-1" disabled>
-                  Alta de emprendimientos (próximamente)
+                <Button
+                  size="sm"
+                  className="w-full mt-1"
+                  onClick={() => {
+                    const link = buildNewListingWhatsApp();
+                    window.open(link, "_blank");
+                  }}
+                >
+                  Quiero sumar mi emprendimiento
                 </Button>
+
               </CardContent>
             </Card>
           </div>
@@ -453,9 +466,21 @@ export default function MarketplacePage() {
                         <CardHeader className="pb-2 pt-3">
                           <div className="flex items-start justify-between gap-2">
                             <div className="space-y-1">
+                              <div className="flex aling-items">
                               <CardTitle className="text-base md:text-lg line-clamp-1">
                                 {item.name}
                               </CardTitle>
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="outline"
+                                className="shrink-0"
+                                onClick={() => shareBusiness(item, toast)}
+                                title="Compartir ficha"
+                              >
+                                <Share2 className="h-4 w-4" />
+                              </Button>
+                              </div>  
                               <CardDescription className="text-xs md:text-sm line-clamp-2">
                                 {item.address ||
                                   `${item.category} en ${item.municipality}`}
@@ -484,13 +509,6 @@ export default function MarketplacePage() {
                               <span className="inline-flex items-center gap-1">
                                 <MapPin className="h-3 w-3" />
                                 {item.municipality}
-                              </span>
-                            )}
-
-                            {createdShort && (
-                              <span className="inline-flex items-center gap-1 text-[11px]">
-                                <Clock className="h-3 w-3" />
-                                {createdShort}
                               </span>
                             )}
                           </div>
@@ -559,6 +577,7 @@ export default function MarketplacePage() {
                               </Button>
                             )}
                           </div>
+                          
                         </CardContent>
                       </Card>
                     );
@@ -741,6 +760,18 @@ export default function MarketplacePage() {
                         Escribir por WhatsApp
                       </Button>
                     )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 sm:flex-none"
+                      onClick={() => {
+                        const link = buildEditRequestWhatsApp(selectedItem);
+                        window.open(link, "_blank");
+                      }}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Actualizar datos de esta ficha
+                    </Button>
                   </div>
                 </div>
               </>
