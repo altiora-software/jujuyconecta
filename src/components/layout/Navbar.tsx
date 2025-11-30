@@ -54,7 +54,7 @@ export function Navbar() {
   const navItems: NavItem[] = [
     { label: "Inicio", href: "/" },
     { label: "Transporte", href: "/transport" },
-    { label: "Turismo", href: "/turismo" }, 
+    { label: "Turismo", href: "/turismo" },
     { label: "Diario Digital", href: "https://diario.jujuyconecta.com" },
   ];
 
@@ -327,7 +327,6 @@ export function Navbar() {
       return;
     }
 
-    // múltiples resultados
     setSearchResults(results.slice(0, 30));
     setIsSearchResultsOpen(true);
     setSearchQuery("");
@@ -415,11 +414,11 @@ export function Navbar() {
     <>
       <nav className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
+          <div className="flex h-16 items-center justify-between gap-3">
             {/* Logo */}
             <Link
               to="/"
-              className="flex items-center space-x-2"
+              className="flex items-center gap-2"
               onClick={() =>
                 trackEvent("navbar_logo_click", {
                   href: "/",
@@ -435,9 +434,9 @@ export function Navbar() {
             </Link>
 
             {/* Desktop Search */}
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
+            <div className="hidden md:flex flex-1 max-w-md mx-4">
               <form onSubmit={handleSearch} className="relative w-full">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   placeholder="Buscar transporte, turismo, empleos, seguridad..."
                   value={searchQuery}
@@ -447,13 +446,13 @@ export function Navbar() {
                       location: "navbar_desktop",
                     });
                   }}
-                  className="pl-10 bg-muted/50 border-0 focus:bg-background transition-smooth"
+                  className="pl-10 bg-muted/40 border-0 focus:bg-background transition"
                 />
               </form>
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-2">
+            <div className="hidden md:flex items-center gap-2">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -467,10 +466,12 @@ export function Navbar() {
                   }
                 >
                   <Button
-                    variant={
-                      location.pathname === item.href ? "default" : "ghost"
-                    }
                     size="sm"
+                    className={`rounded-full px-4 py-1 text-sm transition ${
+                      location.pathname === item.href
+                        ? "bg-primary text-white shadow-sm"
+                        : "bg-muted/40 text-foreground hover:bg-muted"
+                    }`}
                   >
                     {item.label}
                   </Button>
@@ -482,7 +483,15 @@ export function Navbar() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center space-x-2"
+                  className={`
+                    flex items-center gap-1 rounded-full px-3 py-1 text-sm
+                    border transition
+                    ${
+                      isServicesOpen
+                        ? "bg-primary text-white border-primary shadow-sm"
+                        : "bg-muted/30 border-muted hover:bg-muted"
+                    }
+                  `}
                   onClick={() => {
                     const next = !isServicesOpen;
                     setIsServicesOpen(next);
@@ -509,10 +518,10 @@ export function Navbar() {
                 {isServicesOpen && (
                   <div
                     id="services-dropdown"
-                    className="absolute right-0 mt-2 w-105 rounded-lg border bg-background p-4 shadow-lg"
+                    className="absolute right-0 mt-2 w-80 rounded-lg border bg-card shadow-xl p-4 z-50"
                   >
                     {/* Tabs */}
-                    <div className="flex gap-1 mb-3">
+                    <div className="flex flex-wrap gap-2 mb-3">
                       {Object.keys(servicesByTab).map((tab) => (
                         <button
                           key={tab}
@@ -523,19 +532,22 @@ export function Navbar() {
                               context: "desktop",
                             });
                           }}
-                          className={`px-3 py-1 rounded-md text-sm font-medium transition ${
-                            activeServiceTab === tab
-                              ? "bg-primary text-white"
-                              : "bg-muted/30"
-                          }`}
+                          className={`
+                            px-3 py-1 rounded-full text-xs font-medium transition border
+                            ${
+                              activeServiceTab === tab
+                                ? "bg-primary text-white border-primary shadow-sm"
+                                : "bg-muted/30 text-foreground border-transparent hover:bg-muted"
+                            }
+                          `}
                         >
                           {tab}
                         </button>
                       ))}
                     </div>
 
-                    {/* Lista de servicios de la tab activa */}
-                    <div className="grid grid-cols-1 gap-2">
+                    {/* Lista de servicios */}
+                    <div className="space-y-2">
                       {servicesByTab[activeServiceTab].map((s) => (
                         <Link
                           key={s.href}
@@ -550,7 +562,7 @@ export function Navbar() {
                             });
                           }}
                         >
-                          <div className="p-2 rounded hover:bg-primary/10 transition cursor-pointer">
+                          <div className="p-2 rounded-lg border hover:bg-muted/50 transition cursor-pointer">
                             <div className="text-sm font-semibold">
                               {s.label}
                             </div>
@@ -585,12 +597,12 @@ export function Navbar() {
               <Button
                 variant="outline"
                 size="sm"
-                className="ml-2 relative"
+                className="ml-1 relative"
                 onClick={handleNotificationClick}
               >
                 <Bell className="h-4 w-4" />
                 {permission === "default" && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary">
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary text-white">
                     !
                   </Badge>
                 )}
@@ -601,22 +613,22 @@ export function Navbar() {
                 )}
               </Button>
 
-              {/* PWA menu item opcional */}
               <InstallAppMenuItem />
-
               <AuthButton />
             </div>
 
             {/* Mobile Menu Button */}
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               className="md:hidden"
               onClick={() => {
                 const next = !isMenuOpen;
                 setIsMenuOpen(next);
                 trackEvent(
-                  next ? "navbar_mobile_menu_open" : "navbar_mobile_menu_close",
+                  next
+                    ? "navbar_mobile_menu_open"
+                    : "navbar_mobile_menu_close",
                   {}
                 );
               }}
@@ -635,7 +647,7 @@ export function Navbar() {
               <div className="px-4 py-4 space-y-3">
                 {/* Mobile Search */}
                 <form onSubmit={handleSearch} className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
                     placeholder="Buscar en Jujuy Conecta..."
                     value={searchQuery}
@@ -645,12 +657,12 @@ export function Navbar() {
                         location: "navbar_mobile",
                       });
                     }}
-                    className="pl-10"
+                    className="pl-10 bg-muted/40"
                   />
                 </form>
 
                 {/* Mobile Navigation */}
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {navItems.map((item) => (
                     <Link
                       key={item.href}
@@ -665,20 +677,25 @@ export function Navbar() {
                       }}
                     >
                       <Button
-                        variant={
-                          location.pathname === item.href ? "default" : "ghost"
-                        }
-                        className="w-full justify-start"
+                        className={`
+                          w-full justify-start rounded-full text-sm
+                          ${
+                            location.pathname === item.href
+                              ? "bg-primary text-white shadow-sm"
+                              : "bg-muted/40 text-foreground hover:bg-muted"
+                          }
+                        `}
                       >
                         {item.label}
                       </Button>
                     </Link>
                   ))}
 
-                  <div className="w-full box-border overflow-hidden">
+                  {/* Mobile Services Accordion */}
+                  <div className="w-full">
                     <Button
                       variant="ghost"
-                      className="w-full justify-between"
+                      className="w-full justify-between rounded-full border bg-muted/30"
                       onClick={() => {
                         const next = !mobileServicesOpen;
                         setMobileServicesOpen(next);
@@ -699,8 +716,9 @@ export function Navbar() {
                     </Button>
 
                     {mobileServicesOpen && (
-                      <div className="mt-2 space-y-2 px-2 max-w-full overflow-hidden">
-                        <div className="flex flex-wrap gap-2 pb-1">
+                      <div className="mt-3 space-y-3 px-1">
+                        {/* Tabs mobile */}
+                        <div className="flex flex-wrap gap-2">
                           {Object.keys(servicesByTab).map((tab) => (
                             <button
                               key={tab}
@@ -711,11 +729,14 @@ export function Navbar() {
                                   context: "mobile",
                                 });
                               }}
-                              className={`px-3 py-1 rounded-md text-sm font-medium min-w-0 truncate ${
-                                activeServiceTab === tab
-                                  ? "bg-primary text-white"
-                                  : "bg-muted/20"
-                              }`}
+                              className={`
+                                px-3 py-1 rounded-full text-xs font-medium transition border
+                                ${
+                                  activeServiceTab === tab
+                                    ? "bg-primary text-white border-primary shadow-sm"
+                                    : "bg-muted/30 text-foreground border-transparent hover:bg-muted"
+                                }
+                              `}
                               aria-pressed={activeServiceTab === tab}
                             >
                               {tab}
@@ -723,6 +744,7 @@ export function Navbar() {
                           ))}
                         </div>
 
+                        {/* Items mobile */}
                         <div className="space-y-2">
                           {servicesByTab[activeServiceTab].map((s) => (
                             <Link
@@ -740,7 +762,7 @@ export function Navbar() {
                               }}
                               className="block w-full"
                             >
-                              <div className="p-2 w-full box-border rounded hover:bg-muted/40 transition cursor-pointer">
+                              <div className="p-3 w-full rounded-lg border bg-card hover:bg-muted/40 transition">
                                 <div className="text-sm font-semibold truncate">
                                   {s.label}
                                 </div>
@@ -751,28 +773,13 @@ export function Navbar() {
                             </Link>
                           ))}
                         </div>
-
-                        <div className="flex justify-end">
-                          <Link
-                            to="/servicios"
-                            onClick={() => {
-                              setIsMenuOpen(false);
-                              trackEvent("navbar_services_all_click", {
-                                context: "mobile",
-                              });
-                            }}
-                          >
-                            <Button size="sm" variant="outline">
-                              Ver todos
-                            </Button>
-                          </Link>
-                        </div>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-2 flex items-center justify-between gap-2">
+                  <InstallAppMenuItem />
                   <AuthButton />
                 </div>
               </div>
@@ -805,7 +812,7 @@ export function Navbar() {
               No hay resultados para esta búsqueda.
             </p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2"> 
               {searchResults.map((r) => (
                 <div
                   key={`${r.href}-${r.label}`}
@@ -816,9 +823,7 @@ export function Navbar() {
                   }}
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {r.label}
-                    </p>
+                    <p className="text-sm font-medium truncate">{r.label}</p>
                     <p className="text-xs text-muted-foreground truncate">
                       {r.keywords.slice(0, 4).join(" • ")}
                     </p>
