@@ -105,7 +105,6 @@ export default function Tourism() {
         supabase
           .from("tourism_events")
           .select("*")
-          .gte("date", new Date().toISOString().split("T")[0])
           .order("date", { ascending: true })
           .limit(50),
       ]);
