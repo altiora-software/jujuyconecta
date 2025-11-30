@@ -634,7 +634,7 @@ export default function MarketplacePage() {
                               </Button>
                             )}
 
-                            <Button
+                            {/* <Button
                               type="button"
                               size="icon"
                               variant="outline"
@@ -643,7 +643,7 @@ export default function MarketplacePage() {
                               title="Ver ficha completa"
                             >
                               <Store className="h-4 w-4" />
-                            </Button>
+                            </Button> */}
 
                             {item.instagram && (
                               <Button
