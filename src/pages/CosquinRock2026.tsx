@@ -1,4 +1,5 @@
 import CosquinGrilla from "@/components/cosquin/CosquinLineup";
+import { CosquinTicketsJC } from "@/components/cosquin/CosquinTickets";
 import { Layout } from "@/components/layout/Layout";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -209,7 +210,7 @@ const CosquinRock2026 = () => {
         </section>
 
         <CosquinGrilla/>
-
+        <CosquinTicketsJC />
         {/* Sección: Viaje desde Jujuy */}
         <section className="space-y-8">
             <h2 className="text-3xl font-black tracking-tight text-white">
