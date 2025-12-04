@@ -25,6 +25,7 @@ import MarketplacePage from "./pages/servicios/Marketplace";
 import CoursesPage from "./pages/servicios/Cursos";
 import AsesoriaStartupPage from "./pages/servicios/Asesoria";
 import MarketplaceBusinessPage from "./pages/servicios/MarketplaceBusiness";
+import CosquinRock2026 from "./pages/CosquinRock2026";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
         <Route path="/admin" element={<Admin />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/turismo" element={<Tourism />} />
+        <Route path="/cosquin-rock-2026" element={<CosquinRock2026 />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
