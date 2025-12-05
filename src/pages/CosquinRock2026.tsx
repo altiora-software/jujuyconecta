@@ -116,7 +116,7 @@ const CosquinRock2026 = () => {
               {/* CTAs */}
               <div className="mt-6 flex flex-wrap gap-3">
                 <a
-                  href="https://diario.jujuyconecta.com/cosquin-rock-2026"
+                  href="https://diario.jujuyconecta.com/nota/cosquin-rock-2026"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center rounded-full bg-orange-500 px-6 py-2.5 text-sm font-semibold uppercase tracking-wide hover:bg-orange-400 transition"
