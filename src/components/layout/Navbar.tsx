@@ -437,13 +437,13 @@ export function Navbar() {
                   href: "/",
                 })
               }
-            >
-              <div className="h-8 w-8 rounded-lg bg-gradient-hero flex items-center justify-center shadow-glow">
-                <span className="text-white font-bold text-sm">JC</span>
-              </div>
-              <span className="text-xl font-bold text-primary">
+            > 
+            <img src="/images/jc-navidad.png" alt="Jujuy Conecta" className="h-12 w-12" />
+            <div className="flex flex-col leading-tight">
+              <span className="text-lg lg:text-2xl font-bold text-primary">
                 Jujuy Conecta
               </span>
+            </div>
             </Link>
 
             {/* Desktop Search */}
