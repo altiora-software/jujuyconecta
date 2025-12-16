@@ -30,8 +30,8 @@ self.addEventListener("push", (event) => {
   const data = event.data.json();
   const options = {
     body: data.body,
-    icon: "/jc.png",
-    badge: "/jc.png",
+    icon: "/images/jc-navidad.png",
+    badge: "/images/jc-navidad.png",
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -41,12 +41,12 @@ self.addEventListener("push", (event) => {
       {
         action: "explore",
         title: "Ver más",
-        icon: "/jc.png",
+        icon: "/images/jc-navidad.png",
       },
       {
         action: "close",
         title: "Cerrar",
-        icon: "/jc.png",
+        icon: "/images/jc-navidad.png",
       },
     ],
   };
