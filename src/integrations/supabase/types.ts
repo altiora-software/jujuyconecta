@@ -69,7 +69,97 @@ export type Database = {
       
           Relationships: [];
       
-      }      
+      }
+      local_business_submissions: {
+        Row: {
+          id: string;
+  
+          name: string;
+          category: string;
+          type: string;                  // NOT NULL (default 'emprendimiento' en la tabla)
+          municipality: string;
+  
+          address: string | null;
+          whatsapp: string | null;
+          phone: string | null;
+          instagram: string | null;
+          website: string | null;
+          image_url: string | null;
+          source_url: string | null;
+          source_type: string | null;
+          tags: string[] | null;
+          has_delivery: boolean | null;
+          latitude: number | null;
+          longitude: number | null;
+  
+          // columnas extra de submissions
+          status: string;                // 'pending' | 'approved' | 'rejected'
+          created_at: string;            // timestamptz default now()
+  
+          // opcionales (si hiciste ALTER para guardarlos)
+          email: string | null;
+          has_physical_store: boolean;
+        };
+  
+        Insert: {
+          id?: string;
+  
+          name: string;                  // NOT NULL
+          category: string;              // NOT NULL
+          type?: string;                 // default 'emprendimiento'
+          municipality: string;          // NOT NULL
+  
+          address?: string | null;
+          whatsapp?: string | null;
+          phone?: string | null;
+          instagram?: string | null;
+          website?: string | null;
+          image_url?: string | null;
+          source_url?: string | null;
+          source_type?: string | null;
+          tags?: string[] | null;
+          has_delivery?: boolean | null;
+          latitude?: number | null;
+          longitude?: number | null;
+  
+          status?: string;               // default 'pending'
+          created_at?: string;           // default now()
+  
+          // opcionales si existen en DB
+          email?: string | null;
+          has_physical_store?: boolean;  // default false
+        };
+  
+        Update: {
+          id?: string;
+  
+          name?: string;
+          category?: string;
+          type?: string;
+          municipality?: string;
+  
+          address?: string | null;
+          whatsapp?: string | null;
+          phone?: string | null;
+          instagram?: string | null;
+          website?: string | null;
+          image_url?: string | null;
+          source_url?: string | null;
+          source_type?: string | null;
+          tags?: string[] | null;
+          has_delivery?: boolean | null;
+          latitude?: number | null;
+          longitude?: number | null;
+  
+          status?: string;
+          created_at?: string;
+  
+          email?: string | null;
+          has_physical_store?: boolean;
+        };
+  
+        Relationships: [];
+      }
       notification_preferences: {
         Row: {
           id: string;

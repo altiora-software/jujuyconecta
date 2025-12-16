@@ -11,7 +11,7 @@ const sections = [
   { id: "liability-limitation", title: "7. Limitation of Liability" },
   { id: "modifications", title: "8. Modifications" },
   { id: "jurisdiction", title: "9. Jurisdiction" },
-  { id: "note", title: "Important Note (beta)" },
+  { id: "note", title: "Important Note" },
 ];
 
 export default function TermsAndConditions() {
@@ -165,7 +165,7 @@ export default function TermsAndConditions() {
           <section id="note">
             <h2>📌 Important Note</h2>
             <p>
-              The application is in free beta version and may present bugs or
+              The application is in free version and may present bugs or
               limitations.
             </p>
           </section>

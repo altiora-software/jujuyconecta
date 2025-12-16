@@ -95,10 +95,9 @@ export default function MarketplacePage() {
   const [selectedItem, setSelectedItem] = useState<LocalBusiness | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showOwnerBox, setShowOwnerBox] = useState(false);
-  
+
   // nuevo: diálogo de "sumar emprendimiento"
   const [newDialogOpen, setNewDialogOpen] = useState(false);
-  
 
   const { toast } = useToast();
 
@@ -161,8 +160,15 @@ export default function MarketplacePage() {
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      if (selectedTab === "productos" && item.type !== "producto") return false;
-      if (selectedTab === "servicios" && item.type !== "servicio") return false;
+      const t = (item.type || "").toLowerCase();
+
+      // Productos: solo producto
+      if (selectedTab === "productos" && t !== "producto") return false;
+
+      // Servicios: servicios + todos los emprendimientos
+      if (selectedTab === "servicios" && !(t === "servicio" || t === "emprendimiento")) {
+        return false;
+      }
 
       if (selectedCategory !== "todas" && item.category !== selectedCategory) {
         return false;
@@ -217,22 +223,22 @@ export default function MarketplacePage() {
 
   const formatTypeLabel = (type?: string | null) => {
     if (!type) return "Emprendimiento local";
-    const t = type.toLowerCase();
-    if (t === "producto") return "Producto";
-    if (t === "servicio") return "Servicio";
-    if (t === "emprendimiento") return "Emprendimiento";
+    const tt = type.toLowerCase();
+    if (tt === "producto") return "Producto";
+    if (tt === "servicio") return "Servicio";
+    if (tt === "emprendimiento") return "Emprendimiento";
     return "Emprendimiento local";
   };
 
   const buildWhatsAppLink = (phone?: string | null, name?: string) => {
     if (!phone) return null;
-    const clean = phone.replace(/[^\d]/g, "");
+    const cleanPhone = phone.replace(/[^\d]/g, "");
     const texto = encodeURIComponent(
       `Hola, vi tu emprendimiento en el Marketplace de Jujuy Conecta y quiero más info sobre: ${
         name ?? "tu emprendimiento"
       }.`
     );
-    return `https://wa.me/${clean}?text=${texto}`;
+    return `https://wa.me/${cleanPhone}?text=${texto}`;
   };
 
   const isNewItem = (createdAt?: string) => {
@@ -263,14 +269,11 @@ export default function MarketplacePage() {
             <div className="space-y-3 max-w-xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs md:text-sm shadow-sm">
                 <Sparkles className="h-4 w-4 text-primary" />
-                <span>Marketplace Local de Jujuy · versión beta</span>
+                <span>Marketplace Local de Jujuy</span>
               </div>
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
                 Encontrá emprendedores, comercios y servicios,
-                <span className="text-primary">
-                  {" "}
-                  y hablales directo por WhatsApp.
-                </span>
+                <span className="text-primary"> y hablales directo por WhatsApp.</span>
               </h1>
               <p className="text-sm md:text-base text-muted-foreground">
                 Nada de formularios eternos. Elegís el emprendimiento, ves qué
@@ -300,59 +303,58 @@ export default function MarketplacePage() {
             </div>
 
             <div className="w-full lg:max-w-sm">
-            <button
-              type="button"
-              onClick={() => setShowOwnerBox((prev) => !prev)}
-              className="
-                w-full flex items-center justify-between gap-2
-                rounded-lg border bg-background px-3 py-2
-                text-xs md:text-sm font-medium
-                hover:bg-muted/70 transition-colors
-              "
-              aria-expanded={showOwnerBox}
-            >
-              <span className="flex items-center gap-2">
-                <Store className="h-4 w-4 text-primary" />
-                ¿Tenés un emprendimiento? Sumate al Marketplace
-              </span>
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${
-                  showOwnerBox ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+              <button
+                type="button"
+                onClick={() => setShowOwnerBox((prev) => !prev)}
+                className="
+                  w-full flex items-center justify-between gap-2
+                  rounded-lg border bg-background px-3 py-2
+                  text-xs md:text-sm font-medium
+                  hover:bg-muted/70 transition-colors
+                "
+                aria-expanded={showOwnerBox}
+              >
+                <span className="flex items-center gap-2">
+                  <Store className="h-4 w-4 text-primary" />
+                  ¿Tenés un emprendimiento? Sumate al Marketplace
+                </span>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${
+                    showOwnerBox ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
 
-            {showOwnerBox && (
-              <Card className="mt-3 border-dashed shadow-sm bg-gradient-to-b from-background to-muted/60">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Store className="h-4 w-4 text-primary" />
-                    Sumá tu emprendimiento
-                  </CardTitle>
-                  <CardDescription className="text-xs md:text-sm">
-                    Completás un formulario corto y revisamos tu ficha antes de
-                    publicarla en el Marketplace.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-2 pt-0 text-xs md:text-sm">
-                  <p className="text-muted-foreground">Qué vas a tener:</p>
-                  <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-                    <li>Aparición en el mapa de Jujuy Conecta.</li>
-                    <li>Botón directo a tu WhatsApp e Instagram.</li>
-                    <li>Rubro, zona y etiquetas para que te encuentren fácil.</li>
-                  </ul>
-                  <Button
-                    size="sm"
-                    className="w-full mt-1"
-                    onClick={() => setNewDialogOpen(true)}
-                  >
-                    Abrir formulario
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
+              {showOwnerBox && (
+                <Card className="mt-3 border-dashed shadow-sm bg-gradient-to-b from-background to-muted/60">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Store className="h-4 w-4 text-primary" />
+                      Sumá tu emprendimiento
+                    </CardTitle>
+                    <CardDescription className="text-xs md:text-sm">
+                      Completás un formulario corto y revisamos tu ficha antes de
+                      publicarla en el Marketplace.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2 pt-0 text-xs md:text-sm">
+                    <p className="text-muted-foreground">Qué vas a tener:</p>
+                    <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
+                      <li>Aparición en el mapa de Jujuy Conecta.</li>
+                      <li>Botón directo a tu WhatsApp e Instagram.</li>
+                      <li>Rubro, zona y etiquetas para que te encuentren fácil.</li>
+                    </ul>
+                    <Button
+                      size="sm"
+                      className="w-full mt-1"
+                      onClick={() => setNewDialogOpen(true)}
+                    >
+                      Abrir formulario
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
 
           <Separator />
@@ -432,12 +434,11 @@ export default function MarketplacePage() {
               ))}
             </TabsList>
 
-
             <TabsContent value={selectedTab} className="mt-4">
               {loading ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <Card key={i} className="animate-pulse rounded-xl" >
+                    <Card key={i} className="animate-pulse rounded-xl">
                       <CardHeader className="pb-3">
                         <div className="h-4 w-32 bg-muted rounded mb-2" />
                         <div className="h-3 w-24 bg-muted rounded" />
@@ -465,11 +466,7 @@ export default function MarketplacePage() {
                       los filtros.
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleClearFilters}
-                  >
+                  <Button variant="outline" size="sm" onClick={handleClearFilters}>
                     Quitar filtros
                   </Button>
                 </div>
@@ -488,22 +485,20 @@ export default function MarketplacePage() {
                         key={item.id}
                         onClick={() => handleOpenDetails(item)}
                         className="
-                          group flex flex-col rounded-xl 
-                          border border-border/100 
-                          bg-background 
-                          shadow-sm 
-                          hover:shadow-md 
+                          group flex flex-col rounded-xl
+                          border border-border/100
+                          bg-background
+                          shadow-sm
+                          hover:shadow-md
                           hover:border-primary/40
                           transition-all
                           hover:-translate-y-[2px]
                         "
                       >
-
                         {/* Imagen o placeholder */}
                         <div className="relative h-40 w-full overflow-hidden rounded-t-xl bg-muted flex items-center justify-center">
                           {item.image_url ? (
                             <>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={item.image_url}
                                 alt={item.name}
@@ -535,7 +530,7 @@ export default function MarketplacePage() {
                             </>
                           ) : (
                             <div className="flex flex-col items-center gap-1 text-muted-foreground bg-muted/30 w-full h-full justify-center">
-                            <Store className="h-6 w-6" />
+                              <Store className="h-6 w-6" />
                               <span className="text-[11px]">Sin imagen disponible</span>
                             </div>
                           )}
@@ -563,11 +558,6 @@ export default function MarketplacePage() {
                                 {item.address ||
                                   `${item.category} en ${item.municipality}`}
                               </CardDescription>
-                              {/* {createdShort && (
-                                <p className="text-[10px] text-muted-foreground">
-                                  Actualizado: {createdShort}
-                                </p>
-                              )} */}
                             </div>
                           </div>
                         </CardHeader>
@@ -583,10 +573,7 @@ export default function MarketplacePage() {
                             </Badge>
 
                             {item.category && (
-                              <Badge
-                                variant="secondary"
-                                className="text-[11px]"
-                              >
+                              <Badge variant="secondary" className="text-[11px]">
                                 {item.category}
                               </Badge>
                             )}
@@ -633,17 +620,6 @@ export default function MarketplacePage() {
                                 Hablar por WhatsApp
                               </Button>
                             )}
-
-                            {/* <Button
-                              type="button"
-                              size="icon"
-                              variant="outline"
-                              className="shrink-0"
-                              onClick={() => handleOpenDetails(item)}
-                              title="Ver ficha completa"
-                            >
-                              <Store className="h-4 w-4" />
-                            </Button> */}
 
                             {item.instagram && (
                               <Button
@@ -711,17 +687,12 @@ export default function MarketplacePage() {
                   </DialogTitle>
                   <DialogDescription className="space-y-1">
                     <div className="flex flex-wrap gap-2 items-center text-xs md:text-sm">
-                      <Badge
-                        variant="outline"
-                        className="flex items-center gap-1"
-                      >
+                      <Badge variant="outline" className="flex items-center gap-1">
                         <Sparkles className="h-3 w-3" />
                         {formatTypeLabel(selectedItem.type)}
                       </Badge>
                       {selectedItem.category && (
-                        <Badge variant="secondary">
-                          {selectedItem.category}
-                        </Badge>
+                        <Badge variant="secondary">{selectedItem.category}</Badge>
                       )}
                       {selectedItem.municipality && (
                         <span className="inline-flex items-center gap-1 text-muted-foreground">
@@ -734,11 +705,9 @@ export default function MarketplacePage() {
                 </DialogHeader>
 
                 <div className="space-y-4">
-                  {/* Imagen o placeholder en el diálogo */}
                   <div className="relative h-52 w-full overflow-hidden rounded-lg bg-muted flex items-center justify-center">
                     {selectedItem.image_url ? (
                       <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={selectedItem.image_url}
                           alt={selectedItem.name}
@@ -764,9 +733,7 @@ export default function MarketplacePage() {
                       <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
                       <div>
                         <p className="font-medium">Dirección</p>
-                        <p className="text-muted-foreground">
-                          {selectedItem.address}
-                        </p>
+                        <p className="text-muted-foreground">{selectedItem.address}</p>
                       </div>
                     </div>
                   )}
@@ -778,9 +745,7 @@ export default function MarketplacePage() {
                         <div>
                           <p className="font-medium">Contacto</p>
                           {selectedItem.phone && (
-                            <p className="text-muted-foreground">
-                              {selectedItem.phone}
-                            </p>
+                            <p className="text-muted-foreground">{selectedItem.phone}</p>
                           )}
                           {selectedItem.whatsapp && (
                             <p className="text-muted-foreground">
@@ -797,10 +762,9 @@ export default function MarketplacePage() {
                           <button
                             type="button"
                             onClick={() => {
-                              const url =
-                                selectedItem.instagram?.startsWith("http")
-                                  ? selectedItem.instagram
-                                  : `https://instagram.com/${selectedItem.instagram}`;
+                              const url = selectedItem.instagram?.startsWith("http")
+                                ? selectedItem.instagram
+                                : `https://instagram.com/${selectedItem.instagram}`;
                               window.open(url, "_blank");
                             }}
                             className="inline-flex items-center gap-2 text-primary hover:underline text-sm"
@@ -813,9 +777,7 @@ export default function MarketplacePage() {
                           <button
                             type="button"
                             onClick={() => {
-                              const url = selectedItem.website?.startsWith(
-                                "http"
-                              )
+                              const url = selectedItem.website?.startsWith("http")
                                 ? selectedItem.website
                                 : `https://${selectedItem.website}`;
                               window.open(url, "_blank");
@@ -829,20 +791,6 @@ export default function MarketplacePage() {
                       </div>
                     )}
                   </div>
-
-                  {/* {selectedItem.tags && selectedItem.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {selectedItem.tags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="outline"
-                          className="text-[11px] font-normal"
-                        >
-                          #{tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )} */}
 
                   <div className="pt-2 flex flex-col gap-2 sm:flex-row sm:justify-end">
                     {buildWhatsAppLink(
@@ -864,18 +812,6 @@ export default function MarketplacePage() {
                         Escribir por WhatsApp
                       </Button>
                     )}
-                    {/* <Button
-                      type="button"
-                      variant="outline"
-                      className="flex-1 sm:flex-none"
-                      onClick={() => {
-                        const link = buildEditRequestWhatsApp(selectedItem);
-                        window.open(link, "_blank");
-                      }}
-                    >
-                      <Edit3 className="h-4 w-4 mr-2" />
-                      Actualizar datos de esta ficha
-                    </Button> */}
                   </div>
                 </div>
               </>
@@ -884,11 +820,7 @@ export default function MarketplacePage() {
         </Dialog>
 
         {/* Dialog alta de emprendimiento */}
-        <NewBusinessDialog
-          open={newDialogOpen}
-          onOpenChange={setNewDialogOpen}
-        />
-
+        <NewBusinessDialog open={newDialogOpen} onOpenChange={setNewDialogOpen} />
       </div>
     </Layout>
   );
