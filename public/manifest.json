@@ -12,23 +12,23 @@
   "lang": "es-AR",
   "icons": [
     {
-      "src": "/images/jc-logo.png",
+      "src": "/images/jc-navidad.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/images/jc-logo.png",
+      "src": "/images/jc-navidad.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/images/jc-logo.png",
+      "src": "/images/jc-navidad.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/images/jc-logo.png",
+      "src": "/images/jc-navidad.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
