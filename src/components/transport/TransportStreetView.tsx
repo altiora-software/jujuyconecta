@@ -22,7 +22,7 @@ export function TransportStreetView({
 }: {
   stop: TransportRawStop | null;
 }) {
-  const key = import.meta.env.VITE_GOOGLE_MAPS_API as string | undefined;
+  const key = import.meta.env.VITE_GOOGLE_MAPS_API as string | "";
   const query = useMemo(() => (stop ? buildQuery(stop) : ""), [stop]);
 
   const [mode, setMode] = useState<"streetview" | "map">("streetview");
@@ -47,26 +47,26 @@ export function TransportStreetView({
     query
   )}`;
 
-  // if (!key) {
-  //   return (
-  //     <Card className="rounded-2xl border bg-background/70 h-full">
-  //       <CardContent className="p-4 space-y-4">
-  //         <div className="flex items-start gap-2">
-  //           <AlertTriangle className="h-5 w-5 text-muted-foreground mt-0.5" />
-  //           <p className="text-sm text-muted-foreground">
-  //             Vista de imágenes no disponible en este momento.
-  //           </p>
-  //         </div>
+  if (!key) {
+    return (
+      <Card className="rounded-2xl border bg-background/70 h-full">
+        <CardContent className="p-4 space-y-4">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="h-5 w-5 text-muted-foreground mt-0.5" />
+            <p className="text-sm text-muted-foreground">
+              Vista de imágenes no disponible en este momento.
+            </p>
+          </div>
 
-  //         <Button asChild variant="outline" className="w-full">
-  //           <a href={gmapsUrl} target="_blank" rel="noreferrer">
-  //             Abrir en Google Maps
-  //           </a>
-  //         </Button>
-  //       </CardContent>
-  //     </Card>
-  //   );
-  // }
+          <Button asChild variant="outline" className="w-full">
+            <a href={gmapsUrl} target="_blank" rel="noreferrer">
+              Abrir en Google Maps
+            </a>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const streetViewSrc =
     `https://www.google.com/maps/embed/v1/streetview?key=${encodeURIComponent(
@@ -140,7 +140,7 @@ export function TransportStreetView({
         {failed ? (
           <div className="h-full flex flex-col items-center justify-center gap-3 text-center px-6">
             <p className="text-sm text-muted-foreground">
-              Estamos trabajando con Google para incorporar imágenes de esta
+              Estamos trabajando con nuestro Partner Google para incorporar imágenes de esta
               parada.
             </p>
             <Button asChild variant="outline">
@@ -161,7 +161,7 @@ export function TransportStreetView({
           // />
           <div className="h-full flex flex-col items-center justify-center gap-3 text-center px-6">
             <p className="text-sm text-muted-foreground">
-              Estamos trabajando con Google para incorporar imágenes de esta
+              Estamos trabajando con nuestro Partner Google para incorporar imágenes de esta
               parada.
             </p>
             <Button asChild variant="outline">
