@@ -22,7 +22,7 @@ export function TransportStreetView({
 }: {
   stop: TransportRawStop | null;
 }) {
-  const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
+  const key = import.meta.env.VITE_GOOGLE_MAPS_API as string | undefined;
   const query = useMemo(() => (stop ? buildQuery(stop) : ""), [stop]);
 
   const [mode, setMode] = useState<"streetview" | "map">("streetview");
