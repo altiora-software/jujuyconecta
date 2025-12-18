@@ -61,7 +61,7 @@ export default function JujuyConectaAssistantModal({
 
   const startNewSession = () => {
     const newCorr = rotateCorrelator();
-    console.log("Nueva sesión. Correlator:", newCorr);
+    // console.log("Nueva sesión. Correlator:", newCorr);
     };
   // Bienvenida (opcional)
   useEffect(() => {

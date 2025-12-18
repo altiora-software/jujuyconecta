@@ -47,26 +47,26 @@ export function TransportStreetView({
     query
   )}`;
 
-  if (!key) {
-    return (
-      <Card className="rounded-2xl border bg-background/70 h-full">
-        <CardContent className="p-4 space-y-4">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="h-5 w-5 text-muted-foreground mt-0.5" />
-            <p className="text-sm text-muted-foreground">
-              Vista de imágenes no disponible en este momento.
-            </p>
-          </div>
+  // if (!key) {
+  //   return (
+  //     <Card className="rounded-2xl border bg-background/70 h-full">
+  //       <CardContent className="p-4 space-y-4">
+  //         <div className="flex items-start gap-2">
+  //           <AlertTriangle className="h-5 w-5 text-muted-foreground mt-0.5" />
+  //           <p className="text-sm text-muted-foreground">
+  //             Vista de imágenes no disponible en este momento.
+  //           </p>
+  //         </div>
 
-          <Button asChild variant="outline" className="w-full">
-            <a href={gmapsUrl} target="_blank" rel="noreferrer">
-              Abrir en Google Maps
-            </a>
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  //         <Button asChild variant="outline" className="w-full">
+  //           <a href={gmapsUrl} target="_blank" rel="noreferrer">
+  //             Abrir en Google Maps
+  //           </a>
+  //         </Button>
+  //       </CardContent>
+  //     </Card>
+  //   );
+  // }
 
   const streetViewSrc =
     `https://www.google.com/maps/embed/v1/streetview?key=${encodeURIComponent(

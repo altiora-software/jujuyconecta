@@ -26,9 +26,7 @@ export default function MarketplaceBusinessPage() {
       setLoading(true);
 
       try {
-        console.log('slug', slug);
         const id = parseIdFromSlug(slug);
-        console.log('id', id);
         const { data, error } = await supabase
           .from("local_businesses")
           .select("*")

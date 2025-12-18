@@ -104,13 +104,13 @@ async function main() {
   const results = [];
 
   for (const seed of seeds) {
-    console.log("Generando contenido para:", seed.titulo_base);
+    // console.log("Generando contenido para:", seed.titulo_base);
     const page = await generatePage(seed);
     results.push(page);
   }
 
   fs.writeFileSync(outputPath, JSON.stringify(results, null, 2), "utf8");
-  console.log("Listo. Guardado en", outputPath);
+  // console.log("Listo. Guardado en", outputPath);
 }
 
 main().catch((err) => {

@@ -318,7 +318,6 @@ export default function TransportPage() {
   // GA: search tracking (debounced)
   // -----------------------------
   useEffect(() => {
-    console.log('rawStops',rawStops);
     if (!hasQuery) return;
 
     const t = window.setTimeout(() => {
