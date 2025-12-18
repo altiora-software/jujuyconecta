@@ -181,7 +181,7 @@ export function Hero() {
               </div>
             </div>
 
-            <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-4 ">
+            <div className="w-full max-w-3xl text-white grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-4 ">
               <Stat icon={<MapPin />} value={counts.lines} label="Líneas para no perder tiempo" />
               <Stat icon={<Users />} value={counts.resources} label="Lugares donde te dan una mano" />
               <Stat icon={<Briefcase />} value={counts.jobs} label="Oportunidades de trabajo activas" />
