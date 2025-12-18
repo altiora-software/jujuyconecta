@@ -102,7 +102,8 @@ export default function TransportPage() {
 
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailsLine, setDetailsLine] = useState<TransportLine | null>(null);
-
+  
+  const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   // -----------------------------
   // Search state
   // -----------------------------
@@ -268,6 +269,7 @@ export default function TransportPage() {
         if (lid) hits.add(String(lid));
       }
     }
+    
     return hits;
   }, [rawStops, hasQuery, q]);
 
@@ -316,6 +318,7 @@ export default function TransportPage() {
   // GA: search tracking (debounced)
   // -----------------------------
   useEffect(() => {
+    console.log('rawStops',rawStops);
     if (!hasQuery) return;
 
     const t = window.setTimeout(() => {
@@ -462,15 +465,18 @@ export default function TransportPage() {
               />
             </TabsContent>
 
-            <TabsContent value="map">
-              <MapTab
-                lines={lines}
-                stops={stops}
-                selectedLineId={selectedLineId}
-                setSelectedLineId={handleSelectLineFromMap}
-                viewMode={viewMode}
-              />
-            </TabsContent>
+            <TabsContent value="map" forceMount>
+            <MapTab
+              lines={lines}
+              stops={stops}
+              rawStops={rawStops}
+              selectedLineId={selectedLineId}
+              setSelectedLineId={handleSelectLineFromMap}
+              selectedStopId={selectedStopId}
+              setSelectedStopId={setSelectedStopId}
+              viewMode={viewMode}
+            />
+          </TabsContent>
 
             <TabsContent value="reports">
               <ReportsTab reports={reports} />

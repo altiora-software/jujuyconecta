@@ -18,15 +18,30 @@ export interface TransportLine {
   }
   
   export interface TransportRawStop {
-    id: string;
-    line_id: string;
-    direction: string;
-    order_index: number;
-    stop_name: string;
-    direccion: string | null;
-    latitude: string | null;
-    longitude: string | null;
-  }
+  id: string;
+  line_id: string | null;
+  line_code: string;
+  direction: string;
+  order_index: number;
+
+  stop_name: string;
+  direccion: string | null;
+
+  address_raw: string | null;
+  city: string | null;
+  province: string | null;
+  country: string | null;
+
+  latitude: number | null;
+  longitude: number | null;
+  precision_note: string | null;
+
+  source: string | null;
+  processed: boolean | null;
+
+  stop_id: string | null;
+  created_at: string;
+}
   
   export interface TransportReport {
     id: string;

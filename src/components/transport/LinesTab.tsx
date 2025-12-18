@@ -68,7 +68,7 @@ export function LinesTab({
 }: LinesTabProps) {
   // estado común, no puede ser condicional
   const [expandedRouteId, setExpandedRouteId] = useState<string | null>(null);
-
+  const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   // ---------------------------
   // MODO PROVINCIAL
   // ---------------------------
@@ -437,6 +437,7 @@ export function LinesTab({
                     className="h-8 text-xs"
                     onClick={() => {
                       setSelectedLineId(line.id);
+                      setSelectedStopId(null);
                       setActiveTab("map");
                     }}
                   >

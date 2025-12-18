@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MapPin, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface TransportLine {
   id: string;
@@ -22,179 +23,166 @@ interface TransportStop {
 interface TransportMapProps {
   lines: TransportLine[];
   stops: TransportStop[];
+
   selectedLineId?: string;
+  selectedStopId: string | null;
+  onStopSelect: (stopId: string | null) => void;
   onLineSelect: (lineId: string) => void;
 }
 
 const JUJUY_CENTER: [number, number] = [-65.2971, -24.1858];
 
+function isValidStop(s: TransportStop) {
+  return (
+    typeof s.latitude === "number" &&
+    Number.isFinite(s.latitude) &&
+    typeof s.longitude === "number" &&
+    Number.isFinite(s.longitude)
+  );
+}
+
+function normalize(s: string) {
+  return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function looksLikeHub(name: string) {
+  const n = normalize(name || "");
+  const keywords = [
+    "terminal","plaza","hospital","sanatorio","universidad","unju",
+    "escuela","colegio","mercado","catedral","parque","puente","gobierno","municipal",
+  ];
+  return keywords.some((k) => n.includes(k));
+}
+
 export function TransportMap({
   lines,
   stops,
   selectedLineId,
+  selectedStopId,
+  onStopSelect,
+  onLineSelect,
 }: TransportMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<maplibregl.Marker[]>([]);
-  const mapLoadedRef = useRef(false);
-  const userLocationRef = useRef<maplibregl.Marker | null>(null);
-  const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
-  
+
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [showMainStops, setShowMainStops] = useState(true);
+
   const selectedLine = useMemo(
     () => lines.find((l) => l.id === selectedLineId),
     [lines, selectedLineId],
   );
 
   const filteredStops = useMemo(() => {
-    const base = selectedLineId
-      ? stops.filter((s) => s.line_id === selectedLineId)
-      : stops;
-
-    const cleaned = [...base]
-      .filter(
-        (s) =>
-          typeof s.latitude === "number" &&
-          !Number.isNaN(s.latitude) &&
-          typeof s.longitude === "number" &&
-          !Number.isNaN(s.longitude),
-      )
+    if (!selectedLineId) return [];
+    return stops
+      .filter((s) => s.line_id === selectedLineId)
+      .filter(isValidStop)
       .sort((a, b) => a.order_index - b.order_index);
-
-    console.log("filteredStops for map", {
-      selectedLineId,
-      count: cleaned.length,
-    });
-
-    return cleaned;
   }, [stops, selectedLineId]);
 
-  // Inicializar mapa 1 sola vez
+  const mainStops = useMemo(() => {
+    if (filteredStops.length <= 12) return filteredStops;
+
+    const first = filteredStops[0];
+    const last = filteredStops[filteredStops.length - 1];
+    const step = Math.max(4, Math.floor(filteredStops.length / 12));
+    const sampled = filteredStops.filter((_, i) => i % step === 0);
+    const hubs = filteredStops.filter((s) => looksLikeHub(s.name));
+
+    const merged = [first, ...sampled, ...hubs, last];
+    const seen = new Set<string>();
+    const out: TransportStop[] = [];
+    for (const s of merged) {
+      if (seen.has(s.id)) continue;
+      seen.add(s.id);
+      out.push(s);
+    }
+    return out.sort((a, b) => a.order_index - b.order_index);
+  }, [filteredStops]);
+
+  const stopsToRender = showMainStops ? mainStops : filteredStops;
+
+  // Init map
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const coords: [number, number] = [
-          pos.coords.longitude,
-          pos.coords.latitude,
-        ];
-        setUserCoords(coords);
-    
-        if (mapRef.current) {
-          // Centrar un poco mejor cuando se obtiene posición
-          mapRef.current.flyTo({
-            center: coords,
-            zoom: 14,
-          });
-        }
-      },
-      (err) => {
-        console.warn("No se pudo obtener la ubicación", err);
-      },
-      { enableHighAccuracy: true }
-    );
     if (mapRef.current || !mapContainerRef.current) return;
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style:
-        "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      style: "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
       center: JUJUY_CENTER,
       zoom: 12,
     });
 
     map.addControl(new maplibregl.NavigationControl(), "top-right");
-
-    map.on("load", () => {
-      mapLoadedRef.current = true;
-    });
+    map.on("load", () => setMapLoaded(true));
 
     mapRef.current = map;
 
     return () => {
       map.remove();
       mapRef.current = null;
-      mapLoadedRef.current = false;
+      setMapLoaded(false);
       markersRef.current = [];
     };
   }, []);
 
-  // Pintar paradas y recorrido
+  // Render markers + route
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
-    if (!mapLoadedRef.current) return;
+    if (!map || !mapLoaded) return;
 
-    // Limpiar marcadores anteriores
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
-    // Limpiar línea anterior
     if (map.getLayer("route-line")) map.removeLayer("route-line");
     if (map.getSource("route-line")) map.removeSource("route-line");
 
-    // Sin paradas: zoom general
-    if (!filteredStops.length) {
-      map.setCenter(JUJUY_CENTER);
-      map.setZoom(12);
-      return;
-    }
+    if (!selectedLineId) return;
+    if (filteredStops.length === 0) return;
 
-    // Marcadores HTML numerados
-    filteredStops.forEach((stop, idx) => {
+    stopsToRender.forEach((stop) => {
+      const isSelected = selectedStopId === stop.id;
+
       const el = document.createElement("div");
-      el.style.width = "16px";
-      el.style.height = "16px";
+      el.style.width = isSelected ? "20px" : "16px";
+      el.style.height = isSelected ? "20px" : "16px";
       el.style.borderRadius = "9999px";
-      el.style.backgroundColor = "#2563eb";
-      el.style.border = "2px solid white";
-      el.style.boxShadow = "0 0 4px rgba(0,0,0,0.4)";
-      el.style.display = "flex";
-      el.style.alignItems = "center";
-      el.style.justifyContent = "center";
-      el.style.fontSize = "9px";
-      el.style.color = "white";
-      el.style.fontWeight = "bold";
-      el.style.boxSizing = "border-box";
-      el.textContent = String(idx + 1);
+      el.style.backgroundColor = isSelected ? "#f97316" : "#2563eb";
+      el.style.border = isSelected ? "3px solid white" : "2px solid white";
+      el.style.boxShadow = "0 0 6px rgba(0,0,0,0.45)";
+      el.style.cursor = "pointer";
+
+      const gmapsUrl = `https://www.google.com/maps?q=${stop.latitude},${stop.longitude}`;
+
+      const html = `
+        <div style="font-size:12px; line-height:1.35; min-width:220px;">
+          <div style="font-weight:700; margin-bottom:6px;">${stop.name}</div>
+          <div style="margin-bottom:6px;"><span style="opacity:.7;">Orden:</span> ${stop.order_index}</div>
+          <a href="${gmapsUrl}" target="_blank" rel="noreferrer"
+            style="display:inline-flex; gap:6px; align-items:center; padding:8px 10px; border-radius:10px; border:1px solid rgba(0,0,0,.12); text-decoration:none;">
+            <span style="font-weight:600;">Abrir en Google Maps</span>
+          </a>
+        </div>
+      `;
 
       const marker = new maplibregl.Marker({ element: el })
-        .setLngLat([stop.longitude, stop.latitude]) // [lng, lat]
-        .setPopup(
-          new maplibregl.Popup({ offset: 12 }).setHTML(
-            `<div style="font-size:12px;">
-              <strong>${stop.name}</strong><br/>
-              Orden: ${stop.order_index}
-            </div>`,
-          ),
-        )
+        .setLngLat([stop.longitude, stop.latitude])
+        .setPopup(new maplibregl.Popup({ offset: 12 }).setHTML(html))
         .addTo(map);
+
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        onLineSelect(stop.line_id);
+        onStopSelect(stop.id);
+      });
 
       markersRef.current.push(marker);
     });
-    if (map && userCoords) {
-      // borrar marcador anterior
-      if (userLocationRef.current) {
-        userLocationRef.current.remove();
-      }
-    
-      const marker = new maplibregl.Marker({
-        color: "#00c853", // verde
-      })
-        .setLngLat(userCoords)
-        .setPopup(
-          new maplibregl.Popup().setHTML(
-            `<strong>Estás acá</strong>`
-          )
-        )
-        .addTo(map);
-    
-      userLocationRef.current = marker;
-    }
-    // Dibujar polilínea
+
     if (filteredStops.length >= 2) {
-      const coordinates = filteredStops.map((s) => [
-        s.longitude,
-        s.latitude,
-      ]);
+      const coordinates = filteredStops.map((s) => [s.longitude, s.latitude]);
 
       map.addSource("route-line", {
         type: "geojson",
@@ -229,28 +217,64 @@ export function TransportMap({
         maxZoom: 16,
         duration: 600,
       });
-    } else {
-      // Una sola parada
-      const only = filteredStops[0];
-      map.setCenter([only.longitude, only.latitude]);
-      map.setZoom(15);
     }
-  }, [filteredStops, selectedLine]);
+  }, [
+    mapLoaded,
+    selectedLineId,
+    selectedStopId,
+    stopsToRender,
+    filteredStops,
+    selectedLine,
+    onLineSelect,
+    onStopSelect,
+  ]);
+
+  const hasCoords = filteredStops.length > 0;
 
   return (
     <div className="w-full h-[420px] relative rounded-lg overflow-hidden border bg-background">
-      <div className="absolute z-10 top-3 left-3 flex flex-col gap-1 rounded-md bg-background/90 backdrop-blur px-3 py-2 shadow-sm border">
+      <div className="absolute z-10 top-3 left-3 flex flex-col gap-2 rounded-md bg-background/90 backdrop-blur px-3 py-2 shadow-sm border">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <MapPin className="h-4 w-4 text-primary" />
           <span>Mapa de Transporte</span>
         </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={showMainStops ? "default" : "outline"}
+            onClick={() => setShowMainStops(true)}
+            className="h-8 rounded-lg"
+            disabled={!hasCoords}
+          >
+            Principales
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={!showMainStops ? "default" : "outline"}
+            onClick={() => setShowMainStops(false)}
+            className="h-8 rounded-lg"
+            disabled={!hasCoords}
+          >
+            Todas
+          </Button>
+        </div>
+
         {selectedLine ? (
           <div className="text-xs text-muted-foreground">
-            Línea seleccionada:{" "}
-            <span className="font-semibold text-primary">
-              {/* {selectedLine.number} · {selectedLine.name} */}
-            </span>
-            {/* <span className="ml-1">· {filteredStops.length} paradas</span> */}
+            {hasCoords ? (
+              <>
+                {showMainStops ? "Mostrando principales" : "Mostrando todas"} ·{" "}
+                <span className="font-semibold text-foreground">{stopsToRender.length}</span>
+              </>
+            ) : (
+              <>
+                <Clock className="inline h-3 w-3 mr-1" />
+                Esta línea aún no tiene paradas con coordenadas
+              </>
+            )}
           </div>
         ) : (
           <div className="text-xs text-muted-foreground flex items-center gap-1">

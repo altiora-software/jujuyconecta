@@ -6,29 +6,34 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { MapPin, Route as RouteIcon } from "lucide-react";
-import { TransportLine, TransportStop } from "./types";
+import { TransportLine, TransportStop, TransportRawStop } from "./types";
 import { TransportMap } from "@/components/transport/TransportMap";
+import { TransportStopsList } from "@/components/transport/TransportStopsList";
+import { TransportStreetView } from "./TransportStreetView";
 
 interface MapTabProps {
   lines: TransportLine[];
   stops: TransportStop[];
+  rawStops: TransportRawStop[];
+
   selectedLineId?: string;
   setSelectedLineId: (id: string | undefined) => void;
 
-  // nuevo: modo actual
+  selectedStopId: string | null;
+  setSelectedStopId: (id: string | null) => void;
+
   viewMode: "urban" | "intercity";
 }
-
 export function MapTab({
   lines,
   stops,
+  rawStops,
   selectedLineId,
   setSelectedLineId,
+  selectedStopId,
+  setSelectedStopId,
   viewMode,
 }: MapTabProps) {
-  // -----------------------------
-  // MODO PROVINCIAL: EN DESARROLLO
-  // -----------------------------
   if (viewMode === "intercity") {
     return (
       <Card className="rounded-3xl border border-border/70 bg-card/90 backdrop-blur-sm">
@@ -38,59 +43,76 @@ export function MapTab({
             Mapa de rutas provinciales
           </CardTitle>
           <CardDescription className="text-xs md:text-sm">
-            Estamos trabajando para mostrar en el mapa los recorridos y paradas
-            de los servicios provinciales.
+            En modo provincial, por ahora mostramos rutas y horarios en “Líneas y empresas”.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="aspect-[4/3] md:aspect-[16/9] rounded-2xl border border-dashed border-border/70 bg-muted/40 flex items-center justify-center text-center px-6">
-            <div className="space-y-2">
-              <p className="text-sm md:text-base font-medium">
-                Mapa de servicios provinciales en proceso
-              </p>
-              <p className="text-[11px] md:text-xs text-muted-foreground max-w-md mx-auto">
-                Por ahora podés consultar todas las empresas, rutas y horarios
-                en la pestaña <strong>“Líneas y empresas”</strong>.  
-                Próximamente vas a poder ver también estos recorridos
-                sobre el mapa, con sus paradas y puntos de referencia.
-              </p>
-            </div>
+        <CardContent>
+          <div className="h-[220px] md:h-[320px] rounded-2xl border border-dashed border-border/70 bg-muted/40 flex items-center justify-center text-center px-6">
+            <p className="text-sm text-muted-foreground">
+              Próximamente mapa provincial
+            </p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  // -----------------------------
-  // MODO URBANO: MAPA ACTUAL
-  // -----------------------------
+  const selectedRawStop =
+    rawStops.find((r) => (r.stop_id || r.id) === selectedStopId) || null;
+
   return (
     <Card className="rounded-3xl border border-border/70 bg-card/90 backdrop-blur-sm">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <MapPin className="h-5 w-5 text-primary" />
-          Mapa de recorridos urbanos
+          Paradas urbanas
         </CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          Visualizá las paradas y recorridos de las líneas urbanas de San
-          Salvador de Jujuy.
+          Elegí una parada para ver su ubicación o imagen de referencia.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-3">
-        <div className="aspect-[4/3] md:aspect-[16/9] rounded-2xl overflow-hidden border">
-          <TransportMap
-            lines={lines}
-            stops={stops}
-            selectedLineId={selectedLineId}
-            onLineSelect={setSelectedLineId}
-          />
+        {/* MOBILE FIRST */}
+        <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3">
+          {/* STREET VIEW */}
+          <div
+            className="
+              w-full
+              h-[240px]
+              sm:h-[300px]
+              md:h-[360px]
+              lg:col-span-2
+              lg:h-[420px]
+            "
+          >
+            <TransportStreetView stop={selectedRawStop} />
+          </div>
+
+          {/* LISTA */}
+          <div
+            className="
+              w-full
+              lg:col-span-1
+              h-[300px]
+              sm:h-[360px]
+              lg:h-[420px]
+            "
+          >
+            <TransportStopsList
+              lines={lines}
+              stops={stops}
+              rawStops={rawStops}
+              selectedLineId={selectedLineId}
+              selectedStopId={selectedStopId}
+              onSelectStop={setSelectedStopId}
+            />
+          </div>
         </div>
 
         <p className="text-[11px] text-muted-foreground flex items-center gap-2">
           <span className="inline-flex h-3 w-3 rounded-full bg-primary/70" />
-          Seleccioná una línea en la lista o sobre el mapa para ver su
-          recorrido.
+          Tocá una parada para verla en Google Street View o Maps.
         </p>
       </CardContent>
     </Card>
