@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { ScrollToTop } from "./ScrollToTop";
 
 interface LayoutProps { children: ReactNode; }
 
@@ -50,6 +51,7 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <ScrollToTop />
       <Navbar />
       <main className="flex-1">{children}</main>
       {/* <SocialLinks
