@@ -105,7 +105,7 @@ export function TransportStreetView({
           >
             Mapa
           </Button>
-          <Button
+          {/* <Button
             asChild
             size="sm"
             variant="outline"
@@ -114,7 +114,7 @@ export function TransportStreetView({
             <a href={gmapsUrl} target="_blank" rel="noreferrer">
               Maps
             </a>
-          </Button>
+          </Button> */}
           <Button
             size="sm"
             variant={mode === "streetview" ? "default" : "outline"}
@@ -138,17 +138,19 @@ export function TransportStreetView({
         "
       >
         {failed ? (
-          <div className="h-full flex flex-col items-center justify-center gap-3 text-center px-6">
-            <p className="text-sm text-muted-foreground">
-              Estamos trabajando con nuestro Partner Google para incorporar imágenes de esta
-              parada.
+          <div className="h-full flex flex-col items-center justify-center gap-4 text-center px-6">
+            <p className="text-sm text-muted-foreground max-w-xs">
+              Estamos trabajando con tecnologías de Google Maps para incorporar imágenes
+              más precisas de las paradas.
             </p>
-            <Button asChild variant="outline">
+          
+            <Button asChild variant="outline" size="sm">
               <a href={gmapsUrl} target="_blank" rel="noreferrer">
                 Ver en Google Maps
               </a>
             </Button>
           </div>
+        
         ) : mode === "streetview" ? (
           // <iframe
           //   key={`sv-${stop.id}`}
@@ -160,9 +162,9 @@ export function TransportStreetView({
           //   onError={() => setFailed(true)}
           // />
           <div className="h-full flex flex-col items-center justify-center gap-3 text-center px-6">
-            <p className="text-sm text-muted-foreground">
-              Estamos trabajando con nuestro Partner Google para incorporar imágenes de esta
-              parada.
+            <p className="text-sm text-muted-foreground max-w-xs">
+              Estamos trabajando con tecnologías de Google Maps para incorporar imágenes
+              más precisas de las paradas.
             </p>
             <Button asChild variant="outline">
               <a href={gmapsUrl} target="_blank" rel="noreferrer">
