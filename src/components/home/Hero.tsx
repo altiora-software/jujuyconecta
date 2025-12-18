@@ -5,7 +5,7 @@ import { MapPin, Users, Briefcase, Shield, Newspaper, BusFront } from "lucide-re
 import JujuyConectaAssistantModal from "@/components/assistant/JujuyConectaAssistantModal";
 import { OnboardingOnce } from "@/components/onboarding/OnboardingOnce";
 import { useAuth } from "@/hooks/useAuth";
-import imagenHero from "@/assets/hornocal.webp";
+import imagenHero from "@/assets/xibixibi.png";
 import AiTrainingModal from "@/components/aiTrainingModal/AiTrainingModal";
 
 type Counts = {
@@ -98,7 +98,7 @@ export function Hero() {
     label: string;
   }) => (
     <div className="text-center">
-      <div className="h-8 w-8 mx-auto mb-2 text-yellow-400">{icon}</div>
+      <div className="h-8 w-8 mx-auto mb-2 text-white-400">{icon}</div>
 
       <div
         className="
@@ -116,19 +116,19 @@ export function Hero() {
         )}
       </div>
 
-      <div className="text-sm font-semibold text-black">{label}</div>
+      <div className="text-sm font-semibold text-white">{label}</div>
     </div>
   );
 
   return (
     <section
-      className="relative overflow-hidden text-black"
+      className="relative overflow-hidden text-black drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <div className="absolute inset-0">
         <img
           src={imagenHero}
-          alt="Jujuy desde arriba, colores del Hornocal, conectando toda la provincia en una sola plataforma"
+          alt="Jujuy desde arriba, conectando toda la provincia en una sola plataforma"
           className="w-full h-full object-cover object-center scale-[1.15] sm:scale-[1.2] lg:scale-[1.25] transition-transform duration-700"
           loading="lazy"
         />
@@ -147,7 +147,7 @@ export function Hero() {
               </span>
             </h1>
 
-            <p className="max-w-[56rem] text-base sm:text-lg lg:text-xl/7 opacity-95">
+            <p className="max-w-[56rem] text-white sm:text-lg lg:text-xl/7 opacity-95">
               Colectivos, mapas, empleos, ayuda social y noticias al día.  
               Todo organizado para que encuentres lo que necesitás sin perder tiempo.
             </p>
