@@ -14,7 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      
         marketplace_business_requests: {
           Row: {
             id: string;
@@ -458,6 +457,75 @@ export type Database = {
         }
         Relationships: []
       }
+      tourism_hotels: {
+        Row: {
+          id: string
+          name: string
+          slug: string | null
+          region: string | null
+          city: string | null
+          address: string | null
+          latitude: number | null
+          longitude: number | null
+          stars: number | null
+          category: string | null
+          description: string | null
+          amenities: string[] | null
+          phone: string | null
+          whatsapp: string | null
+          website: string | null
+          image_url: string | null
+          booking_url: string | null
+          active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug?: string | null
+          region?: string | null
+          city?: string | null
+          address?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          stars?: number | null
+          category?: string | null
+          description?: string | null
+          amenities?: string[] | null
+          phone?: string | null
+          whatsapp?: string | null
+          website?: string | null
+          image_url?: string | null
+          booking_url?: string | null
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string | null
+          region?: string | null
+          city?: string | null
+          address?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          stars?: number | null
+          category?: string | null
+          description?: string | null
+          amenities?: string[] | null
+          phone?: string | null
+          whatsapp?: string | null
+          website?: string | null
+          image_url?: string | null
+          booking_url?: string | null
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }      
       transport_lines: {
         Row: {
           active: boolean | null

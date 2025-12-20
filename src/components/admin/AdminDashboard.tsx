@@ -29,6 +29,7 @@ import { SecurityAlertsManager } from "./SecurityAlertsManager";
 import { TransportReportsManager } from "./TransportReportsManager";
 import { TourismPlacesManager } from "./TourismPlacesManager";
 import { MarketplaceManager } from "./MarketplaceManager";
+import { TourismHotelsManager } from "./TourismHotelsManager";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -126,7 +127,7 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           .from("local_businesses")
           .select("*", { count: "exact", head: true }),
         supabase
-          .from("community_events")
+          .from("tourism_hotels")
           .select("*", { count: "exact", head: true }),
       ]);
 
@@ -310,47 +311,82 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         </div>
 
         {/* Management Tabs */}
-        <Tabs
-          value={activeTab}
-          onValueChange={handleTabChange}
-          className="w-full"
-        >
-          <TabsList className="grid w-full grid-cols-8">
-            <TabsTrigger value="transport">Transporte</TabsTrigger>
-            <TabsTrigger value="resources">Recursos</TabsTrigger>
-            <TabsTrigger value="jobs">Empleos</TabsTrigger>
-            <TabsTrigger value="security">Seguridad</TabsTrigger>
-            <TabsTrigger value="tourism">Turismo</TabsTrigger>
-            <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
-            <TabsTrigger value="agenda">Agenda comunitaria</TabsTrigger>
-            <TabsTrigger value="reports">Reportes</TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full min-w-0">
+          <div className="md:top-[64px] z-20">
+            <div className="rounded-3xl border bg-card/90 backdrop-blur shadow px-2 py-2">
+              <TabsList
+                className="
+                  w-full h-auto p-0 bg-transparent
+                  grid grid-cols-2 gap-2
+                  sm:grid-cols-3
+                  lg:grid-cols-4
+                  xl:flex xl:flex-wrap xl:gap-2
+                "
+              >
+                <TabsTrigger value="transport" className="w-full xl:w-auto rounded-2xl">
+                  Transporte
+                </TabsTrigger>
+                <TabsTrigger value="resources" className="w-full xl:w-auto rounded-2xl">
+                  Recursos
+                </TabsTrigger>
+                <TabsTrigger value="jobs" className="w-full xl:w-auto rounded-2xl">
+                  Empleos
+                </TabsTrigger>
+                <TabsTrigger value="security" className="w-full xl:w-auto rounded-2xl">
+                  Seguridad
+                </TabsTrigger>
 
-          <TabsContent value="transport" className="mt-6">
+                <TabsTrigger value="tourism" className="w-full xl:w-auto rounded-2xl">
+                  Turismo
+                </TabsTrigger>
+                <TabsTrigger value="hotels" className="w-full xl:w-auto rounded-2xl">
+                  Hoteles
+                </TabsTrigger>
+
+                <TabsTrigger value="marketplace" className="w-full xl:w-auto rounded-2xl">
+                  Marketplace
+                </TabsTrigger>
+                <TabsTrigger value="agenda" className="w-full xl:w-auto rounded-2xl">
+                  Agenda
+                </TabsTrigger>
+                <TabsTrigger value="reports" className="w-full xl:w-auto rounded-2xl">
+                  Reportes
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="mt-2 h-1 bg-gradient-to-r from-sky-500/40 via-emerald-500/30 to-purple-500/40 rounded-b-3xl" />
+            </div>
+          </div>
+
+          <TabsContent value="transport" className="mt-6 min-w-0">
             <TransportLinesManager onUpdate={refreshStats} />
           </TabsContent>
 
-          <TabsContent value="resources" className="mt-6">
+          <TabsContent value="resources" className="mt-6 min-w-0">
             <SocialResourcesManager onUpdate={refreshStats} />
           </TabsContent>
 
-          <TabsContent value="jobs" className="mt-6">
+          <TabsContent value="jobs" className="mt-6 min-w-0">
             <JobsManager onUpdate={refreshStats} />
           </TabsContent>
 
-          <TabsContent value="security" className="mt-6">
+          <TabsContent value="security" className="mt-6 min-w-0">
             <SecurityAlertsManager onUpdate={refreshStats} />
           </TabsContent>
 
-          <TabsContent value="tourism" className="mt-6">
+          <TabsContent value="tourism" className="mt-6 min-w-0">
             <TourismPlacesManager onUpdate={refreshStats} />
           </TabsContent>
 
-          <TabsContent value="marketplace" className="mt-6">
+          <TabsContent value="hotels" className="mt-6 min-w-0">
+            <TourismHotelsManager onUpdate={refreshStats} />
+          </TabsContent>
+
+          <TabsContent value="marketplace" className="mt-6 min-w-0">
             <MarketplaceManager onUpdate={refreshStats} />
           </TabsContent>
 
-          <TabsContent value="agenda" className="mt-6">
+          <TabsContent value="agenda" className="mt-6 min-w-0">
             <Card>
               <CardHeader>
                 <CardTitle>Agenda comunitaria</CardTitle>
@@ -360,18 +396,17 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Este tab está listo para que montes el administrador de la
-                  agenda comunitaria, usando la tabla que definas
-                  para eventos (por ejemplo community_events).
+                  Este tab está listo para que montes el administrador de la agenda comunitaria.
                 </p>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="reports" className="mt-6">
+          <TabsContent value="reports" className="mt-6 min-w-0">
             <TransportReportsManager onUpdate={refreshStats} />
           </TabsContent>
         </Tabs>
+
       </div>
     </div>
   );

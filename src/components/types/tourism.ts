@@ -38,5 +38,5 @@ export interface TourismPlace {
     external_link: string | null;
   }
   
-  export type TourismTab = "places" | "map" | "routes" | "events";
+  export type TourismTab = "places" | "map" | "routes" | "events" | "hotels";
   

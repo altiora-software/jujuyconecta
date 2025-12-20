@@ -74,7 +74,7 @@ export function Navbar() {
     Turismo: [
       { label: "Mapa Turístico", href: "/turismo" },
       { label: "Rutas y Recorridos", href: "/turismo?rutas=true" },
-      { label: "Eventos Turísticos", href: "/turismo?tab=events" },
+      { label: "Hoteles", href: "/turismo?tab=hotels" },
       { label: "Conocé Cosquin Rock", href: "/cosquin-rock-2026" },
     ],
     "Servicios Públicos": [

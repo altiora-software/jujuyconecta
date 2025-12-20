@@ -87,11 +87,11 @@ const CHANNEL_LABELS: { key: NotificationChannelKey; title: string; description:
     title: "Rutas y Recorridos",
     description: "Cambios o mejoras en circuitos y recorridos.",
   },
-  {
-    key: "eventos_turisticos",
-    title: "Eventos Turísticos",
-    description: "Fiestas, festivales y actividades para visitar.",
-  },
+  // {
+  //   key: "eventos_turisticos",
+  //   title: "Eventos Turísticos",
+  //   description: "Fiestas, festivales y actividades para visitar.",
+  // },
   {
     key: "recursos_sociales",
     title: "Recursos Sociales",
