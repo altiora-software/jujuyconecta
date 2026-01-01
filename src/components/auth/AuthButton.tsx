@@ -34,7 +34,7 @@ export function AuthButton() {
           variant="outline"
           size="sm"
           onClick={() => setLoginDialogOpen(true)}
-          className="gap-2"
+          className="gap-2 text-accent-foreground"
         >
           <LogIn className="h-4 w-4" />
           Ingresar

@@ -75,6 +75,9 @@ export function Hero() {
     };
   }, [toast]);
 
+
+  
+
   const handleOpenAssistant = useCallback(async () => {
     if (authLoading) return;
     if (!user) {
@@ -88,125 +91,83 @@ export function Hero() {
     await signInWithGoogle();
   }, [signInWithGoogle]);
 
-  const Stat = ({
-    icon,
-    value,
-    label,
-  }: {
-    icon: React.ReactNode;
-    value: number | null;
-    label: string;
-  }) => (
-    <div className="text-center">
-      <div className="h-8 w-8 mx-auto mb-2 text-white-400">{icon}</div>
-
-      <div
-        className="
-          text-3xl
-          font-extrabold
-          tabular-nums
-          text-black
-          drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]
-        "
-      >
+  const Stat = ({ icon, value, label }: { icon: React.ReactNode; value: number | null; label: string; }) => (
+    <div className="group text-center p-4 rounded-2xl bg-white/[0.03] backdrop-blur-md border border-white/10 transition-all hover:bg-white/[0.08] hover:border-primary/30">
+      <div className="h-6 w-6 mx-auto mb-2 text-primary group-hover:scale-110 transition-transform duration-300">
+        {icon}
+      </div>
+      <div className="text-2xl sm:text-3xl font-bold tabular-nums text-white">
         {loading ? (
-          <span className="inline-block h-6 w-16 bg-white/30 rounded animate-pulse" />
+          <span className="inline-block h-6 w-16 bg-white/10 rounded animate-pulse" />
         ) : (
           value ?? 0
         )}
       </div>
-
-      <div className="text-sm font-semibold text-white">{label}</div>
+      <div className="text-[10px] sm:text-xs font-semibold text-white/50 uppercase tracking-[0.1em] mt-1">{label}</div>
     </div>
   );
 
   return (
-    <section
-      className="relative overflow-hidden text-black drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]"
-      style={{ paddingTop: "env(safe-area-inset-top)" }}
-    >
-      <div className="absolute inset-0">
-        <img
-          src={imagenHero}
-          alt="Jujuy desde arriba, conectando toda la provincia en una sola plataforma"
-          className="w-full h-full object-cover object-center scale-[1.15] sm:scale-[1.2] lg:scale-[1.25] transition-transform duration-700"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-hero/45 sm:bg-gradient-hero/40 lg:bg-gradient-hero/35" />
-        <div className="hidden sm:block absolute -top-24 -left-24 w-64 h-64 bg-white/25 rounded-full blur-3xl" />
-        <div className="hidden sm:block absolute -bottom-28 -right-28 w-[28rem] h-[28rem] bg-white/20 rounded-full blur-3xl" />
+    <section className="relative min-h-[80vh] flex items-center overflow-hidden bg-[#020817]">
+      {/* FONDO BRANDING: Gradientes basados en el verde de Jujuy Conecta */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-primary/20 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] bg-emerald-500/10 blur-[100px] rounded-full" />
+        {/* Trama de puntos sutil para textura */}
+        <div className="absolute inset-0 opacity-[0.15]" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', size: '30px 30px', backgroundSize: '40px 40px' }} />
       </div>
 
-      <div className="relative z-10">
-        <div className="container mx-auto px-4">
-          <div className="min-h-[70svh] sm:min-h-[68svh] lg:min-h-[60svh] flex flex-col items-center justify-center text-center gap-6 py-12 sm:py-14 lg:py-20">
-
-            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight">
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">
-                Todo Jujuy en un lugar claro y fácil de usar.
-              </span>
-            </h1>
-
-            <p className="max-w-[56rem] text-white sm:text-lg lg:text-xl/7 opacity-95">
-              Colectivos, mapas, empleos, ayuda social y noticias al día.  
-              Todo organizado para que encuentres lo que necesitás sin perder tiempo.
-            </p>
-
-            <div className="w-full max-w-2xl flex flex-col xs:flex-row gap-3 justify-center items-center">
-              <div className="flex gap-3 w-full xs:w-auto flex-wrap justify-center">
-                <Button
-                  size="lg"
-                  className="w-full xs:w-auto"
-                  onClick={() => (window.location.href = "/transport")}
-                >
-                  <BusFront className="mr-2" /> Encontrar mi colectivo ahora
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full xs:w-auto hover:animate-glow"
-                  onClick={() => (window.location.href = "https://diario.jujuyconecta.com")}
-                >
-                  <Newspaper className="mr-2" /> Ver qué está pasando hoy
-                </Button>
-
-                <Button
-                  size="lg"
-                  className="w-full xs:w-auto"
-                  onClick={() => (window.location.href = "/turismo")}
-                >
-                  <Briefcase className="mr-2" /> Conocé la provincia
-                </Button>
-              </div>
-            </div>
-
-            <div className="w-full max-w-3xl text-white grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-4 ">
-              <Stat icon={<MapPin />} value={counts.lines} label="Líneas para no perder tiempo" />
-              <Stat icon={<Users />} value={counts.resources} label="Lugares donde te dan una mano" />
-              <Stat icon={<Briefcase />} value={counts.jobs} label="Oportunidades de trabajo activas" />
-              <Stat icon={<Shield />} value={counts.alerts} label="Alertas para que no te agarren desprevenido" />
-            </div>
-
-            <p className="text-xs sm:text-[13px] text-blue/80 max-w-[34rem] mt-2">
-              Los datos pueden cambiar según el día y la fuente. Usá la info como guía y, si algo no cierra, escribinos a jujuyconecta@gmail.com para revisarlo.
-            </p>
-
+      <div className="container relative z-10 mx-auto px-4 py-16 sm:py-24">
+        <div className="max-w-4xl mx-auto flex flex-col items-center text-center gap-8">
+          
+          {/* BADGE CON TU VERDE */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs sm:text-sm font-medium backdrop-blur-xl animate-fade-in">
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+            Conectando a toda la provincia
           </div>
+
+          <h1 className="text-4xl sm:text-6xl lg:text-[5rem] font-extrabold tracking-tight leading-[1.1] text-white">
+            Todo Jujuy en un <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-emerald-400 to-teal-300">
+              lugar inteligente.
+            </span>
+          </h1>
+
+          <p className="max-w-2xl text-slate-400 text-lg sm:text-xl leading-relaxed">
+            La plataforma centralizada para el transporte, el empleo y la ayuda social. 
+            Información <span className="text-white">real, verificada y al alcance</span> de todos.
+          </p>
+
+          {/* BOTONES CON BRANDING */}
+          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center mt-6">
+            <Button 
+              size="lg" 
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-10 h-14 rounded-xl shadow-[0_10px_20px_-10px_rgba(var(--primary),0.5)] transition-all hover:translate-y-[-2px]"
+              onClick={() => (window.location.href = "/transport")}
+            >
+              <BusFront className="mr-2 h-5 w-5" /> Buscar Colectivo
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="border-white/10 bg-white/5 text-white hover:bg-white/10 hover:text-white h-14 rounded-xl backdrop-blur-md"
+              onClick={() => (window.location.href = "https://diario.jujuyconecta.com")}
+            >
+              <Newspaper className="mr-2 h-5 w-5" /> Diario Digital
+            </Button>
+          </div>
+
+          {/* STATS GRID */}
+          <div className="w-full max-w-5xl grid grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
+            <Stat icon={<MapPin />} value={counts.lines} label="Líneas de Bus" />
+            <Stat icon={<Users />} value={counts.resources} label="Puntos Sociales" />
+            <Stat icon={<Briefcase />} value={counts.jobs} label="Bolsa de Trabajo" />
+            <Stat icon={<Shield />} value={counts.alerts} label="Alertas Digitales" />
+          </div>
+          
         </div>
       </div>
-
-      <OnboardingOnce onOpenAssistant={handleOpenAssistant} />
-
-      <AiTrainingModal
-        open={open}
-        onClose={() => setOpen(false)}
-        supportEmail="jujuyconecta@gmail.com"
-      />
-
-      {assistantOpen && user && (
-        <JujuyConectaAssistantModal open={assistantOpen} onClose={() => setAssistantOpen(false)} />
-      )}
     </section>
   );
 }

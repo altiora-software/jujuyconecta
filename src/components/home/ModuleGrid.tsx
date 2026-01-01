@@ -78,9 +78,8 @@ export function ModuleGrid() {
     const loadAll = async () => {
       try {
         setLoading(true);
-
         const res = await fetch("/api/home");
-        if (!res.ok) throw new Error("Error al cargar datos desde /api/home");
+        if (!res.ok) throw new Error("Error al cargar datos");
 
         const json = (await res.json()) as HomeResponse;
 
@@ -94,54 +93,46 @@ export function ModuleGrid() {
         setJobsCount(jobs.length);
         setSecurityCount(alerts.length);
 
-        setRecentLines(
-          lines.slice(0, 3).map((l: any) => ({
-            id: l.id,
-            number: l.number ?? "",
-            name: l.name ?? "",
-            active: l.active ?? true,
-            created_at: l.created_at,
-          }))
-        );
+        setRecentLines(lines.slice(0, 3).map((l: any) => ({
+          id: l.id,
+          number: l.number ?? "",
+          name: l.name ?? "",
+          active: l.active ?? true,
+          created_at: l.created_at,
+        })));
 
-        setRecentResources(
-          social.slice(0, 3).map((r: any) => ({
-            id: r.id,
-            name: r.name ?? "",
-            active: r.active ?? true,
-            verified: r.verified ?? false,
-            schedule: r.schedule ?? null,
-            needs: r.needs ?? null,
-            created_at: r.created_at,
-          }))
-        );
+        setRecentResources(social.slice(0, 3).map((r: any) => ({
+          id: r.id,
+          name: r.name ?? "",
+          active: r.active ?? true,
+          verified: r.verified ?? false,
+          schedule: r.schedule ?? null,
+          needs: r.needs ?? null,
+          created_at: r.created_at,
+        })));
 
-        setRecentJobs(
-          jobs.slice(0, 3).map((j: any) => ({
-            id: j.id,
-            title: j.title ?? "",
-            location: j.city ?? j.municipality ?? "",
-            active: j.status ? j.status === "published" : true,
-            featured: j.is_featured ?? false,
-            created_at: j.created_at ?? j.published_at,
-          }))
-        );
+        setRecentJobs(jobs.slice(0, 3).map((j: any) => ({
+          id: j.id,
+          title: j.title ?? "",
+          location: j.city ?? j.municipality ?? "",
+          active: j.status ? j.status === "published" : true,
+          featured: j.is_featured ?? false,
+          created_at: j.created_at ?? j.published_at,
+        })));
 
-        setRecentAlerts(
-          alerts.slice(0, 3).map((a: any) => ({
-            id: a.id,
-            title: a.title ?? "",
-            category: a.category ?? "",
-            active: a.active ?? true,
-            featured: a.featured ?? false,
-            created_at: a.created_at,
-          }))
-        );
+        setRecentAlerts(alerts.slice(0, 3).map((a: any) => ({
+          id: a.id,
+          title: a.title ?? "",
+          category: a.category ?? "",
+          active: a.active ?? true,
+          featured: a.featured ?? false,
+          created_at: a.created_at,
+        })));
       } catch (e: any) {
         console.error(e);
         toast({
-          title: "No se pudieron cargar los módulos",
-          description: e?.message || "Intentá nuevamente.",
+          title: "Error de conexión",
+          description: "No pudimos sincronizar los datos en tiempo real.",
           variant: "destructive",
         });
       } finally {
@@ -152,209 +143,132 @@ export function ModuleGrid() {
     loadAll();
   }, [toast]);
 
-  const transportStats = useMemo(
-    () =>
-      transportCount != null
-        ? `${transportCount} línea${transportCount === 1 ? "" : "s"} activas`
-        : "—",
-    [transportCount]
-  );
-  const resourcesStats = useMemo(
-    () =>
-      resourcesCount != null
-        ? `${resourcesCount} recurso${resourcesCount === 1 ? "" : "s"} activos`
-        : "—",
-    [resourcesCount]
-  );
-  const jobsStats = useMemo(
-    () =>
-      jobsCount != null
-        ? `${jobsCount} empleo${jobsCount === 1 ? "" : "s"} disponibles`
-        : "—",
-    [jobsCount]
-  );
-  const alertsStats = useMemo(
-    () =>
-      securityCount != null
-        ? `${securityCount} alerta${securityCount === 1 ? "" : "s"} activas`
-        : "—",
-    [securityCount]
-  );
+  const transportStats = useMemo(() => transportCount != null ? `${transportCount} líneas activas` : "—", [transportCount]);
+  const resourcesStats = useMemo(() => resourcesCount != null ? `${resourcesCount} recursos activos` : "—", [resourcesCount]);
+  const jobsStats = useMemo(() => jobsCount != null ? `${jobsCount} empleos disponibles` : "—", [jobsCount]);
+  const alertsStats = useMemo(() => securityCount != null ? `${securityCount} alertas activas` : "—", [securityCount]);
 
   const modules = [
     {
       key: "transport",
       title: "Transporte Público",
-      description: "Estado de líneas, paradas y reportes ciudadanos",
+      description: "Estado de líneas, paradas y reportes en tiempo real.",
       icon: Bus,
       href: "/transport",
-      color: "primary",
       stats: transportStats,
       recent: recentLines.map((l) => `Línea ${l.number}: ${l.name}`),
     },
     {
       key: "resources",
       title: "Recursos Sociales",
-      description: "Comedores, merenderos y centros con ubicación y horarios",
+      description: "Centros de ayuda, comedores y asistencia directa.",
       icon: Users,
       href: "/resources",
-      color: "secondary",
       stats: resourcesStats,
-      recent: recentResources.map((r) => {
-        const needs =
-          r.needs && r.needs.length > 0
-            ? `Necesita: ${r.needs.slice(0, 2).join(", ")}`
-            : r.schedule
-            ? "Abierto"
-            : "Disponible";
-        return `${r.name} — ${needs}`;
-      }),
+      recent: recentResources.map((r) => `${r.name} — ${r.needs?.length ? "Necesita donaciones" : "Disponible"}`),
     },
     {
       key: "jobs",
       title: "Bolsa de Trabajo",
-      description: "Empleos formales e informales con contacto seguro",
+      description: "Oportunidades laborales formales e independientes.",
       icon: Briefcase,
       href: "/jobs",
-      color: "success",
       stats: jobsStats,
-      recent: recentJobs.map(
-        (j) => `${j.title}${j.location ? " — " + j.location : ""}`
-      ),
+      recent: recentJobs.map((j) => `${j.title}${j.location ? " en " + j.location : ""}`),
     },
     {
       key: "security",
       title: "Seguridad Digital",
-      description: "Estafas, grooming y fraudes con guías de prevención",
+      description: "Prevención de estafas, grooming y delitos digitales.",
       icon: Shield,
       href: "/security",
-      color: "warning",
       stats: alertsStats,
       recent: recentAlerts.map((a) => `${a.category}: ${a.title}`),
     },
   ] as const;
 
-  const getColorClasses = (color: string) => {
-    switch (color) {
-      case "primary":
-        return "border-primary/20 md:hover:border-primary/40 md:hover:shadow-glow";
-      case "secondary":
-        return "border-secondary/20 md:hover:border-secondary/40 md:hover:shadow-glow-secondary";
-      case "success":
-        return "border-emerald-500/20 md:hover:border-emerald-500/40";
-      case "warning":
-        return "border-amber-500/20 md:hover:border-amber-500/40";
-      default:
-        return "border-primary/20 md:hover:border-primary/40";
-    }
-  };
-
-  const getIconColorClasses = (color: string) => {
-    switch (color) {
-      case "primary":
-        return "bg-primary/10 text-primary";
-      case "secondary":
-        return "bg-secondary/10 text-secondary";
-      case "success":
-        return "bg-emerald-500/10 text-emerald-600";
-      case "warning":
-        return "bg-amber-500/10 text-amber-600";
-      default:
-        return "bg-primary/10 text-primary";
-    }
-  };
-
   return (
-    <section className="py-12 sm:py-16 bg-gradient-subtle">
+    <section id="servicios" className="py-20 sm:py-28 bg-background relative">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">
-            Servicios disponibles
+        <div className="text-center mb-12 sm:mb-16">
+          <Badge variant="outline" className="mb-4 border-primary/30 text-primary px-4 py-1">
+            Ecosistema Digital
+          </Badge>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-4 tracking-tight">
+            Servicios <span className="text-primary">Conectados</span>
           </h2>
-          <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Accedé a la información que necesitás para moverte y crecer en Jujuy
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Accedé a información pública centralizada para moverte y crecer en Jujuy.
           </p>
         </div>
 
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {modules.map((module) => {
             const Icon = module.icon;
             return (
               <Card
                 key={module.key}
-                className={`h-full transition-transform duration-200 ${getColorClasses(
-                  module.color
-                )} md:hover:scale-[1.02]`}
+                className="group h-full transition-all duration-300 border border-primary/10 bg-card/50 backdrop-blur-sm md:hover:-translate-y-1 md:hover:border-primary/40 md:hover:shadow-[0_0_20px_-5px_rgba(16,185,129,0.1)]"
               >
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className={`p-3 rounded-lg ${getIconColorClasses(
-                          module.color
-                        )}`}
-                      >
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="p-3.5 rounded-2xl bg-primary/10 text-primary transition-transform group-hover:scale-110 duration-300">
                         <Icon className="h-6 w-6" />
                       </div>
                       <div>
-                        <CardTitle className="text-base sm:text-lg md:text-xl">
+                        <CardTitle className="text-xl md:text-2xl font-bold italic tracking-tight uppercase">
                           {module.title}
                         </CardTitle>
-                        <Badge className="mt-1 text-[10px] sm:text-[11px] md:text-xs">
-                          {loading ? "Cargando..." : module.stats}
-                        </Badge>
+                        <div className="flex items-center gap-2 mt-1">
+                           <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                           <span className="text-[10px] font-bold uppercase tracking-widest text-primary/80">
+                             {loading ? "Cargando..." : module.stats}
+                           </span>
+                        </div>
                       </div>
                     </div>
-
+                    
                     <Link to={module.href}>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        aria-label={`Ir a ${module.title}`}
-                        className="shrink-0"
-                      >
-                        <ArrowRight className="h-4 w-4" />
+                      <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary hover:text-white transition-colors">
+                        <ArrowRight className="h-5 w-5" />
                       </Button>
                     </Link>
                   </div>
 
-                  <CardDescription className="text-xs sm:text-sm md:text-base mt-2">
+                  <CardDescription className="text-sm sm:text-base mt-4 leading-relaxed">
                     {module.description}
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent>
-                  <div className="space-y-2 mb-4">
-                    <h4 className="text-[11px] sm:text-xs md:text-sm font-medium text-muted-foreground mb-1 sm:mb-2">
-                      Actividad reciente:
+                  <div className="bg-muted/30 rounded-xl p-4 mb-6 border border-border/50">
+                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                      <span className="w-4 h-[1px] bg-primary/40" />
+                      Novedades
                     </h4>
-                    {loading ? (
-                      <div className="space-y-2">
-                        <div className="h-3 bg-muted rounded w-3/4 animate-pulse" />
-                        <div className="h-3 bg-muted rounded w-2/3 animate-pulse" />
-                        <div className="h-3 bg-muted rounded w-1/2 animate-pulse" />
-                      </div>
-                    ) : module.recent.length > 0 ? (
-                      module.recent.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center space-x-2 text-[11px] sm:text-xs md:text-sm"
-                        >
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                          <span className="truncate">{item}</span>
+                    <div className="space-y-3">
+                      {loading ? (
+                        <div className="space-y-2">
+                          <div className="h-3 bg-muted rounded w-3/4 animate-pulse" />
+                          <div className="h-3 bg-muted rounded w-1/2 animate-pulse" />
                         </div>
-                      ))
-                    ) : (
-                      <p className="text-xs sm:text-sm text-muted-foreground">
-                        Sin novedades por ahora.
-                      </p>
-                    )}
+                      ) : module.recent.length > 0 ? (
+                        module.recent.map((item, idx) => (
+                          <div key={idx} className="flex items-start gap-3 text-sm text-foreground/80">
+                            <ArrowRight className="h-3 w-3 mt-1 text-primary shrink-0 opacity-50" />
+                            <span className="line-clamp-1 group-hover:text-foreground transition-colors">{item}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-xs text-muted-foreground italic">Sin actualizaciones recientes.</p>
+                      )}
+                    </div>
                   </div>
 
-                  <Link to={module.href}>
-                    <Button className="w-full" variant="outline" size="sm">
-                      Explorar {module.title.toLowerCase()}
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                  <Link to={module.href} className="block">
+                    <Button className="w-full bg-primary/5 hover:bg-primary hover:text-white text-primary border-primary/20 transition-all font-bold" variant="outline">
+                      Explorar módulo
                     </Button>
                   </Link>
                 </CardContent>
@@ -363,7 +277,9 @@ export function ModuleGrid() {
           })}
         </div>
 
-        <AboutJujuyConecta />
+        <div className="mt-20">
+          <AboutJujuyConecta />
+        </div>
       </div>
     </section>
   );
