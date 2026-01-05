@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { AuthButton } from "@/components/auth/AuthButton";
 
-type NavItem = { label: string; href: string };
+type NavItem = { label: string; href: string }; 
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
