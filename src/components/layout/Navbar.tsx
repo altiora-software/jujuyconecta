@@ -42,15 +42,15 @@ const servicesByTab: Record<string, { label: string; href: string }[]> = {
   Plataforma: [
     { label: "Portal de Noticias", href: "https://diario.jujuyconecta.com" },
   ],
-  Emprendimientos: [{ label: "Marketplace Local", href: "/servicios/marketplace" }],
-  Formación: [
-    { label: "Alertas de Seguridad", href: "/security" },
-    { label: "Cursos y Talleres", href: "/servicios/cursos" },
-  ],
   Turismo: [
     { label: "Mapa Turístico", href: "/turismo" },
     { label: "Hoteles", href: "/turismo?tab=hotels" },
     { label: "Conocé Cosquin Rock", href: "/cosquin-rock-2026" },
+  ],
+  Emprendimientos: [{ label: "Marketplace Local", href: "/servicios/marketplace" }],
+  Formación: [
+    { label: "Alertas de Seguridad", href: "/security" },
+    { label: "Cursos y Talleres", href: "/servicios/cursos" },
   ],
   "Servicios Públicos": [
     { label: "Recursos Sociales", href: "/resources" },
