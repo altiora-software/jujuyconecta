@@ -225,6 +225,7 @@ export function TourismHotelsManager({ onUpdate }: { onUpdate: () => void }) {
         .upload(filePath, file, {
           cacheControl: "3600",
           upsert: true,
+          contentType: file.type || "image/jpeg",
         });
 
       if (uploadError) {

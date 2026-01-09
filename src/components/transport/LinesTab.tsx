@@ -391,7 +391,7 @@ export function LinesTab({
                 </div>
 
                 <div className="space-y-2 text-xs md:text-sm">
-                  <div className="flex items-start gap-2 text-muted-foreground">
+                  {/* <div className="flex items-start gap-2 text-muted-foreground">
                     <RouteIcon className="h-4 w-4 mt-0.5" />
                     {firstStop && lastStop ? (
                       <span>
@@ -401,13 +401,13 @@ export function LinesTab({
                     ) : (
                       <span>Recorrido base no disponible aún</span>
                     )}
-                  </div>
+                  </div> */}
 
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="text-[11px]">
+                    {/* <Badge variant="outline" className="text-[11px]">
                       {lineRawStops.length || lineStops.length} paradas
                       registradas
-                    </Badge>
+                    </Badge> */}
                     {lineReports.length > 0 ? (
                       <Badge variant="destructive" className="text-[11px]">
                         {lineReports.length} reporte

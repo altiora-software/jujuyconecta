@@ -94,7 +94,7 @@ import {
                 )}
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="outline">
-                    {totalRawStopsForLine} paradas registradas
+                    {totalRawStopsForLine} paradas cargadas
                   </Badge>
                   <Badge
                     variant={

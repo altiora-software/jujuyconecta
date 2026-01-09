@@ -1,193 +1,285 @@
 import { useState, useRef, useEffect } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Search, Menu, X, Bell, ArrowRight, ExternalLink, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useToast } from "@/hooks/use-toast";
 import { AuthButton } from "@/components/auth/AuthButton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { InstallAppMenuItem } from "../pwa/InstallAppMenuItem";
 
-type NavItem = { label: string; href: string }; 
+// --- TIPOS Y DATA ---
+type NavItem = { label: string; href: string };
+type SearchItemType = "seccion" | "servicio" | "externo";
+interface SearchItem {
+  label: string;
+  href: string;
+  type: SearchItemType;
+  keywords: string[];
+}
+
+const SEARCH_ITEMS: SearchItem[] = [
+    { label: "Inicio", href: "/", type: "seccion", keywords: ["inicio", "home"] },
+    { label: "Diario Digital", href: "https://diario.jujuyconecta.com", type: "externo", keywords: ["noticias", "diario"] },
+    { label: "Turismo", href: "/turismo", type: "seccion", keywords: ["viaje", "mapa"] },
+    { label: "Transporte Público", href: "/transport", type: "seccion", keywords: ["colectivo", "bondi"] },
+    { label: "Marketplace Local", href: "/servicios/marketplace", type: "servicio", keywords: ["ventas", "compras"] },
+    { label: "Alertas de Seguridad", href: "/security", type: "servicio", keywords: ["estafas", "seguridad"] },
+    { label: "Recursos Sociales", href: "/resources", type: "servicio", keywords: ["ayuda", "ong"] },
+    { label: "Bolsa de trabajo local", href: "/jobs", type: "servicio", keywords: ["empleo", "trabajo"] },
+    { label: "Cosquin Rock", href: "/cosquin-rock-2026", type: "servicio", keywords: ["festival", "musica"] },
+];
+
+const servicesByTab: Record<string, { label: string; href: string }[]> = {
+  Plataforma: [
+    { label: "Portal de Noticias", href: "https://diario.jujuyconecta.com" },
+  ],
+  Emprendimientos: [{ label: "Marketplace Local", href: "/servicios/marketplace" }],
+  Formación: [
+    { label: "Alertas de Seguridad", href: "/security" },
+    { label: "Cursos y Talleres", href: "/servicios/cursos" },
+  ],
+  Turismo: [
+    { label: "Mapa Turístico", href: "/turismo" },
+    { label: "Hoteles", href: "/turismo?tab=hotels" },
+    { label: "Conocé Cosquin Rock", href: "/cosquin-rock-2026" },
+  ],
+  "Servicios Públicos": [
+    { label: "Recursos Sociales", href: "/resources" },
+    { label: "Transporte y Mapas", href: "/transport" },
+    { label: "Bolsa de trabajo local", href: "/jobs" },
+  ],
+};
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchItem[]>([]);
+  const [isSearchResultsOpen, setIsSearchResultsOpen] = useState(false);
 
   const location = useLocation();
-  const isHomePage = location.pathname === "/";
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const servicesRef = useRef<HTMLDivElement | null>(null);
+  const isHomePage = location.pathname === "/";
 
-  // 1. EFECTO DE SCROLL: Cambia el estado cuando el usuario baja más de 20px.
-  // Esto permite que la Navbar pase de transparente a sólida.
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 2. LÓGICA DE FONDO (Corrección de visibilidad):
-  // Si es Home y no hay scroll -> Transparente.
-  // En cualquier otro caso (Otras páginas o Scroll) -> Fondo oscuro sólido (slate-950).
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (servicesRef.current && !servicesRef.current.contains(event.target as Node)) {
+        setIsServicesOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return;
+    const results = SEARCH_ITEMS.filter(item => 
+      item.label.toLowerCase().includes(q) || item.keywords.some(k => k.includes(q))
+    );
+    if (!results.length) {
+      toast({ title: "Sin resultados", variant: "destructive" });
+      return;
+    }
+    setSearchResults(results);
+    setIsSearchResultsOpen(true);
+    setIsMenuOpen(false);
+  };
+
   const navbarBg = isHomePage 
     ? (isScrolled ? "bg-slate-950/95 backdrop-blur-md border-b border-white/10" : "bg-transparent border-transparent") 
     : "bg-slate-950 border-b border-white/10";
 
-  // 3. ITEMS DE NAVEGACIÓN:
-  // Importante: El Diario Digital usa URL completa para activar la lógica de enlace externo.
-  const navItems: NavItem[] = [
-    { label: "Inicio", href: "/" },
-    { label: "Transporte", href: "/transport" },
-    { label: "Turismo", href: "/turismo" },
-    { label: "Diario Digital", href: "https://diario.jujuyconecta.com" },
-  ];
-
-  // 4. CIERRE DE DROPDOWNS: Cierra el menú de servicios si se hace clic fuera de él.
-  useEffect(() => {
-    function onClick(e: MouseEvent) {
-      if (servicesRef.current && !servicesRef.current.contains(e.target as Node)) {
-        setIsServicesOpen(false);
-      }
-    }
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
-  }, []);
-
-  // 5. HELPER DE RENDERIZADO: Esta función decide si usa <Link> (interno) o <a> (externo/pestaña nueva).
-  const renderNavLink = (item: NavItem, isMobile: boolean) => {
-    const isExternal = item.href.startsWith("http");
-    const baseStyles = isMobile 
-      ? `flex items-center px-4 py-4 rounded-2xl text-lg font-bold transition-all ${
-          location.pathname === item.href ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-300 hover:bg-white/5 hover:text-white'
-        }`
-      : `rounded-full px-4 font-medium transition-colors hover:bg-white/10 ${
-          location.pathname === item.href ? "text-primary bg-white/5" : "text-white"
-        }`;
-
-    if (isExternal) {
-      return (
-        <a
-          key={item.href}
-          href={item.href}
-          target="_blank"        // Abre en nueva pestaña
-          rel="noopener noreferrer" // Seguridad para enlaces externos
-          onClick={() => setIsMenuOpen(false)}
-          className={baseStyles}
-        >
-          {item.label}
-        </a>
-      );
-    }
-
-    return (
-      <Link
-        key={item.href}
-        to={item.href}
-        onClick={() => setIsMenuOpen(false)}
-        className={baseStyles}
-      >
-        {item.label}
-      </Link>
-    );
-  };
+  // Componente de Lista de Servicios (Reutilizable)
+  const ServiceList = ({ onItemClick }: { onItemClick: () => void }) => (
+    <div className="space-y-6">
+      {Object.entries(servicesByTab).map(([category, items]) => (
+        <div key={category} className="space-y-2">
+          <h3 className="px-4 text-[15px] font-bold text-primary uppercase tracking-[0.2em]">
+            {category}
+          </h3>
+          <div className="space-y-1">
+            {items.map((item) => {
+              const isExternal = item.href.startsWith("http");
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  target={isExternal ? "_blank" : "_self"}
+                  rel={isExternal ? "noopener noreferrer" : ""}
+                  onClick={(e) => {
+                    if (!isExternal) {
+                      e.preventDefault();
+                      navigate(item.href);
+                    }
+                    onItemClick();
+                  }}
+                  className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/5 group transition-colors"
+                >
+                  <span className="text-medium font-medium text-slate-200 group-hover:text-white">
+                    {item.label}
+                  </span>
+                  {isExternal ? (
+                    <ExternalLink className="h-3 w-3 text-slate-500" />
+                  ) : (
+                    <ArrowRight className="h-4 w-4 text-slate-600 group-hover:text-primary transition-colors translate-x-[-4px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100 transition-all" />
+                  )}
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <>
       <nav className={`fixed top-0 z-50 w-full transition-all duration-300 ${navbarBg} ${isScrolled ? 'h-16' : 'h-20'}`}>
-        <div className="container mx-auto px-4 h-full">
-          <div className="flex h-full items-center justify-between gap-3">
-            
-            {/* LOGO E IDENTIDAD */}
-            <Link to="/" className="flex items-center gap-2 group"> 
-              <img src="/images/jc.png" alt="Jujuy Conecta" className="h-10 w-10 sm:h-12 sm:w-12 transition-transform group-hover:scale-110" />
-              <div className="flex flex-col leading-tight">
-                <span className="text-lg lg:text-2xl font-black tracking-tighter text-white uppercase italic">
-                  JUJUY <span className="text-primary font-bold">CONECTA</span>
-                </span>
-              </div>
-            </Link>
+        <div className="container mx-auto px-4 h-full flex items-center justify-between gap-4">
+          
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group shrink-0">
+            <img src="/images/jc.png" alt="Logo" className="h-10 w-10 transition-transform group-hover:scale-110" />
+            <span className="hidden sm:block text-lg lg:text-xl font-black text-white uppercase italic">
+              JUJUY <span className="text-primary">CONECTA</span>
+            </span>
+          </Link>
 
-            {/* NAVEGACIÓN DESKTOP */}
-            <div className="hidden md:flex items-center gap-1">
-              {navItems.map((item) => renderNavLink(item, false))}
-              
-              <div className="h-6 w-[1px] bg-white/20 mx-2" />
-              <AuthButton />
+          {/* Desktop Search */}
+          <div className="hidden lg:flex flex-1 max-w-sm">
+            <form onSubmit={handleSearch} className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
+              <input
+                type="text"
+                placeholder="Buscar servicios, transporte..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 text-white text-sm rounded-full py-2 pl-10 pr-4 focus:outline-none focus:bg-white/10 transition-all placeholder:text-slate-500"
+              />
+            </form>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-1">
+            {["Inicio", "Transporte", "Turismo"].map((label) => (
+              <Link
+                key={label}
+                to={label === "Inicio" ? "/" : `/${label.toLowerCase()}`}
+                className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+
+            {/* Dropdown Lista Desktop */}
+            <div className="relative" ref={servicesRef}>
+              <button
+                onClick={() => setIsServicesOpen(!isServicesOpen)}
+                className={`flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                  isServicesOpen ? "text-primary bg-white/10" : "text-slate-300 hover:text-white"
+                }`}
+              >
+                Servicios <ChevronDown className={`h-4 w-4 transition-transform ${isServicesOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {isServicesOpen && (
+                <div className="absolute right-0 mt-4 w-72 max-h-[70vh] overflow-y-auto bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-4 no-scrollbar animate-in fade-in zoom-in duration-200">
+                  <ServiceList onItemClick={() => setIsServicesOpen(false)} />
+                </div>
+              )}
             </div>
 
-            {/* BOTÓN MENÚ MÓVIL (Hamburguesa/Cerrar) */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden text-white hover:bg-white/10 z-[110]" // Z-index alto para estar sobre el panel
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </Button>
+            <div className="h-6 w-[1px] bg-white/10 mx-2" />
+            <AuthButton />
           </div>
+
+          <Button variant="ghost" size="icon" className="md:hidden text-white" onClick={() => setIsMenuOpen(true)}>
+            <Menu />
+          </Button>
         </div>
       </nav>
 
-      {/* PANEL DE MENÚ MÓVIL */}
+      {/* MOBILE MENU: LISTA ÚNICA */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[100] md:hidden">
-          {/* 6. OVERLAY: Fondo desenfocado que cierra el menú al tocarlo */}
-          <div 
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300" 
-            onClick={() => setIsMenuOpen(false)}
-          />
-          
-          {/* 7. CONTENEDOR DEL PANEL: Color oscuro para no cansar la vista */}
-          <div className="fixed right-0 top-0 h-full w-[80%] max-w-[320px] bg-slate-950 border-l border-white/10 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+          <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-md" onClick={() => setIsMenuOpen(false)} />
+          <div className="fixed right-0 top-0 h-full w-[85%] bg-slate-950 border-l border-white/10 flex flex-col animate-in slide-in-from-right duration-300">
             
-            {/* Header del Panel con Logo */}
-            <div className="flex items-center justify-between p-6 border-b border-white/5">
-              <div className="flex items-center gap-2">
-                <img src="/images/jc.png" alt="Logo" className="h-8 w-8" />
-                <span className="text-white font-black tracking-tighter italic text-sm">
-                  JUJUY <span className="text-primary">CONECTA</span>
-                </span>
-              </div>
-              {/* Botón X dentro del panel */}
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setIsMenuOpen(false)}
-                className="text-white hover:bg-white/10 rounded-full"
-              >
-                <X className="h-6 w-6" />
+            <div className="flex items-center justify-between p-6">
+              <span className="font-black text-white italic">JUJUY <span className="text-primary">CONECTA</span></span>
+              <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)} className="text-white">
+                <X />
               </Button>
             </div>
 
-            {/* Enlaces del Menú Móvil */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-8">
-              <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-bold text-primary uppercase tracking-widest px-4 mb-2 tracking-widest">Navegación</span>
-                {navItems.map((item) => renderNavLink(item, true))}
+            <div className="flex-1 overflow-y-auto px-2 pb-8 no-scrollbar">
+              <div className="px-4 mb-6">
+                <form onSubmit={handleSearch} className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
+                  <Input 
+                    placeholder="¿Qué buscas?" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-white/5 border-white/10 rounded-xl pl-10 h-11 text-white"
+                  />
+                </form>
               </div>
-              
-              <div className="h-[1px] bg-white/5 mx-4" />
-              
-              <div className="flex flex-col gap-4">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Mi Cuenta</span>
-                <div className="px-2">
-                  <AuthButton />
-                </div>
-              </div>
+
+              {/* Lista Unificada Mobile */}
+              <ServiceList onItemClick={() => setIsMenuOpen(false)} />
             </div>
 
-            {/* Footer del Menú */}
-            <div className="p-8 text-center border-t border-white/5">
-              <p className="text-[10px] text-slate-600 font-medium uppercase tracking-tighter">
-                Conectando Jujuy © 2026
-              </p>
+            <div className="p-6 border-t border-white/5 bg-slate-900/50 space-y-4">
+              <AuthButton />
+              <div className="flex justify-center"><InstallAppMenuItem /></div>
             </div>
           </div>
         </div>
       )}
 
-      {/* 8. ESPACIADOR DINÁMICO:
-          En Home, el contenido va detrás de la Navbar (transparente).
-          En otras páginas, este div empuja el contenido 80px hacia abajo para que la Navbar sólida no lo tape. */}
+      {/* DIALOG RESULTADOS */}
+      <Dialog open={isSearchResultsOpen} onOpenChange={setIsSearchResultsOpen}>
+        <DialogContent className="bg-slate-900 border-white/10 text-white rounded-3xl">
+          <DialogHeader><DialogTitle>Resultados</DialogTitle></DialogHeader>
+          <div className="space-y-1 max-h-[50vh] overflow-y-auto no-scrollbar">
+            {searchResults.map((r) => (
+              <div 
+                key={r.href} 
+                onClick={() => { navigate(r.href); setIsSearchResultsOpen(false); }}
+                className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 cursor-pointer transition-colors"
+              >
+                <div>
+                  <div className="font-bold text-sm text-white">{r.label}</div>
+                  <div className="text-[10px] text-primary font-bold uppercase">{r.type}</div>
+                </div>
+                <ArrowRight className="h-4 w-4 text-slate-600" />
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {!isHomePage && <div className="h-20 w-full bg-slate-950" />}
     </>
   );

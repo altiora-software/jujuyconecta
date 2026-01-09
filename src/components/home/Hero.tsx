@@ -114,7 +114,13 @@ export function Hero() {
         <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-primary/20 blur-[120px] rounded-full" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] bg-emerald-500/10 blur-[100px] rounded-full" />
         {/* Trama de puntos sutil para textura */}
-        <div className="absolute inset-0 opacity-[0.15]" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', size: '30px 30px', backgroundSize: '40px 40px' }} />
+        <div
+          className="absolute inset-0 opacity-[0.15]"
+          style={{
+            backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)',
+            backgroundSize: '40px 40px'
+          }}
+        />
       </div>
 
       <div className="container relative z-10 mx-auto px-4 py-16 sm:py-24">

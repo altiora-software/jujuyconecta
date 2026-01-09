@@ -12,49 +12,12 @@ import {
   IntercityRoute,
 } from "@/components/transport/types";
 
-const STOPS_PAGE_SIZE = 1000;
-
-// Helper genérico por si después querés reutilizarlo
-async function fetchAllFromTable<T>(table: string): Promise<T[]> {
-  let all: T[] = [];
-  let page = 0;
-
-  while (true) {
-    const from = page * STOPS_PAGE_SIZE;
-    const to = from + STOPS_PAGE_SIZE - 1;
-
-    const { data, error } = await supabase
-      .from(table)
-      .select("*")
-      .range(from, to);
-
-    if (error) {
-      console.error(`Error cargando página ${page} de ${table}`, error);
-      break; // si querés ser más duro acá podés hacer: throw error;
-    }
-
-    if (!data || data.length === 0) {
-      break;
-    }
-
-    all = all.concat(data as T[]);
-
-    if (data.length < STOPS_PAGE_SIZE) {
-      // última página
-      break;
-    }
-
-    page += 1;
-  }
-
-  return all;
-}
-
 export function useTransportData() {
   // ------------------------------------
   // ESTADOS
   // ------------------------------------
   const [loading, setLoading] = useState(true);
+  const [stopsLoading, setStopsLoading] = useState(false); // Nuevo estado para feedback
 
   // URBANO
   const [lines, setLines] = useState<TransportLine[]>([]);
@@ -62,101 +25,104 @@ export function useTransportData() {
   const [rawStops, setRawStops] = useState<TransportRawStop[]>([]);
   const [reports, setReports] = useState<TransportReport[]>([]);
   const [companyNames, setCompanyNames] = useState<string[]>([]);
-  const [selectedCompanyName, setSelectedCompanyName] = useState<string | null>(
-    null
-  );
+  const [selectedCompanyName, setSelectedCompanyName] = useState<string | null>(null);
   const [selectedLineId, setSelectedLineId] = useState<string | undefined>();
 
   // PROVINCIAL
-  const [intercityCompanies, setIntercityCompanies] = useState<
-    IntercityCompany[]
-  >([]);
-  const [intercityRoutes, setIntercityRoutes] = useState<IntercityRouteUI[]>(
-    []
-  );
+  const [intercityCompanies, setIntercityCompanies] = useState<IntercityCompany[]>([]);
+  const [intercityRoutes, setIntercityRoutes] = useState<IntercityRouteUI[]>([]);
   const [intercitySchedulesCount, setIntercitySchedulesCount] = useState(0);
 
   // ------------------------------------
-  // FETCH URBANO (con paginación para paradas)
+  // FETCH URBANO (Optimizado)
   // ------------------------------------
   const loadUrbanData = async () => {
-    const [
-      { data: linesData, error: linesError },
-      { data: reportData, error: reportsError },
-      stopsData,
-      rawStopsData,
-    ] = await Promise.all([
-      supabase.from("transport_lines").select("*").order("number"),
-      supabase.from("transport_reports").select("*"),
-      fetchAllFromTable<TransportStop>("transport_stops"),
-      fetchAllFromTable<TransportRawStop>("transport_raw_stops"),
-    ]);
+    try {
+      // Ya NO cargamos todas las paradas aquí. Solo líneas y reportes (datos ligeros).
+      const [
+        { data: linesData, error: linesError },
+        { data: reportData, error: reportsError },
+      ] = await Promise.all([
+        supabase.from("transport_lines").select("*").order("number"),
+        supabase.from("transport_reports").select("*"),
+      ]);
 
-    if (linesError) console.error("Error cargando líneas urbanas", linesError);
-    if (reportsError) console.error("Error cargando reportes", reportsError);
+      if (linesError) throw linesError;
+      if (reportsError) throw reportsError;
 
-    const normalizedLines: TransportLine[] = (linesData || []).map(
-      (l: any) => ({
+      const normalizedLines: TransportLine[] = (linesData || []).map((l: any) => ({
         ...l,
-        // ojo: acá estabas pisando company_name con name
-        // si el schema cambió, revisá esto, pero te lo dejo igual que lo tenías
         company_name: l.name,
-      })
-    );
+      }));
 
-    setLines(normalizedLines);
-    setStops(stopsData || []);
-    setRawStops(rawStopsData || []);
-    setReports((reportData || []) as TransportReport[]);
+      setLines(normalizedLines);
+      setReports((reportData || []) as TransportReport[]);
 
-    const companies = Array.from(
-      new Set(normalizedLines.map((l) => l.name))
-    ).sort();
-    setCompanyNames(companies);
-
-    // si querés ver si pasaste los 1000:
-    // console.log("total stops", (stopsData || []).length);
-    // console.log("total rawStops", (rawStopsData || []).length);
+      const companies = Array.from(
+        new Set(normalizedLines.map((l) => l.name))
+      ).sort();
+      setCompanyNames(companies);
+    } catch (e) {
+      console.error("Error cargando líneas urbanas", e);
+    }
   };
 
   // ------------------------------------
-  // FETCH PROVINCIAL
+  // FETCH DE PARADAS BAJO DEMANDA (La clave de la eficiencia)
+  // ------------------------------------
+  useEffect(() => {
+    // Si no hay línea seleccionada, vaciamos paradas para liberar memoria
+    if (!selectedLineId) {
+      setRawStops([]);
+      setStops([]);
+      return;
+    }
+
+    const fetchStopsForLine = async () => {
+      setStopsLoading(true);
+      try {
+        // Traemos paradas filtradas por base de datos, no por JS
+        const [
+          { data: stopsData, error: stopsError },
+          { data: rawStopsData, error: rawStopsError }
+        ] = await Promise.all([
+          supabase.from("transport_stops").select("*").eq("line_id", selectedLineId),
+          supabase.from("transport_raw_stops").select("*").eq("line_id", selectedLineId)
+        ]);
+
+        if (stopsError) throw stopsError;
+        if (rawStopsError) throw rawStopsError;
+
+        setStops(stopsData || []);
+        setRawStops(rawStopsData || []);
+      } catch (e) {
+        console.error("Error cargando paradas de la línea seleccionada", e);
+      } finally {
+        setStopsLoading(false);
+      }
+    };
+
+    fetchStopsForLine();
+  }, [selectedLineId]);
+
+  // ------------------------------------
+  // FETCH PROVINCIAL (Se mantiene íntegro)
   // ------------------------------------
   const fetchIntercityCompanies = async () => {
-    const { data, error } = await supabase
-      .from("transport_companies")
-      .select("id, name");
-
-    if (error) {
-      console.error("Error cargando empresas interurbanas", error);
-      return [] as IntercityCompany[];
-    }
+    const { data, error } = await supabase.from("transport_companies").select("id, name");
+    if (error) return [];
     return data as IntercityCompany[];
   };
 
   const fetchIntercityRoutes = async () => {
-    const { data, error } = await supabase
-      .from("transport_intercity_routes")
-      .select("*")
-      .order("company_id");
-
-    if (error) {
-      console.error("Error cargando rutas interurbanas", error);
-      return [] as IntercityRoute[];
-    }
+    const { data, error } = await supabase.from("transport_intercity_routes").select("*").order("company_id");
+    if (error) return [];
     return data as IntercityRoute[];
   };
 
   const fetchIntercitySchedules = async () => {
-    const { data, error } = await supabase
-      .from("transport_intercity_schedules")
-      .select("*")
-      .order("departure_time", { ascending: true });
-
-    if (error) {
-      console.error("Error cargando horarios interurbanos", error);
-      return [] as any[];
-    }
+    const { data, error } = await supabase.from("transport_intercity_schedules").select("*").order("departure_time", { ascending: true });
+    if (error) return [];
     return data as any[];
   };
 
@@ -167,10 +133,7 @@ export function useTransportData() {
       fetchIntercitySchedules(),
     ]);
 
-    const schedulesByRoute: Record<
-      string,
-      { weekday: string[]; weekend: string[] }
-    > = {};
+    const schedulesByRoute: Record<string, { weekday: string[]; weekend: string[] }> = {};
 
     schedules.forEach((s: any) => {
       if (!schedulesByRoute[s.route_id]) {
@@ -185,10 +148,7 @@ export function useTransportData() {
 
     const finalRoutes: IntercityRouteUI[] = routes.map((r) => {
       const company = companies.find((c) => c.id === r.company_id);
-      const group = schedulesByRoute[r.id] || {
-        weekday: [],
-        weekend: [],
-      };
+      const group = schedulesByRoute[r.id] || { weekday: [], weekend: [] };
 
       return {
         id: r.id,
@@ -207,7 +167,7 @@ export function useTransportData() {
   };
 
   // ------------------------------------
-  // LOAD ALL DATA (UN SOLO useEffect)
+  // LOAD ALL DATA (Carga Inicial)
   // ------------------------------------
   useEffect(() => {
     const loadAll = async () => {
@@ -220,7 +180,6 @@ export function useTransportData() {
         setLoading(false);
       }
     };
-
     loadAll();
   }, []);
 
@@ -236,7 +195,6 @@ export function useTransportData() {
 
   const linesWithReports = useMemo(() => {
     const ids = new Set(reports.map((r) => r.line_id));
-    // ojo: acá devolvés un número, no un array
     return lines.filter((l) => ids.has(l.id)).length;
   }, [lines, reports]);
 
@@ -245,6 +203,7 @@ export function useTransportData() {
   // ------------------------------------
   return {
     loading,
+    stopsLoading, // Devuelto para mostrar spinners en MapTab o Dialogs
 
     // urbano
     lines,
