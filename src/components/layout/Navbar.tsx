@@ -39,6 +39,7 @@ const SEARCH_ITEMS: SearchItem[] = [
 ];
 
 const servicesByTab: Record<string, { label: string; href: string }[]> = {
+  Emprendimientos: [{ label: "Marketplace Local", href: "/servicios/marketplace" }],
   Plataforma: [
     { label: "Portal de Noticias", href: "https://diario.jujuyconecta.com" },
   ],
@@ -52,7 +53,6 @@ const servicesByTab: Record<string, { label: string; href: string }[]> = {
     { label: "Hoteles", href: "/turismo?tab=hotels" },
     { label: "Conocé Cosquin Rock", href: "/cosquin-rock-2026" },
   ],
-  Emprendimientos: [{ label: "Marketplace Local", href: "/servicios/marketplace" }],
   Formación: [
     { label: "Alertas de Seguridad", href: "/security" },
     { label: "Cursos y Talleres", href: "/servicios/cursos" },
@@ -204,7 +204,7 @@ export function Navbar() {
               </button>
 
               {isServicesOpen && (
-                <div className="absolute right-0 mt-4 w-72 max-h-[70vh] overflow-y-auto bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-4 no-scrollbar animate-in fade-in zoom-in duration-200">
+                <div className="absolute right-0 mt-4 w-80 max-h-[70vh] overflow-y-auto bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-2 no-scrollbar animate-in fade-in zoom-in duration-200">
                   <ServiceList onItemClick={() => setIsServicesOpen(false)} />
                 </div>
               )}
