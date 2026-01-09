@@ -42,6 +42,11 @@ const servicesByTab: Record<string, { label: string; href: string }[]> = {
   Plataforma: [
     { label: "Portal de Noticias", href: "https://diario.jujuyconecta.com" },
   ],
+  "Servicios Públicos": [
+    { label: "Transporte y Mapas", href: "/transport" },
+    { label: "Bolsa de trabajo local", href: "/jobs" },
+    { label: "Recursos Sociales", href: "/resources" },
+  ],
   Turismo: [
     { label: "Mapa Turístico", href: "/turismo" },
     { label: "Hoteles", href: "/turismo?tab=hotels" },
@@ -51,11 +56,6 @@ const servicesByTab: Record<string, { label: string; href: string }[]> = {
   Formación: [
     { label: "Alertas de Seguridad", href: "/security" },
     { label: "Cursos y Talleres", href: "/servicios/cursos" },
-  ],
-  "Servicios Públicos": [
-    { label: "Recursos Sociales", href: "/resources" },
-    { label: "Transporte y Mapas", href: "/transport" },
-    { label: "Bolsa de trabajo local", href: "/jobs" },
   ],
 };
 
