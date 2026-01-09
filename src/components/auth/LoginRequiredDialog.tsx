@@ -49,7 +49,7 @@ export default function LoginRequiredDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => (!v ? onClose() : null)}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg z-[100]">
         <DialogHeader>
           <DialogTitle>Ingresá para usar el asistente</DialogTitle>
           <DialogDescription>
